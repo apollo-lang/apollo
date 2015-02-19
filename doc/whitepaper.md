@@ -1,6 +1,4 @@
-# The Apollo Programming Language
-
-Language Whitepaper
+# Apollo Language Whitepaper
 
 Contributors:
 
