@@ -21,17 +21,6 @@ There are a number of extant music programming languages such as [RTcmix][] and 
 
 Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifics of musical articulation are eschewed. In the place of deep --- but complex --- sonic articulation, the programmer should be able to interpret familiar data-values using a `play` function or optionally act on a discrete note-type. Instead of conceiving of specific musical compositions prior to programming, the user conceives of a program that is transformed into music during execution. Apollo thus takes a more experimental approach where the programmer is able to *become* a musician through the act of programming.
 
-We hope to...
-
-- Exploring the sound of algorithms
-- Create chance music
-- Prototype music
-
----
-
-- cross the sensory and the rational
-- enable correspondence between shape and form to be visible
-
 [RTcmix]: http://rtcmix.org
 [SuperCollider]: http://supercollider.sourceforge.net
 
@@ -39,7 +28,7 @@ Language Features
 -----------------
 
 - Statically typed
-- Multi-paradigm (including functional tools)
+- Light-weight functional tools
 - Interpreted / Compiled
 
 Implementation
