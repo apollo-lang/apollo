@@ -27,27 +27,57 @@ Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifi
 Language Features
 -----------------
 
+- Simple
+- Abstract
 - Statically-typed
 - Imperative, but with light-weight functional tools
 - Interpreted
 - First-class functions
 - Concise --- to a degree alike Python or Ruby, but with the addition of explicit typing
-- Single-threaded
 - Easily usable by musicians and programmers alike with minimal learning curve
-- Abstracted
-- Simple
-
-Implementation
---------------
-
-- Maintains a record of notes in global state that are ultimately used to create a music file
 - Uses MIDI as a representation of music
-- reasoning about music logically by leveraging light-weight functional programming
-- code as music
-- ability to reach to note values, or to interpret
+- Single-threaded
 
-Use Cases
----------
+Use Case
+--------
 
+The algorithm for producing a number in the Fibonacci sequence given its index presents an interesting use case for Apollo. The algorithm is both simple and familiar; however, it yields interesting consequences when return values are translated to musical notes.
 
+*Note that the below is intended as a sketch of functionality. The syntax used is alike a statically-typed variant of Python for the sake of familiarity, but may not be the exact syntax used by Apollo.*
+
+    def fib(n: Int) -> Int
+        if n == 0:
+            play(0)
+        elif n == 1:
+            play(1)
+        else:
+            play(fib(n-1) + fib(n-2))
+
+First, a few of Apollo's constructs must be explained in brief. The `play` function maps a given integer value (for example) to a scaled note. The note is then added in sequence to the global representation of a composition and then the value of the integer argument is returned by the function. The composition's representation is not unlike an array where elements occur in sequential units of time. After the program executes, the composition is translated to MIDI and printed to `stdout` so that it may be piped to a file.
+
+The result of executing the above code is distinct from simply mapping the play function over a pre-determined section of the Fibonacci sequence. The latter would produce a result to the effect of mapping play over the sequence `[0, 1, 1, 2, 3]` if given the number 4. The former sounds intermediary values in sequence, effectively building a depth-first parsing of recursive parse tree in sound. Visually, this would be represented as follows:
+
+*In the tree below, non-terminal nodes represent indices of the Fibonacci sequence for which recusive calls to `fib` are made. Terminal nodes represent return values, which are then propogated up through the tree.*
+
+                                    (4)
+                                  /     \
+                                 /       \
+                                /         \
+                              (3)    +     (2)
+                             /   \        /   \
+                            /     \      /     \
+                          (2)  +  (1)  (1)  +  (0)
+                         /   \     |    |       |
+                       (1) + (0)   1    1       0
+                        |     |
+                        1     0
+
+The tree above propagates into the following sequence to be played `[1, 0, 1, 1, 2, 1, 0, 1, 3]`. By a simple modification of a Fibonacci...
+
+---
+
+- the sound of process
+- sound; data vs algos
+- hopefully sonically interesting as well
+    - simple process, but illustrates truths (and also sonically interesting)
 
