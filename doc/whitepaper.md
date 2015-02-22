@@ -27,18 +27,27 @@ Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifi
 Language Features
 -----------------
 
-- Statically typed
-- Light-weight functional tools
-- Interpreted / Compiled
+- Statically-typed
+- Imperative, but with light-weight functional tools
+- Interpreted
+- First-class functions
+- Concise --- to a degree alike Python or Ruby, but with the addition of explicit typing
+- Single-threaded
+- Easily usable by musicians and programmers alike with minimal learning curve
+- Abstracted
+- Simple
 
 Implementation
 --------------
 
+- Maintains a record of notes in global state that are ultimately used to create a music file
+- Uses MIDI as a representation of music
 - reasoning about music logically by leveraging light-weight functional programming
 - code as music
 - ability to reach to note values, or to interpret
-- MIDI...; another kind of abstraction
 
 Use Cases
 ---------
+
+
 
