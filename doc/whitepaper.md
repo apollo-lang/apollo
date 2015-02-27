@@ -7,7 +7,7 @@ Team number 8. Contributors:
 - **Language & Tools Guru:** Benjamin Matthew Kogan (bmk2130)
 - **System Integrator:** Javier Llaca (jl3960)
 - **Project Manager:** Reza Nayebi (rn2324)
-- **System Integrator:** Souren Sarkis Papazian (ssp2155)
+- **System Architect:** Souren Sarkis Papazian (ssp2155)
 
 Implementation language: Haskell.
 
