@@ -1,6 +1,6 @@
 -- Parser for a simple imperative grammar
 
-module ParseWhile where
+module SimpleParser where
 
 -- Imports
 
