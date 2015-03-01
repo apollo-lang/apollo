@@ -17,7 +17,9 @@
 
 ## Functions
 
-	func (x: Int) -> String {
+Comparison of braces vs `end`:
+
+	func greet(x: Int) -> String {
 	  case x < 10 {
 	    'hi'
 	  } case x > 10 {
@@ -27,9 +29,9 @@
 	  }
 	}
 
-	func (x: Int) -> String
+	def greet(x: Int) -> String
 	    case x < 10
-		'hi'
+	        'hi'
 	    case x > 10
 	       'ho'
 	    otherwise
@@ -37,7 +39,6 @@
 	    end
 	end
 
-	def fff(x) if x > 10 then 'hi' else 'ho' end end
+	func greet(x) { if x > 10 { 'hi' } else { 'ho' } }
 
-	def fff(x) { if x > 10 { 'hi' } else { 'ho' } }
-
+	def greet(x) if x > 10 then 'hi' else 'ho' end end
