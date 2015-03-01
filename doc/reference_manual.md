@@ -31,7 +31,7 @@ Comparison of braces vs `end`:
 
 	def greet(x: Int) -> String
 	    case x < 10
-	        'hi'
+	       'hi'
 	    case x > 10
 	       'ho'
 	    otherwise
