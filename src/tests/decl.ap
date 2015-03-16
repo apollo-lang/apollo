@@ -1,0 +1,50 @@
+// Value declaration
+x : Int = 3
+
+/*
+ * Variables can be set to blocks
+ * The value of a block is the value of its last expression
+ */
+a : Int = {
+    x : Int = 3
+    y : Int = 4
+    z : Int = 5
+}
+
+// Function declaration
+add : (a : Int, b : Int) -> Int = 4
+
+/*
+ * AST for this program
+
+Program
+    [Assign 
+        (Var "x" 
+            (DataType "Int")) 
+        (Val 3),
+    Assign
+        (Var "a" 
+            (DataType "Int"))
+        (Block
+            [Assign
+                (Var "x" 
+                    (DataType "Int"))
+                (Val 3),
+            Assign
+                (Var "y"
+                    (DataType "Int"))
+                (Val 4),
+            Assign
+                (Var "z"
+                    (DataType "Int"))
+                (Val 5)]),
+    Assign
+           (Var "add"
+                (Function
+                    [Var "a"
+                        (DataType "Int"),
+                    Var "b"
+                        (DataType "Int")]
+                "Int"))
+           (Val 4)]
+ */
