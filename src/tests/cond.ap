@@ -1,27 +1,48 @@
-fib : (n : Int) -> Int = case (0) 1 otherwise 10
+/* Conditionals */
 
-case (0) 1 case (2) 3 otherwise 4
+foo : (n : Int) -> Int = case (0) 1 otherwise 10
+
+case (0)
+    1
+case (2)
+    3
+otherwise
+    4
+
+// -----------
+// Program AST
+// -----------
 
 /*
- * AST for this program
 
 Program
     [Assign 
-        (Var "fib" 
+        (Var 
+            "fib" 
             (FunctionType 
-                [Var "n" 
-                    (DataType "Int")] 
-            "Int"))
+                [Var 
+                    "n" 
+                    (DataType 
+                        "Int")] 
+                "Int"))
         (Cond 
-            (Val 0) 
-            (Val 1) 
-            (Val 10)),
+            (Val 
+                0) 
+            (Val 
+                1) 
+            (Val 
+                10)),
     Cond 
-        (Val 0) 
-        (Val 1) 
+        (Val 
+            0) 
+        (Val 
+            1) 
         (Cond 
-            (Val 2) 
-            (Val 3) 
-            (Val 4))]
+            (Val 
+                2) 
+            (Val 
+                3) 
+            (Val 
+                4))]
 
  */

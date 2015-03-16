@@ -1,4 +1,6 @@
-// Value declaration
+/* Declarations */
+
+// Values
 x : Int = 3
 
 /*
@@ -14,37 +16,61 @@ a : Int = {
 // Function declaration
 add : (a : Int, b : Int) -> Int = 4
 
+// -----------
+// Program AST
+// -----------
+
 /*
- * AST for this program
 
 Program
     [Assign 
-        (Var "x" 
-            (DataType "Int")) 
-        (Val 3),
+        (Var 
+            "x" 
+            (DataType 
+                "Int")) 
+        (Val 
+            3),
     Assign
-        (Var "a" 
-            (DataType "Int"))
+        (Var 
+            "a" 
+            (DataType 
+                "Int"))
         (Block
             [Assign
-                (Var "x" 
-                    (DataType "Int"))
-                (Val 3),
+                (Var
+                    "x" 
+                (DataType
+                    "Int"))
+                (Val 
+                    3),
             Assign
-                (Var "y"
-                    (DataType "Int"))
-                (Val 4),
+                (Var
+                    "y"
+                    (DataType
+                        "Int"))
+                (Val 
+                    4),
             Assign
-                (Var "z"
-                    (DataType "Int"))
-                (Val 5)]),
+                (Var
+                    "z"
+                    (DataType
+                        "Int"))
+                (Val
+                    5)]),
     Assign
-           (Var "add"
+           (Var
+                "add"
                 (Function
-                    [Var "a"
-                        (DataType "Int"),
-                    Var "b"
-                        (DataType "Int")]
-                "Int"))
-           (Val 4)]
+                    [Var
+                        "a"
+                        (DataType 
+                            "Int"),
+                    Var 
+                        "b"
+                        (DataType 
+                            "Int")]
+                    "Int"))
+           (Val 
+                4)]
+
  */
