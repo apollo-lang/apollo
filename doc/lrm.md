@@ -23,10 +23,9 @@ programming types like integers can be interpreted by the compiler as musical
 sequences. At the same time, more experienced musicians can directly manipulate
 note and chord types while leveraging Apollo's programming constructs to create
 novel compositions. In effect, Apollo empowers the programmer to hear the sound
-of algorithms and the musician to compose in code.
+of algorithms and the musician to compose in code.  An Apollo source program 
+produces as output a MIDI file, which is a standardized way to store a musical piece.
 
-**TODO:** explanation of flow of a program; a composition (notes /
-abstractions) -> midi at end
 
 ### Why is it called Apollo?
 
@@ -39,7 +38,7 @@ Functional Constructs
 
 Since the functional programming paradigm encompasses a number of different
 programming constructs, it is useful to describe the manner in which Apollo is
-a functional language.
+a functional language. 
 
 **TODO**: functional purity in scope making a typical program, immutability; IO
 handled by frame
@@ -337,25 +336,25 @@ rather than a memory-reference value, for example.
 
 If the expressions both have integral type, then `>` yields `True` if and only
 if the expression on the left side is larger than the expression on the right
-side
+side.
 
 #### `expression < expression`
 
 If the expressions both have integral type, then `<` yields `True` if and only
 if the expression on the left side is smaller than the expression on the right
-side
+side.
 
 #### `expression >= expression`
 
 If the expressions both have integral type, then `>=` yields `True` if and only
 if the expression on the left side is larger than or equal to the expression on
-the right side
+the right side.
 
 #### `expression <= expression`
 
 If both expressions have integral type, then `<=` yields `True` if and only if
 the expression on the left side is smaller than or equal to the expression on
-the right side
+the right side.
 
 #### `expression && expression`
 
@@ -392,7 +391,7 @@ expressions are `False`.
 | `=`      | assignment            | 0          | N/A[^assn]    |
 
 [^assn]: multiple-assignment is not allowed, so associativity rules are not
-applicable to the assignment operator
+applicable to the assignment operator.
 
 Functions
 ---------
@@ -425,7 +424,7 @@ A function consists of a declaration and definition. The declaration of square i
 square: (x: Int) -> Int
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-, which reads as "square is a function that takes an Int whose identifier is x and returns an Int."
+which reads as "square is a function that takes an Int whose identifier is x and returns an Int."
 
 The definition is whatever is to the right side of the assignment operator:
     
