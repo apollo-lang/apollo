@@ -15,17 +15,17 @@ Apollo Language Reference Manual
 Introduction
 ------------
 
-Apollo is a functional programming language for algorithmic musical
-composition. Apollo is intended to be usable by a programmer with knowledge of
-basic functional constructs and no prior experience with music creation. The
+Apollo is a functional programming language for algorithmic music composition.
+Apollo is intended to be usable by a programmer with knowledge of basic
+functional constructs and no prior experience with music creation. The
 fine-details of synthesizing music are abstracted such that familiar
 programming types like integers can be interpreted by the compiler as musical
 sequences. At the same time, more experienced musicians can directly manipulate
 note and chord types while leveraging Apollo's programming constructs to create
 novel compositions. In effect, Apollo empowers the programmer to hear the sound
-of algorithms and the musician to compose in code.  An Apollo source program 
-produces as output a MIDI file, which is a standardized way to store a musical piece.
-
+of algorithms and the musician to compose in code.  An Apollo source program
+produces as output a MIDI file, which is a standardized way to store a musical
+piece.
 
 ### Why is it called Apollo?
 
@@ -130,37 +130,6 @@ behavior is undefined.
 Data Types
 ----------
 
-### Type System
-
-Apollo types are polymorphic. This means that a type can take on different
-shapes. Apollo types adhere to the following rules:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Pitch   : Int
-
-Duration: Int
-
-Rhythm	: Rhythm [Duration]
-
-Atom    : Note Pitch Duration
-        | Rest Duration
-        | Chord [Pitch] Duration
-
-Part    : Part [Atom]
-
-Music   : Music [Part]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The items on the left side are types; the items on the right side are instances
-of those types, together with their components.
-
-Consider the `Atom` type. The `Atom` type has three instances with names
-`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
-parameters: the first one with type Pitch and the second one with type
-Duration.
-
-Types like Pitch and Duration are just different names for the Int type.
-
 All data types are named beginning with a capital letter, as to distinguish
 them from identifiers.
 
@@ -237,12 +206,13 @@ of three components:
 These are some examples:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\1		-- Whole note. Equivalent to 64
-\2		-- Half note.Equivalent 32
-\4		-- Quarter note. Equivalent to 16
-\8      -- Eigth note. Equivalent
-\16     -- Sixteenth note, or 4 64th notes
-\32     -- Thirtysecond note, or 2 64th notes
+\1		-- Whole note.          Equivalent to 64
+\2		-- Half note.           Equivalent to 32
+\4		-- Quarter note.        Equivalent to 16
+\8      -- Eigth note.          Equivalent to 8
+\16     -- Sixteenth note.      Equivalent to 4
+\32     -- Thirtysecond note.   Equivalent to 2
+\64     -- Sixtyfourth note.    Equivalent to 1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using this notation, one can declare a Duration in the following way:
@@ -254,7 +224,7 @@ d: Duration = \4
 This notation can be described by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`\[0-9]+\.?`
+\\[0-9]+\.?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that for `Duration` and `Pitch`, initialization to a number outside of the
@@ -331,6 +301,37 @@ one exception is lists, which are declared using brackets: `[...]`.
 
 	song: Music = Music([lead, back])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Type System
+
+Apollo types are polymorphic. This means that a type can take on different
+shapes. Apollo types adhere to the following rules:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pitch   : Int
+
+Duration: Int
+
+Rhythm	: Rhythm [Duration]
+
+Atom    : Note Pitch Duration
+        | Rest Duration
+        | Chord [Pitch] Duration
+
+Part    : Part [Atom]
+
+Music   : Music [Part]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The items on the left side are types; the items on the right side are instances
+of those types, together with their components.
+
+Consider the `Atom` type. The `Atom` type has three instances with names
+`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
+parameters: the first one with type Pitch and the second one with type
+Duration.
+
+Types like Pitch and Duration are just different names for the Int type.
 
 Operators
 ---------
@@ -505,7 +506,7 @@ Now we can use our two functions to declare a new function, pow4, which takes
 an integer x and returns x^4.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pow4: (x: Int) -> Int = twice(square, x) -- returns x^4
+pow4: (x: Int) -> Int = twice(square, x)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Functions can be recursive, that is, they can call themselves. Consider the
@@ -561,7 +562,7 @@ cannot be used for any kind of resulting value. As such, the following is
 invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int = x: Int = 4 -- compile-time error
+y: Int = x: Int = 4     -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because names are immutable in Apollo, any name must be defined in the same
@@ -569,7 +570,7 @@ line that it is declared. Declaring a name without a value is not allowed, and
 so the following is invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int -- compile-time error
+y: Int                  -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Value Expressions
@@ -601,8 +602,8 @@ area of a cylinder:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
-    sideArea: Int = 2 * r * pi * h
-    baseArea: Int = 2 * r * r
+    sideArea: Int = 2 * pi * r * h
+    baseArea: Int = 2 * pi * r * r
     sideArea + 2 * baseArea
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -610,7 +611,7 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 ##### Two: without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cylinderArea: (r: Int, h: Int) -> Int = 2 * r * pi * h + 2 * (2 * r * r)
+cylinderArea: (r: Int, h: Int) -> Int = 2 * pi * r * h + 2 * (2 * pi * r * r)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Both versions produce the same result, but the first one is arguably more
@@ -679,25 +680,62 @@ Grammar
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Program     : Expressions
+
 Expressions : Expression
             | Expression Expressions
+
 Expression  : Assignment
             | Value
+            | UnOp Value
+            | Value BinOp Value
             | Block
             | Conditional
+
 Assignment  : Declaration '=' Expression
+
 Declaration : ID ':' Type
             | ID ':' FnType
+
 Type        : Int
             | Bool 
-            | Note
             | Pitch
+            | Duration
+            | Atom
+            | Music
             | FnType
+
 FnType      : '(' Params ')' '->' ID
+
 Params      : Declaration
             | Declaration ',' Params
-Value       : NUM
+
+Value       : '(' Value ')'
+            | NUM
+            | Constructor '(' Vals ')'
+
+Vals        : Value
+            | Value ',' Vals
+
+UnOp        : '-' 
+            | '!'
+
+BinOp       : '+'
+            | '-'
+            | '*'
+            | '/'
+            | '%'
+            | '='
+            | '=='
+            | '!=' 
+            | '<'
+            | '>'
+            | '<=' 
+            | '>='
+            | '&&'
+            | '||'
+
 Block       : '{' Expressions '}'
+
 Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
             | CASE '(' Expression ')' Expression Conditional
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
