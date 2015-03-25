@@ -15,17 +15,17 @@ Apollo Language Reference Manual
 Introduction
 ------------
 
-Apollo is a functional programming language for algorithmic musical
-composition. Apollo is intended to be usable by a programmer with knowledge of
-basic functional constructs and no prior experience with music creation. The
+Apollo is a functional programming language for algorithmic music composition.
+Apollo is intended to be usable by a programmer with knowledge of basic
+functional constructs and no prior experience with music creation. The
 fine-details of synthesizing music are abstracted such that familiar
 programming types like integers can be interpreted by the compiler as musical
 sequences. At the same time, more experienced musicians can directly manipulate
 note and chord types while leveraging Apollo's programming constructs to create
 novel compositions. In effect, Apollo empowers the programmer to hear the sound
-of algorithms and the musician to compose in code.  An Apollo source program 
-produces as output a MIDI file, which is a standardized way to store a musical piece.
-
+of algorithms and the musician to compose in code.  An Apollo source program
+produces as output a MIDI file, which is a standardized way to store a musical
+piece.
 
 ### Why is it called Apollo?
 
@@ -129,37 +129,6 @@ behavior is undefined.
 
 Data Types
 ----------
-
-### Type System
-
-Apollo types are polymorphic. This means that a type can take on different
-shapes. Apollo types adhere to the following rules:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Pitch   : Int
-
-Duration: Int
-
-Rhythm	: Rhythm [Duration]
-
-Atom    : Note Pitch Duration
-        | Rest Duration
-        | Chord [Pitch] Duration
-
-Part    : Part [Atom]
-
-Music   : Music [Part]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The items on the left side are types; the items on the right side are instances
-of those types, together with their components.
-
-Consider the `Atom` type. The `Atom` type has three instances with names
-`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
-parameters: the first one with type Pitch and the second one with type
-Duration.
-
-Types like Pitch and Duration are just different names for the Int type.
 
 All data types are named beginning with a capital letter, as to distinguish
 them from identifiers.
@@ -331,6 +300,37 @@ one exception is lists, which are declared using brackets: `[...]`.
 
 	song: Music = Music([lead, back])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Type System
+
+Apollo types are polymorphic. This means that a type can take on different
+shapes. Apollo types adhere to the following rules:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pitch   : Int
+
+Duration: Int
+
+Rhythm	: Rhythm [Duration]
+
+Atom    : Note Pitch Duration
+        | Rest Duration
+        | Chord [Pitch] Duration
+
+Part    : Part [Atom]
+
+Music   : Music [Part]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The items on the left side are types; the items on the right side are instances
+of those types, together with their components.
+
+Consider the `Atom` type. The `Atom` type has three instances with names
+`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
+parameters: the first one with type Pitch and the second one with type
+Duration.
+
+Types like Pitch and Duration are just different names for the Int type.
 
 Operators
 ---------
@@ -505,7 +505,7 @@ Now we can use our two functions to declare a new function, pow4, which takes
 an integer x and returns x^4.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pow4: (x: Int) -> Int = twice(square, x) -- returns x^4
+pow4: (x: Int) -> Int = twice(square, x)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Functions can be recursive, that is, they can call themselves. Consider the
@@ -679,25 +679,61 @@ Grammar
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Program     : Expressions
+
 Expressions : Expression
             | Expression Expressions
+
 Expression  : Assignment
             | Value
+            | UnOp Value
+            | Value BinOp Value
             | Block
             | Conditional
+
 Assignment  : Declaration '=' Expression
+
 Declaration : ID ':' Type
             | ID ':' FnType
+
 Type        : Int
             | Bool 
-            | Note
             | Pitch
+            | Duration
+            | Atom
+            | Music
             | FnType
+
 FnType      : '(' Params ')' '->' ID
+
 Params      : Declaration
             | Declaration ',' Params
+
 Value       : NUM
+            | Constructor '(' Vals ')'
+
+Vals        : Value
+            | Value ',' Vals
+
+UnOp        : '-' 
+            | '!'
+
+BinOp       : '+'
+            | '-'
+            | '*'
+            | '/'
+            | '%'
+            | '='
+            | '=='
+            | '!=' 
+            | '<'
+            | '>'
+            | '<=' 
+            | '>='
+            | '&&'
+            | '||'
+
 Block       : '{' Expressions '}'
+
 Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
             | CASE '(' Expression ')' Expression Conditional
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
