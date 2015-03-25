@@ -276,9 +276,9 @@ If both expressions are of `Bool` type, then `||` yields true if at least one of
 | `>=`     | greater than or equal | 3          | left          |
 | `&&`     | logical AND           | 2          | left          |
 | `||`     | logical OR            | 1          | left          |
-| `=`      | assignment            | 0          | N/A\*         |
+| `=`      | assignment            | 0          | N/A[^assn]    |
 
-\*: multiple-assignment is not allowed
+[^assn]: multiple-assignment is not allowed, so associativity rules are not applicable to the assignment operator
 
 ### Declaration
 
