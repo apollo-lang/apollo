@@ -47,10 +47,8 @@ handled by frame
 Lexical Elements
 ----------------
 
-Apollo has seven types of tokens: keywords, identifiers, constants, literals,
-operators and separators.
-
-Whitespace and comments are ignored.
+Apollo has five types of tokens: keywords, identifiers, constants, operators
+and separators.
 
 All language constructs are written in camel-case; user-defined names should
 also follow this naming convention.
@@ -93,43 +91,6 @@ Data Types).
 
 Either `True` or `False`.
 
-### Literals
-
-There are two types of literals: pitch literals and duration literals.
-
-#### Pitch Literal
-
-A backtick, followed by a single letter character indicating the note, followed
-by an optional `#` or `b` character indicating the accidental (sharp or flat,
-respectively), followed by a number indicating the octave.
-
-For example:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`a#5
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The backtick indicates that you are defining a pitch.
-
-The character for the note must be in the range `[a-g]`. In this case it is the
-note `a`.
-
-Not including an accidental indicates that the note is natural. In this case we
-make the pitch a sharp by using `#`. The integer for the octave must be in the
-range `[0-10]`. In this case we use the pitch `a` in the fifth octave.
-
-This notation is inspired by the way notes are defined in MIDI.
-
-#### Duration Literal
-
-A backslash, followed by a natural number indicating the fraction of a whole
-note.
-
-For example, a quarter note:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\4
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Operators
 
@@ -168,21 +129,74 @@ them from identifiers.
  * `Bool`: boolean value; either `True` or `False`.
  * `Pitch`: a type alias for an `Int` that ranges from 0 to 127, interpreted
     as a musical pitch. A `Pitch` may be initialized using an integer or a
-    macro that indicates note, accidental, and ocatave:
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	d: Pitch = 123  -- integer initialization
-	d: Pitch = `d#3 -- macro initialization
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    macro that indicates note, accidental, and octave:
 
  * `Duration`: describes the duration of a `Note` or `Chord` and is also a type
    alias for `Int`, ranging from 1 to 256, indicating the multiple of the
    smallest possible duration (which itself is a 64th note or a 64th of a beat
-   in 4/4 time). For example, a duration of 64 would be one beat. A `Duration`
-   can also be declared as a literal using a backward slash and an integer. The
-   integer denotes the fraction of a whole note. Duration literals are
-   syntactic sugar and are thus an optional alternative to using only integers
-   to declare duration. See the section on macros for more information.
+   in 4/4 time). For example, a duration of 64 would be one beat. 
+
+#### Short-hand notation for pitch and duration
+
+##### Pitch
+
+A backtick, followed by a single letter character indicating the note, followed
+by an optional `#` or `b` character indicating the accidental (sharp or flat,
+respectively), followed by a number indicating the octave.
+
+For example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`a#5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The backtick indicates that you are defining a pitch.
+
+The character for the note must be in the range `[a-g]`. In this case it is the
+note `a`.
+
+Not including an accidental indicates that the note is natural. In this case we
+make the pitch a sharp by using `#`. The integer for the octave must be in the
+range `[0-10]`. In this case we use the pitch `a` in the fifth octave.
+
+This notation is inspired by the way notes are defined in MIDI. It can be
+described by the regular expression
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`[a-g](#|b)?[0-9]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##### Duration
+
+`Duration` types can be initialized using a short-hand notation, which consists
+of three components:
+
+ * A backslash `\`
+ * An integer from 1 to 64, denoting 
+ * An optional dot `.`, denoting dotted-rhythms
+
+These are some examples:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\1		-- whole note, or 64 64th notes
+\2		-- half note, or 32 64th notes
+\4		-- quarter note, or 16 64th notes
+\8      -- eigth note, or 8 64th notes
+\16     -- sixteenth note, or 4 64th notes
+\32     -- thirtysecond note, or 2 64th notes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using this notation, one can declare a Duration in the following way:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+d: Duration = \4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This notation can be described by the regular expression
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`\[0-9]+\.?`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that for `Duration` and `Pitch`, initialization to a number outside of the
 allowed range will result in a compile-time error.
@@ -200,8 +214,8 @@ one exception is lists, which are declared using brackets: `[...]`.
 	a: [Int] = [1, 2, 3]
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Atom`: a polymorphic type indicating a musical sound-unit. An `Atom` can be
-   initialized to either a `Note`, a `Chord`, or a `Rest`. For example:
+ * `Atom`: a polymorphic type indicating a musical sound-unit. Instances of
+    `Atom` can be either a `Note`, a `Chord`, or a `Rest`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	n: Atom = Note(`a5, \8)
@@ -209,21 +223,22 @@ one exception is lists, which are declared using brackets: `[...]`.
 	r: Atom = Rest(\4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Note`: a tuple consisting of a `Pitch` and a `Duration`. For example:
+ * `Note`: an instance of the Atom type consisting of a `Pitch` and a
+   `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	n: Atom = Note(`a5, \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Chord`: a tuple consisting of a list of `Pitch`es and a `Duration`. For
-   example:
+ * `Chord`: an instance of the `Atom` type consisting of a list of `Pitch`es
+    and a `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	c: Atom = Chord([`a5, `c#5, `e5], \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Rest`: a `Rest` is simply a `Duration` indicating a space in which no notes
-   are played. For example:
+ * `Rest`: an instance of the `Atom` type consisting of `Duration`. A `Rest`
+    indicates a space in which no notes are played. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	r: Atom = Rest(\4)
@@ -394,11 +409,65 @@ add: (x: Int, y: Int) -> Int = x + y
 Functions can be recursive, that is, they can call themselves. They can also be
 nested, that is, a function can contain one or more functions within itself.
 
+Functions and values are declared using the same syntax. Functions, however,
+have different types -- they take one or more types and return another type.
+Like mathematical functions, they map elements in one or more sets to an
+element in another set. Let's define a function that takes an integer x and
+returns its square.
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+square: (x: Int) -> Int = x * x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A function consists of a declaration and definition. The declaration of square is
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+square: (x: Int) -> Int
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+, which reads as "square is a function that takes an Int whose identifier is x and returns an Int."
+
+The definition is whatever is to the right side of the assignment operator:
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x * x
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that declarations cannot exist on their own; they require a definition.
+
+Functions in Apollo can be passed as parameters to other functions. Example:
+        
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+twice: (f: (n: Int) -> Int, x: Int) = f(f(x))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The twice function takes a function f and applies it twice to the argument x.
+Now we can use our two functions to declare a new function, pow4, which takes
+an integer x and returns x^4.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pow4: (x: Int) -> Int = twice(square, x) -- returns x^4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Functions can be recursive, that is, they can call themselves. Consider the
+following function for computing the factorial of an integer n:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+factorial: (n: Int) -> Int = 
+    case (n == 0) 1 otherwise n * factorial(n - 1)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As in all recursive functions, we need a base case to prevent infinite
+recursive calls. For this we use conditional statements. The functions reads as
+"the factorial of n is 1 if n is 0, otherwise it is n times the factorial
+of n - 1."
+ 
 Looping
 -------
 
-Looping is enabled using recursion. To create a subroutine that should loop, a
-recursive function can be defined. A simple example of a recursive loop:
+Looping can be simulated using recursion. To create a subroutine that should
+loop, a recursive function can be defined. A simple example of a recursive
+loop:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 addX: (foo: Int, x: Int) = case x == 0 { foo }
@@ -459,9 +528,15 @@ branch is evaluated.
 
 #### Blocks
 
-A block is a value expression consisting of one or more expressions and is delimited by curly braces. The value of a block is the value of its last expression. Therefore, the last expression of a block must be a value expression. The previous expressions, however, can be a combination of assignment and value expressions.
+A block is a value expression consisting of one or more expressions and is
+delimited by curly braces. The value of a block is the value of its last
+expression. Therefore, the last expression of a block must be a value
+expression. The previous expressions, however, can be a combination of
+assignment and value expressions.
 
-Blocks can be used to declare local-scope auxiliary values or functions. Consider the following two versions of a function that computes the surface area of a cylinder:
+Blocks can be used to declare local-scope auxiliary values or functions.
+Consider the following two versions of a function that computes the surface
+area of a cylinder:
 
 ##### One: using a block:
 
@@ -485,9 +560,18 @@ readable, modular, and easy to reason about.
 Control Flow
 ------------
 
-Conditionals are statements that perform different computations depending on whether a programmer-specified boolean condition evaluates to `True` or `False` in a sequence of such conditions.
+Conditionals are statements that perform different computations depending on
+whether a programmer-specified boolean condition evaluates to `True` or `False`
+in a sequence of such conditions.
 
-A conditional expression is a series of one or more `case` statements, followed by an `otherwise` statement. A case statement must be followed by a single parenthesis-enclosed expression that must evaluate to a `Bool`. The first `case` statement whose condition evaluates to `True` will be evaluated and the value it returns will be the value for the entire conditional statement. If no preceding case condition evaluates to `True`, the `otherwise` expression will be evaluated. Note that this means if multiple case conditions evaluate to `True`, only the first of these case expressions will be evaluated.
+A conditional expression is a series of one or more `case` statements, followed
+by an `otherwise` statement. A case statement must be followed by a single
+parenthesis-enclosed expression that must evaluate to a `Bool`. The first
+`case` statement whose condition evaluates to `True` will be evaluated and the
+value it returns will be the value for the entire conditional statement. If no
+preceding case condition evaluates to `True`, the `otherwise` expression will
+be evaluated. Note that this means if multiple case conditions evaluate to
+`True`, only the first of these case expressions will be evaluated.
 
 TODO: explain example
 
@@ -537,83 +621,41 @@ lead: Part = [(`a5, 10), (`b5, 10), (`c4, 10)]
 main: Music = Multi([lead, back])
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Type Hierarchy
+Type System
 --------------
 
+Apollo types are polymorphic. This means that a type can take on different
+shapes. Roughly speaking, Apollo types adhere to the following rules:
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-data Music
-	= SingleTrack Part
-| MultiTrack [Part]
+Music   : Music [Part]
 
-data Part
-	= Part [Atom]
+Part    : Part [Atom]
 
-data Atom
-	= Note Pitch Duration
-	| Rest Duration
-	| Chord [Pitch] Duration
+Atom    : Note Pitch Duration
+        | Rest Duration
+        | Chord [Pitch] Duration
 
-data Rhythm
-	= Rhythm [Duration]
+Rhythm	: Rhythm [Duration]
 
-type Pitch = Int
+Pitch   : Int
 
-type Duration = Int
+Duration: Int
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Syntax Features & "Syntactic Sugar"
+The items on the left side are types; the items on the right side are instances
+of those types, together with their components. Let's elaborate...
+
+Consider the `Atom` type. The `Atom` type has three instances with names
+`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
+parameters: the first one with type Pitch and the second one with type
+Duration.
+
+Types like Pitch and Duration are just different names for the Int type.
+
+Advanced Syntax Features & "Syntactic Sugar"
 -----------------------------------
 
-### Lists
-
-**TODO**
-
-### Duration Macros
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Regular expression: \\[0-9]+\.?
-
-Syntax
-
-\<denominator>
-
-\1		64
-\2		32
-\3		21	(floor)
-\4		16
-\8
-\16
-\32
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-### Pitch Macros
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Regular expression: `[a-g](#|b)?[0-9]
-
-`a5		a in the 5th octave
-
-a: Pitch = `a5
-b: Pitch = 123
-
-n: Note = (a, \3)
-
-vs
-
-n1: Note = `a64
-n1: Note = a:\64
-n2: Note = a5:\1
-n3: Note = 9
-
-p: Phrase = Phrase([(`a5,\1), `b5:3, `c5:3}
-
-p: Phrase = [(`a5, 1), (`b5, 3), (`c5, 3)]
-p: Phrase = {`a5, `b5, `c5} <= 1
-
-this could be cool hehe: |`a5, `b5, `c5|
-
-c: Chord = [(`c5, 3), (`e5, 2), (`g5, 1)]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Grammar
 -------
