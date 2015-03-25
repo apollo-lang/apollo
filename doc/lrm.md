@@ -572,8 +572,6 @@ preceding case condition evaluates to `True`, the `otherwise` expression will
 be evaluated. Note that this means if multiple case conditions evaluate to
 `True`, only the first of these case expressions will be evaluated.
 
-TODO: explain example
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 foo: Int = case (1 > 2) { 1 }
            case (False) { 2 }
@@ -581,6 +579,10 @@ foo: Int = case (1 > 2) { 1 }
            case (True)  { 4 }
            otherwise    { 5 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here foo is an integer whose value is determined by a case statement. The first two case
+statements evaluate to False and their return value is ignored. The third statement is the 
+first one to evaluate to True and foo is therefore assigned the value 3.
 
 Program Structure and Scope
 ---------------------------
