@@ -360,11 +360,11 @@ A block of code implicitly returns the value of its last expression. As such, a 
 
 #### Blocks
 
-A block is a value expression consisting of one or more expressions contained within curly braces. The value of a block is the value of its last expression. Therefore, the last expression of a block must be a value expression. The previous expressions, however, can be a combination of assignment and value expressions.
+A block is a value expression consisting of one or more expressions and is delimited by curly braces. The value of a block is the value of its last expression. Therefore, the last expression of a block must be a value expression. The previous expressions, however, can be a combination of assignment and value expressions.
 
-Blocks can be used to declare local-scope auxiliary values or functions. Consider the two versions of the following functions, which computes the surface area of a cylinder:
+Blocks can be used to declare local-scope auxiliary values or functions. Consider the following two versions of a function that computes the surface area of a cylinder:
 
-##### One:
+##### One: using a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
@@ -374,7 +374,7 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-##### Two:
+##### Two: without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = 2 * r * pi * h + 2 * (2 * r * r)
@@ -385,9 +385,19 @@ Both versions produce the same result, but the first one is arguably more readab
 Control Flow
 ------------
 
-Conditionals are statements that perform different computations depending on whether a programmer-specified boolean condition evaluates to `True` or `False`.
+Conditionals are statements that perform different computations depending on whether a programmer-specified boolean condition evaluates to `True` or `False` in a sequence of such conditions.
 
-TODO: explain case / otherwise; expression taht evaluates to a value, so must return same value for any branch
+A conditional expression is a series of one or more `case` statements, followed by an `otherwise` statement. A case statement must be followed by a single parenthesis-enclosed expression that must evaluate to a `Bool`. The first `case` statement whose condition evaluates to `True` will be evaluated and the value it returns will be the value for the entire conditional statement. If no preceding case condition evaluates to `True`, the `otherwise` expression will be evaluated. Note that this means if multiple case conditions evaluate to `True`, only the first of these case expressions will be evaluated.
+
+TODO: explain example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+foo: Int = case (1 > 2) { 1 }
+           case (False) { 2 }
+           case (True)  { 3 }
+           case (True)  { 4 }
+           otherwise    { 5 }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Program Structure and Scope
 ---------------------------
