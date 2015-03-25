@@ -33,12 +33,11 @@ Apollo combines the power of source code, or Apollonian logic, with the art of
 music, the domain of the god Apollo. The logo is derived from a combination of
 the f in functional and the f-hole opening in the body of a cello.
 
-Functional Constructs
----------------------
+Paradigm
+--------
 
-Since the functional programming paradigm encompasses a number of different
-programming constructs, it is useful to describe the manner in which Apollo is
-a functional language. 
+Apollo is a functional programming language, and thus incorporates the
+following patterns.
 
 ### First-class functions
 
@@ -50,7 +49,7 @@ Functions are first-class citizens in Apollo. This means that functions can be:
 
 Apollo variables are not like C variables, which can be manipulated and be
 changed during the execution of a program. A value can be bound to a type and
-a variable only once. This allows programs to be more safe easy to reason
+a variable only once. This allows programs to be more safe and easy to reason
 about. The return value of a function for a given input will always be the
 same, since there are is data mutation, or side effects.
 
@@ -292,12 +291,12 @@ one exception is lists, which are declared using brackets: `[...]`.
    example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	aMajor: Atom = Chord([`a5, `c#5, `e5])
-	bMinor: Atom = Chord([`b5, `d#5, `f#5])
-	eMajor: Atom = Chord([`e5, `g#5, `b5])
+	aMajor: Atom = Chord([`a5, `c#5, `e5], \4)
+	bMinor: Atom = Chord([`b5, `d#5, `f#5], \4)
+	eMajor: Atom = Chord([`e5, `g#5, `b5], \4)
 
 	back: Part = Part([aMajor, bMinor, eMajor])
-	lead: Part = Part([Note(`a5, 10), Note(`b5, 10), Note(`c4, 10)])
+	lead: Part = Part([Note(`a5, \4), Note(`f#5, \4), Note(`e4, \4)])
 
 	song: Music = Music([lead, back])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
