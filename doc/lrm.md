@@ -206,12 +206,13 @@ of three components:
 These are some examples:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\1		-- Whole note. Equivalent to 64
-\2		-- Half note.Equivalent 32
-\4		-- Quarter note. Equivalent to 16
-\8      -- Eigth note. Equivalent
-\16     -- Sixteenth note, or 4 64th notes
-\32     -- Thirtysecond note, or 2 64th notes
+\1		-- Whole note.          Equivalent to 64
+\2		-- Half note.           Equivalent to 32
+\4		-- Quarter note.        Equivalent to 16
+\8      -- Eigth note.          Equivalent to 8
+\16     -- Sixteenth note.      Equivalent to 4
+\32     -- Thirtysecond note.   Equivalent to 2
+\64     -- Sixtyfourth note.    Equivalent to 1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using this notation, one can declare a Duration in the following way:
@@ -223,7 +224,7 @@ d: Duration = \4
 This notation can be described by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\[0-9]+\.?
+\\[0-9]+\.?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that for `Duration` and `Pitch`, initialization to a number outside of the
