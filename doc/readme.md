@@ -12,7 +12,7 @@ You'll need [Pandoc][] though.
 [Pandoc]: http://johnmacfarlane.net/pandoc/
 
 Getting Pandoc Ready for Your Shit
-==================================
+----------------------------------
 
 > *Install pandoc and its bullshit dependencies.*
 
