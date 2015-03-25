@@ -2,9 +2,8 @@ import Parser
 import Expr
 
 ast :: String -> String
-ast input = show (parseProgram input)
+ast = show . parseProgram
 
 main :: IO ()
-main = do
-    input <- getContents
-    putStrLn $ ast input
+main = getContents >>= putStrLn . ast
+
