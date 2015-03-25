@@ -561,7 +561,7 @@ cannot be used for any kind of resulting value. As such, the following is
 invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int = x: Int = 4 -- compile-time error
+y: Int = x: Int = 4     -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because names are immutable in Apollo, any name must be defined in the same
@@ -569,7 +569,7 @@ line that it is declared. Declaring a name without a value is not allowed, and
 so the following is invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int -- compile-time error
+y: Int                  -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Value Expressions
@@ -602,7 +602,7 @@ area of a cylinder:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
     sideArea: Int = 2 * r * pi * h
-    baseArea: Int = 2 * r * r
+    baseArea: Int = 2 * pi * r * r
     sideArea + 2 * baseArea
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -708,7 +708,8 @@ FnType      : '(' Params ')' '->' ID
 Params      : Declaration
             | Declaration ',' Params
 
-Value       : NUM
+Value       : '(' Value ')'
+            | NUM
             | Constructor '(' Vals ')'
 
 Vals        : Value
