@@ -601,7 +601,7 @@ area of a cylinder:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
-    sideArea: Int = 2 * r * pi * h
+    sideArea: Int = 2 * pi * r * h
     baseArea: Int = 2 * pi * r * r
     sideArea + 2 * baseArea
 }
@@ -610,7 +610,7 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 ##### Two: without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cylinderArea: (r: Int, h: Int) -> Int = 2 * r * pi * h + 2 * (2 * r * r)
+cylinderArea: (r: Int, h: Int) -> Int = 2 * pi * r * h + 2 * (2 * pi * r * r)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Both versions produce the same result, but the first one is arguably more
