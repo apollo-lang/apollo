@@ -581,8 +581,8 @@ foo: Int = case (1 > 2) { 1 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here foo is an integer whose value is determined by a case statement. The first two case
-statements evaluate to False and their return value is ignored. The third statement is the 
-first one to evaluate to True and foo is therefore assigned the value 3.
+statements evaluate to `False` and their return value is ignored. The third statement is the 
+first one to evaluate to `True` and foo is therefore assigned the value `3`.
 
 Program Structure and Scope
 ---------------------------
