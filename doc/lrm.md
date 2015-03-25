@@ -25,9 +25,6 @@ note and chord types while leveraging Apollo's programming constructs to create
 novel compositions. In effect, Apollo empowers the programmer to hear the sound
 of algorithms and the musician to compose in code.
 
-**TODO:** explanation of flow of a program; a composition (notes /
-abstractions) -> midi at end
-
 ### Why is it called Apollo?
 
 Apollo combines the power of source code, or Apollonian logic, with the art of
@@ -37,12 +34,22 @@ the f in functional and the f-hole opening in the body of a cello.
 Functional Constructs
 ---------------------
 
-Since the functional programming paradigm encompasses a number of different
-programming constructs, it is useful to describe the manner in which Apollo is
-a functional language.
+Apollo is a functional programming language and thus incorporates functional
+programming patters.
 
-**TODO**: functional purity in scope making a typical program, immutability; IO
-handled by frame
+### First-class functions
+
+Functions are first-class citizens in Apollo. This means that functions can be:
+ * passed as function parameters
+ * returned as values by other functions
+
+### Immutable data
+
+Apollo variables are not like C variables, which can be manipulated and be
+changed during the execution of a program. A value can be bound to a type and
+a variable only once. This allows programs to be more safe easy to reason
+about. The return value of a function for a given input will always be the
+same, since there are is data mutation, or side effects.
 
 Lexical Elements
 ----------------
@@ -120,6 +127,37 @@ behavior is undefined.
 Data Types
 ----------
 
+### Type System
+
+Apollo types are polymorphic. This means that a type can take on different
+shapes. Apollo types adhere to the following rules:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pitch   : Int
+
+Duration: Int
+
+Rhythm	: Rhythm [Duration]
+
+Atom    : Note Pitch Duration
+        | Rest Duration
+        | Chord [Pitch] Duration
+
+Part    : Part [Atom]
+
+Music   : Music [Part]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The items on the left side are types; the items on the right side are instances
+of those types, together with their components.
+
+Consider the `Atom` type. The `Atom` type has three instances with names
+`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
+parameters: the first one with type Pitch and the second one with type
+Duration.
+
+Types like Pitch and Duration are just different names for the Int type.
+
 All data types are named beginning with a capital letter, as to distinguish
 them from identifiers.
 
@@ -127,18 +165,15 @@ them from identifiers.
 
  * `Int`: 29 bit signed integer (corresponding to Haskell's `Int` type).
  * `Bool`: boolean value; either `True` or `False`.
- * `Pitch`: a type alias for an `Int` that ranges from 0 to 127, interpreted
-    as a musical pitch. A `Pitch` may be initialized using an integer or a
-    macro that indicates note, accidental, and octave:
 
- * `Duration`: describes the duration of a `Note` or `Chord` and is also a type
-   alias for `Int`, ranging from 1 to 256, indicating the multiple of the
-   smallest possible duration (which itself is a 64th note or a 64th of a beat
-   in 4/4 time). For example, a duration of 64 would be one beat. 
+### Aliased Types
 
-#### Short-hand notation for pitch and duration
+#### Pitch
 
-##### Pitch
+A type alias for an `Int`, ranging from 0 to 127, interpreted as a musical
+pitch, or the height of a note on a musical staff.
+
+##### Short-hand notation
 
 A backtick, followed by a single letter character indicating the note, followed
 by an optional `#` or `b` character indicating the accidental (sharp or flat,
@@ -159,6 +194,20 @@ Not including an accidental indicates that the note is natural. In this case we
 make the pitch a sharp by using `#`. The integer for the octave must be in the
 range `[0-10]`. In this case we use the pitch `a` in the fifth octave.
 
+|    | c   | c# db | d   | d# eb | e   | f   | f# gb | g   | g# ab | a   | a# bb | b   |
+|----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
+| 0  | 0   | 1     | 2   | 3     | 4   | 5   | 6     | 7   | 8     | 9   | 10    | 11  |
+| 1  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
+| 2  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
+| 3  | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
+| 4  | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
+| 5  | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
+| 6  | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
+| 7  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
+| 8  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
+| 9  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
+| 10 | 120 | 121   | 122 | 123   | 124 | 125 |       |     |       |     |       |     |
+
 This notation is inspired by the way notes are defined in MIDI. It can be
 described by the regular expression
 
@@ -168,22 +217,29 @@ described by the regular expression
 
 ##### Duration
 
+A type alias for an `Int` ranging from 1 to 256, which indicates a multiple of
+the smallest possible duration -- a 64th note or a 64th of a beat in 4/4 time.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+d: Duration = 32    -- 32 64th notes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 `Duration` types can be initialized using a short-hand notation, which consists
 of three components:
 
  * A backslash `\`
- * An integer from 1 to 64, denoting 
+ * An integer from 1 to 64, denoting the denominator of duration fraction
  * An optional dot `.`, denoting dotted-rhythms
 
 These are some examples:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\1		-- whole note, or 64 64th notes
-\2		-- half note, or 32 64th notes
-\4		-- quarter note, or 16 64th notes
-\8      -- eigth note, or 8 64th notes
-\16     -- sixteenth note, or 4 64th notes
-\32     -- thirtysecond note, or 2 64th notes
+\1		-- Whole note. Equivalent to 64
+\2		-- Half note.Equivalent 32
+\4		-- Quarter note. Equivalent to 16
+\8      -- Eigth note. Equivalent
+\16     -- Sixteenth note, or 4 64th notes
+\32     -- Thirtysecond note, or 2 64th notes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using this notation, one can declare a Duration in the following way:
@@ -250,8 +306,8 @@ one exception is lists, which are declared using brackets: `[...]`.
 	r: Rhythm = Rhythm([\4, \8, \8])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Part`: a `Part` is a list of `Atoms`. This is useful for distinguishing
-   separate but simultaneously-occurring lines of musical thought. For example:
+ * `Part`: a is a list of `Atom`s. This is useful for distinguishing
+   separate but simultaneously-occurring lines of music. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	p: Part = Part([Note(`a5, 1), Note(`c#5, 2)])
@@ -560,10 +616,6 @@ readable, modular, and easy to reason about.
 Control Flow
 ------------
 
-Conditionals are statements that perform different computations depending on
-whether a programmer-specified boolean condition evaluates to `True` or `False`
-in a sequence of such conditions.
-
 A conditional expression is a series of one or more `case` statements, followed
 by an `otherwise` statement. A case statement must be followed by a single
 parenthesis-enclosed expression that must evaluate to a `Bool`. The first
@@ -573,7 +625,7 @@ preceding case condition evaluates to `True`, the `otherwise` expression will
 be evaluated. Note that this means if multiple case conditions evaluate to
 `True`, only the first of these case expressions will be evaluated.
 
-TODO: explain example
+Consider the following example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 foo: Int = case (1 > 2) { 1 }
@@ -583,12 +635,22 @@ foo: Int = case (1 > 2) { 1 }
            otherwise    { 5 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+`foo` will be bound to `3`, since it is associated with the first boolean
+condition to evaluate to True.
+
 Program Structure and Scope
 ---------------------------
 
 A program in Apollo is made up of one or more valid statements. A program
-begins in a main function which needs to be defined for a program to compile.
-This main function can execute statements and call functions.
+begins in a main variable, which is of type Music and is required for a program
+to compile. For example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+main: Music = Music([Part([Note(`a5, \4)])])
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The program will compile to a MIDI file containing a single note -- an a in the
+fifth octave with a quarter-note duration.
 
 ### Block Scoping
 
@@ -608,55 +670,6 @@ body of a function follows the rules of block scoping. This means that a
 function defined within a function creates a new block inside the parent
 function's block.
 
-Hello World
------------
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-aMajor: Atom = Chord([`a5, `c#5, `e5])
-
-back: Part = [aMajor, bMinor, eMajor, aMajor]
-
-lead: Part = [(`a5, 10), (`b5, 10), (`c4, 10)]
-
-main: Music = Multi([lead, back])
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Type System
---------------
-
-Apollo types are polymorphic. This means that a type can take on different
-shapes. Roughly speaking, Apollo types adhere to the following rules:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Music   : Music [Part]
-
-Part    : Part [Atom]
-
-Atom    : Note Pitch Duration
-        | Rest Duration
-        | Chord [Pitch] Duration
-
-Rhythm	: Rhythm [Duration]
-
-Pitch   : Int
-
-Duration: Int
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The items on the left side are types; the items on the right side are instances
-of those types, together with their components. Let's elaborate...
-
-Consider the `Atom` type. The `Atom` type has three instances with names
-`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
-parameters: the first one with type Pitch and the second one with type
-Duration.
-
-Types like Pitch and Duration are just different names for the Int type.
-
-Advanced Syntax Features & "Syntactic Sugar"
------------------------------------
-
-
 Grammar
 -------
 
@@ -669,8 +682,13 @@ Expression  : Assignment
             | Block
             | Conditional
 Assignment  : Declaration '=' Expression
-Declaration : ID ':' ID
+Declaration : ID ':' Type
             | ID ':' FnType
+Type        : Int
+            | Bool 
+            | Note
+            | Pitch
+            | FnType
 FnType      : '(' Params ')' '->' ID
 Params      : Declaration
             | Declaration ',' Params
