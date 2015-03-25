@@ -223,7 +223,7 @@ d: Duration = \4
 This notation can be described by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`\[0-9]+\.?`
+\[0-9]+\.?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that for `Duration` and `Pitch`, initialization to a number outside of the
