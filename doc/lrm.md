@@ -50,7 +50,7 @@ Functions are first-class citizens in Apollo. This means that functions can be:
 
 Apollo variables are not like C variables, which can be manipulated and be
 changed during the execution of a program. A value can be bound to a type and
-a variable only once. This allows programs to be more safe easy to reason
+a variable only once. This allows programs to be more safe and easy to reason
 about. The return value of a function for a given input will always be the
 same, since there are is data mutation, or side effects.
 
