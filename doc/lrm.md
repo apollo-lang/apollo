@@ -1,3 +1,12 @@
+% Apollo Language Reference Manual
+% **Team 8**
+  **Tester & Validator:** Roberto Jose De Amorim (rja2139)
+  **Language & Tools Guru:** Benjamin Matthew Kogan (bmk2130)
+  **System Integrator:** Javier Llaca (jl3960)
+  **Project Manager:** Reza Nayebi (rn2324)
+  **System Architect:** Souren Sarkis Papazian (ssp2155)
+% March 25, 2015
+
 ![](./img/lrm-logo.png)
 
 Apollo Language Reference Manual
