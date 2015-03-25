@@ -1,4 +1,4 @@
-% Apollo Language Reference Manual
+% Apollo Language Tutorial
 % **Team 8**
   **Tester & Validator:** Roberto Jose De Amorim (rja2139)
   **Language & Tools Guru:** Benjamin Matthew Kogan (bmk2130)
