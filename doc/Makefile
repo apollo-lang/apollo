@@ -1,7 +1,6 @@
-
 ## Flags for Pandoc:
 
-FLAGS = -fmarkdown-implicit_figures --toc
+FLAGS = --standalone -fmarkdown-implicit_figures --table-of-contents
 
 ## All markdown files in working directory:
 
@@ -14,7 +13,7 @@ PDFS=$(SRC:.md=.pdf)
 all:	$(PDFS)
 
 %.pdf: %.md
-	pandoc -r markdown --latex-engine=pdflatex $(FLAGS) -o $@ $<
+	pandoc --from=markdown --latex-engine=pdflatex $(FLAGS) --output=$@ $<
 
 .PHONY: all
 
