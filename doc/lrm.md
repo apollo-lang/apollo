@@ -15,11 +15,20 @@ Apollo Language Reference Manual
 Introduction
 ------------
 
-Apollo is a functional programming language for algorithmic musical composition. Apollo is intended to be usable by a programmer with knowledge of basic functional constructs and no prior experience with music creation. The fine-details of synthesizing music are abstracted such that familiar programming types like integers can be interpreted by the compiler as musical sequences. At the same time, more experienced musical composers work directly with note and chord types while leveraging Apollo's programming constructs to create novel compositions. In effect, Apollo empowers the programmer to hear the sound of algorithms and the musician to compose in code.
+Apollo is a functional programming language for algorithmic musical composition. Apollo is intended to be usable by a programmer with knowledge of basic functional constructs and no prior experience with music creation. The fine-details of synthesizing music are abstracted such that familiar programming types like integers can be interpreted by the compiler as musical sequences. At the same time, more experienced musicians can directly manipulate note and chord types while leveraging Apollo's programming constructs to create novel compositions. In effect, Apollo empowers the programmer to hear the sound of algorithms and the musician to compose in code.
+
+**TODO:** explanation of flow of a program; a composition (notes / abstractions) -> midi at end
 
 ### Why is it called Apollo?
 
-Apollo combines the power of source code, or Apollonian logic, with the art of music, the domain of the god Apollo. The logo is derived from a combination of the f in functional and the f-hole opening in the body of the cello.
+Apollo combines the power of source code, or Apollonian logic, with the art of music, the domain of the god Apollo. The logo is derived from a combination of the f in functional and the f-hole opening in the body of a cello.
+
+Functional Constructs
+---------------------
+
+Since the functional programming paradigm encompasses a number of different programming constructs, it is useful to describe the manner in which Apollo is a functional language.
+
+**TODO**: functional purity in scope making a typical program, immutability; IO handled by frame
 
 Lexical Elements
 ----------------
@@ -27,6 +36,8 @@ Lexical Elements
 Apollo has seven types of tokens: keywords, identifiers, constants, literals, operators and separators.
 
 Whitespace and comments are ignored.
+
+All language constructs are written in camel-case; user-defined names should also follow this naming convention.
 
 ### Keywords
 
@@ -42,7 +53,6 @@ The list of keywords is:
  * `otherwise`
  * `List`
  * `Pitch`
- * `Harmony`
  * `Note`
  * `Chord`
  * `Rest`
@@ -54,11 +64,11 @@ Identifiers are for naming variables and functions. An identifier is any lowerca
 
 ### Constants
 
-There are four types of constants: integer constant, boolean constant, pitch literal, and duration constant.
+There are two types of constants: integer constants and boolean constants.
 
 #### Integer Constant
 
-Any signed sequence of digits that is in the range of `Int`.
+Any signed sequence of digits that is in the range of `Int` (see the section on Data Types).
 
 #### Boolean Constant
 
@@ -70,7 +80,7 @@ There are two types of literals: pitch literals and duration literals.
 
 #### Pitch Literal
 
-A backtick, followed by a single character indicating the note, followed by an optional `#` or `b` character indicating the accidental, followed by a number indicating the octave.
+A backtick, followed by a single letter character indicating the note, followed by an optional `#` or `b` character indicating the accidental (sharp or flat, respectively), followed by a number indicating the octave.
 
 For example:
 
@@ -80,20 +90,20 @@ For example:
 
 The backtick indicates that you are defining a pitch.
 
-The character for the note has to be in the range `[a-g]`. In this case it is the note `a`.
+The character for the note must be in the range `[a-g]`. In this case it is the note `a`.
 
-Not including an accidental indicates that the note is natural. In this case we make the pitch a sharp by using `#`. The integer for the octave has to be in the range `[0-10]`. In this case we use the pitch a in the fifth octave.
+Not including an accidental indicates that the note is natural. In this case we make the pitch a sharp by using `#`. The integer for the octave must be in the range `[0-10]`. In this case we use the pitch `a` in the fifth octave.
 
 This notation is inspired by the way notes are defined in MIDI.
 
 #### Duration Literal
 
-A backslash, followed by an natural number indicating the fraction of the whole note.
+A backslash, followed by a natural number indicating the fraction of a whole note.
 
-For example:
+For example, a quarter note:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\4 -- a quarter-note
+\4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Operators
@@ -106,11 +116,11 @@ See Section 4 for more information on operators.
 
 Symbols that separate tokens. They are: `(`, `)`, `[`, `]`, `{`, `}`, and `,`.
 
-Whitespace is ignored, and hence is not considered a token, but also serves as a separator.
+Whitespace is ignored --- and hence is not considered a token --- but serves as a token separator.
 
 ### Comments
 
- * `--` is used to comment one line.
+ * `--` introuces a comment that terminates with the newline character.
  * `{-` introduces a mutli-line comment.
  * `-}` terminates a multi-line comment.
 
@@ -121,90 +131,96 @@ Apollo officially supports the ASCII character set. Because Haskell supports UTF
 Data Types
 ----------
 
+All data types are named beginning with a capital letter, as to distinguish them from identifiers.
+
 ### Primitive Data Types
 
- * `Int`: 29 bit signed integer (corresponding to Haskell's Int type).
- * `Bool`: boolean value, either `True` or `False`.
- * `Pitch`: typedef for an `Int` that ranges from 0 to 127, interpreted as a musical pitch. Another option to initialize a `Pitch` is using a macro like so:
+ * `Int`: 29 bit signed integer (corresponding to Haskell's `Int` type).
+ * `Bool`: boolean value; either `True` or `False`.
+ * `Pitch`: a type alias for an `Int` that ranges from 0 to 127, interpreted as a musical pitch. A `Pitch` may be initialized using an integer or a macro that indicates note, accidental, and ocatave:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	d: Pitch = `d#3
+	d: Pitch = 123  -- integer initialization
+	d: Pitch = `d#3 -- macro initialization
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Duration`: describes the duration of a Note or Chord and is also a typedef for Int, ranging from 1 to 256.
+ * `Duration`: describes the duration of a `Note` or `Chord` and is also a type alias for `Int`, ranging from 1 to 256, indicating the multiple of the smallest possible duration (which itself is a 64th note or a 64th of a beat in 4/4 time). For example, a duration of 64 would be one beat. A `Duration` can also be declared as a literal using a backward slash and an integer. The integer denotes the fraction of a whole note. Duration literals are syntactic sugar and are thus an optional alternative to using only integers to declare duration. See the section on macros for more information.
+
+Note that for `Duration` and `Pitch`, initialization to a number outside of the allowed range will result in a compile-time error.
 
 ### Derived Types
 
- * `List`: an ordered collection of elements of the same type. For example:
+Derived types are declared using a constructor function of the same name. The one exception is lists, which are declared using brackets: `[...]`.
+
+ * `List`: an ordered collection of elements of the same type. The type of the list's elements must be declared between brackets in the type-annotation. For example, a list of `Int`s:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	a: [Int] = [1, 2, 3]
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Rhythm`: a list of `Duration`s. For example:
+ * `Atom`: a polymorphic type indicating a musical sound-unit. An `Atom` can be initialized to either a `Note`, a `Chord`, or a `Rest`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	r: Rhythm = Rhythm([\4,\8,\8])
+	n: Atom = Note(`a5, \8)
+	c: Atom = Chord([`a5, `c#5, `e5], \4)
+	r: Atom = Rest(\4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Note`: a tuple consisting of a `Pitch` and a `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Note = Note(`a5, \4)
+	n: Atom = Note(`a5, \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Harmony`: a list of (simultaneous) `Pitch`es. For example:
+ * `Chord`: a tuple consisting of a list of `Pitch`es and a `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	h: Harmony = Harmony([`b5, `c#5, d#5])
+	c: Atom = Chord([`a5, `c#5, `e5], \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Chord`: a tuple consisting of a list of `Pitch`es and a `Duration` or a `Harmony` and a `Duration`. For example:
+ * `Rest`: a `Rest` is simply a `Duration` indicating a space in which no notes are played. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	c: Chord = Chord([`a5, `c#5, `e5], \4)
+	r: Atom = Rest(\4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Rest`: a `Rest` is simply a `Duration` indicating a space in which no notes are played.
+ * `Rhythm`: a list of `Duration`s. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	r: Rest = Rest(\4)
+	r: Rhythm = Rhythm([\4, \8, \8])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Atom`: either a `Note`, a `Chord`, or a `Rest`. For example:
+ * `Part`: a `Part` is a list of `Atoms`. This is useful for distinguishing separate but simultaneously-occurring lines of musical thought. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	a: Atom = Note(`a5, \8)
+	p: Part = Part([Note(`a5, 1), Note(`c#5, 2)])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Part`: a `Part` is a list of `Atoms`.
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	p: Part = Part([(`a5, 1), (`c#5, 2)])
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * `Music`: the `Music` data type is either a single part or multiple parts (playing simultaneously). For example:
+ * `Music`: the `Music` data type is initialized with a list containing all `Part`s in the composition. When the output MIDI file is generated, all parts contained in a `Music` element are sounded simultaneously. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	aMajor: Atom = Chord([`a5, `c#5, `e5])
 	bMinor: Atom = Chord([`b5, `d#5, `f#5])
 	eMajor: Atom = Chord([`e5, `g#5, `b5])
 
-	back: Part = [aMajor, bMinor, eMajor]
+	back: Part = Part([aMajor, bMinor, eMajor])
+	lead: Part = Part([Note(`a5, 10), Note(`b5, 10), Note(`c4, 10)])
 
-	lead: Part = [(`a5, 10), (`b5, 10), (`c4, 10)]
-
-	main: Music = Music([lead, back])
+	song: Music = Music([lead, back])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Operators
 ---------
 
+The behavior of each operator is defined based on the type(s) to which it is applied. Certain operators such a `/` (integer division) are defined only for a single pair of types (in this case, two `Ints`). Other operators are overloaded such that their behavior depends on the types to which it is applied. For example, the `+` operator preforms infix addition when applied to a pair of `Int`s, whereas it preforms list concatenation when applied to a pair of `List`s.
+
+When an operator is applied to a type with which it is not compatible, a compile-time error is triggered.
+
 ### Arithmetic Operators
 
 #### `expression * expression`
 
-If the two expressions are of type `Int`, `*` corresponds to regular multiplication. If the first expression is a list, `*` concatenates that list as many times as specified by the integer on the right-side of the operator.
+If the two expressions are of type `Int`, `*` corresponds to regular multiplication. If the first expression is a `List` and the second expression is an `Int`, `*` concatenates that list to itself as many times as specified by the second expression.
 
 #### `expression / expression`
 
@@ -216,7 +232,7 @@ The two expressions must be of type `Int`. The operator yields the integer remai
 
 #### `expression + expression`
 
-When the two expressions are of type `Int`, the result is addition. When the two expressions are lists, `+` corresponds to list concatenation.
+When the two expressions are of type `Int`, the result is addition. When the two expressions are `List`s, `+` corresponds to list concatenation and concatenates the second list to the end of the first.
 
 #### `expression - expression`
 
@@ -226,11 +242,11 @@ When the two expressions are of type `Int`, the result is addition. When the two
 
 #### `expression == expression`
 
-Returns `True` if and only if the expressions have the same value, which can be of any integral type (`Int`, `Pitch`, `Duration`) or a `List`.
+Returns `True` if and only if the expressions have the same value, which can be of any integral type (`Int`, `Pitch`, `Duration`) or a `List`. In the latter case, this is evaluated in terms of element-by-element value of a `List` rather than a memory-reference value, for example.
 
 #### `expression != expression`
 
-Returns `True` if and only if the expressions have different values, which could be of any integral type (`Int`, `Pitch`, `Duration`) or a `List`.
+Returns `True` if and only if the expressions have different values, which could be of any integral type (`Int`, `Pitch`, `Duration`) or a `List`. In the latter case, this is evaluated in terms of element-by-element value of a `List` rather than a memory-reference value, for example.
 
 #### `expression > expression`
 
@@ -280,15 +296,35 @@ If both expressions are of `Bool` type, then `||` yields true if at least one of
 
 [^assn]: multiple-assignment is not allowed, so associativity rules are not applicable to the assignment operator
 
-### Declaration
+Functions
+---------
 
-**TODO**
+Functions are first-class in Apollo and are treated like values of any other type.
 
-### Expressions
+They are defined as follows:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+add: (x: Int, y: Int) -> Int = x + y
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Functions can be recursive, that is, they can call themselves. They can also be nested, that is, a function can contain one or more functions within itself.
+
+Looping
+-------
+
+Looping is enabled using recursion. To create a subroutine that should loop, a recursive function can be defined. A simple example of a recursive loop:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+addX: (foo: Int, x: Int) = case x == 0 { foo }
+                           otherwise   { addX(foo + 1, x - 1) }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Expressions
+-----------
 
 Apollo expressions can be broadly classified into two categories: assignments and values.
 
-#### Declaration Expressions
+### Assignment Expressions
 
 An assignment consists of an identifier, a type, and a value.
 
@@ -304,17 +340,23 @@ If, for example, we want to declare an `Int` *x* whose value is 4, we would writ
 x: Int = 4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The syntax for defining functions **TODO: ???**
-
-Note that assignment expressions have no value --- assignment expressions can't be used.
+Note that assignment expressions have no value. Assignment expressions thus cannot be used for any kind of resulting value. As such, the following is invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int = x: Int = 4	-- invalid
+y: Int = x: Int = 4 -- compile-time error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because names are immutable in Apollo, any name must be defined in the same line that it is declared. Declaring a name without a value is not allowed, and so the following is invalid:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+y: Int -- compile-time error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #### Value Expressions
 
-Every other Apollo expression has a value. Essentially, if the expression is not an assignment, it has a value and will be evaluated.
+Every other Apollo expression has a value. Essentially, if the expression is not an assignment, it has a value and will be evaluated. Because Apollo imposes functional purity, a value expression can in effect can always be replaced with its value.
+
+A block of code implicitly returns the value of its last expression. As such, a `return` keyword (as in the C programming language) is unnecessary. For example, any function will return the value of its final expression. Similarly, any branch of a conditional statement will return its final expression if that branch is evaluated.
 
 #### Blocks
 
@@ -345,18 +387,7 @@ Control Flow
 
 Conditionals are statements that perform different computations depending on whether a programmer-specified boolean condition evaluates to `True` or `False`.
 
-Functions
----------
-
-Functions are first-class in Apollo and are treated like values of any other type.
-
-They are defined as follows:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-add: (x: Int, y: Int) -> Int = x + y
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Functions can be recursive, that is, they can call themselves. They can also be nested, that is, a function can contain one or more functions within itself.
+TODO: explain case / otherwise; expression taht evaluates to a value, so must return same value for any branch
 
 Program Structure and Scope
 ---------------------------
