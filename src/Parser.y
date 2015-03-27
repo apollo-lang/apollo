@@ -11,20 +11,23 @@ import Expr
 
 %token
     NUM         { TokenNum $$ }
-    ID          { TokenSym $$ }
+    ID          { TokenId $$ }
     '->'        { TokenArrow }
     '='         { TokenEq }
     '+'         { TokenPlus }
     '-'         { TokenMinus }
     '*'         { TokenMult }
-    ','         { TokenComma }
+    '%'         { TokenMod }
     ':'         { TokenColon } 
+    ','         { TokenComma }
     '('         { TokenLParen }
     ')'         { TokenRParen }
     '{'         { TokenLBrack }
     '}'         { TokenRBrack }
     CASE        { TokenCase }
     OTHERWISE   { TokenOtherwise }
+    TRUE        { TokenTrue }
+    FALSE       { TokenFalse }
 
 %%
 
@@ -49,6 +52,10 @@ Params      : Declaration                   { [$1] }
             | Declaration ',' Params        { $1:$3 }
 
 Value       : NUM                           { Val $1 }
+            | Boolean                       { $1 }
+
+Boolean     : TRUE                          { True }
+            | FALSE                         { False }
 
 Block       : '{' Expressions '}'           { Block $2 }
 
