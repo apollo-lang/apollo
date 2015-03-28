@@ -10,9 +10,9 @@ noteTrack chan pitch vel dur = notePair chan pitch vel dur ++ [(0, TrackEnd)]
 
 -- Multi-track MIDI
 
-chordMidi chordTracks = Midi { fileType = MultiTrack, 
-                               timeDiv  = TicksPerBeat 24,
-			       tracks   = cMajorTracks }
+chordMidi = Midi {  fileType = MultiTrack, 
+                    timeDiv  = TicksPerBeat 24,
+			        tracks   = cMajorTracks }
 
 -- Multi-track Chords
 
