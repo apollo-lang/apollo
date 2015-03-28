@@ -1,0 +1,16 @@
+f: (m: Int) -> Int = {
+    g: (x: Int) -> Int = 1
+    4
+}
+
+foo: Int = 
+    length: Int = 5
+    bar: Int = 4
+    length * bar
+}
+
+volumeCylinder: (r: Int, b: Int, h: Int) -> Int = {
+    sideArea: Int = b * h 
+    circleArea: Int = 2 * pi * r * r
+    sideArea + circleArea
+}
