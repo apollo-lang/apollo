@@ -1,0 +1,59 @@
+Program     : Definitions
+
+Definitions : Definition
+            | Definition Definitions
+
+Definition  : Declaration '=' Expression
+
+Declaration : ID ':' Type
+
+Type        : INT
+            | BOOL 
+            | PITCH
+            | DURATION
+            | ATOM
+            | MUSIC
+            | FnType
+
+FnType      : '(' Params ')' '->' Type
+
+Params      : Declaration
+            | Declaration ',' Params
+
+Expression  : Atom
+            | Block
+            | Conditional
+            | UnOp
+            | BinOp
+            | '(' Expression ')'
+
+Atom        : NUM
+            | BOOL
+            | NOTE '(' Expression Expression ')'
+            | CHORD '(' Expression Expression ')'
+            | RHYTHM '(' Expression ')'
+            | PART '(' Expression ')'
+            | MUSIC '(' Expression ')'
+
+UnOp        : '-' Expression
+            | '!' Expression
+
+BinOp       : Expression '+' Expression
+            | Expression '-' Expression
+            | Expression '*' Expression
+            | Expression '/' Expression
+            | Expression '%' Expression
+            | Expression '==' Expression
+            | Expression '!=' Expression
+            | Expression '<' Expression
+            | Expression '>' Expression
+            | Expression '<=' Expression
+            | Expression '>=' Expression
+            | Expression '&&' Expression
+            | Expression '||' Expression
+
+Block       : '{' Expression '}'
+            | '{' Definitions Expression '}'
+
+Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
+            | CASE '(' Expression ')' Expression Conditional
