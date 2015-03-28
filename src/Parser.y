@@ -3,6 +3,7 @@ module Parser where
 
 import Lexer
 import Expr
+import Types
 }
 
 %name           program
@@ -14,6 +15,8 @@ import Expr
     NUM         { TokenNum $$ }
     BOOL        { TokenBool $$ }
     TYPE        { TokenType $$ }
+    DUR         { TokenDur $$ }
+    PITCH       { TokenPitch $$ }
     CASE        { TokenCase }
     OTHERWISE   { TokenOtherwise }
     '+'         { TokenPlus }
@@ -75,6 +78,8 @@ Params      : Param                         { [$1] }
 Expression  : NUM                           { ApolloInt $1 }
             | BOOL                          { ApolloBool $1 }
             | ID                            { Name $1 }
+            | DUR                           { ApolloDuration $ parseDuration $1 }
+            | PITCH                         { ApolloPitch $ parsePitch $1 }
             | Conditional                   { $1 }
             | UnOp                          { Unary $1 }
             | BinOp                         { Binary $1 }
