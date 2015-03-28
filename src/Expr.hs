@@ -1,36 +1,37 @@
 module Expr where
 
 data Program
-    = Program [Def]
+    = Program [Stmt]
+    deriving Show
+
+data Stmt
+    = StDef Def
+    | StExp Expr
     deriving Show
 
 data Def
-    = Def Decl Expr
+    = Def Id Type Expr
     deriving Show
 
-data Decl
-    = Decl Id Type
+data Param
+    = Param Id Type
     deriving Show
 
 type Id = String
 
 data Type
     = Data Id
-    | Function [Decl] Type
+    | Function [Param] Type
     deriving Show
 
 data Expr
-    = Atom Primitive
+    = ApolloInt Int
+    | ApolloBool Bool
     | Name Id
     | Block [Def] Expr
     | Cond Expr Expr Expr
     | Unary UnOp
     | Binary BinOp
-    deriving Show
-
-data Primitive
-    = ApolloInt Int
-    | ApolloBool Bool
     deriving Show
 
 data UnOp

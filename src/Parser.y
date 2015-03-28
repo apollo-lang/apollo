@@ -39,35 +39,47 @@ import Expr
     '{'         { TokenLBrack }
     '}'         { TokenRBrack }
 
+%nonassoc '='
+%left '||'
+%left '&&'
+%left '==' '!=' '<' '>' '<=' '>='
+%left '+' '-'
+%left '*' '/' '%'
+%right NEG '!'
+
 %%
 
-Program     : Definitions                   { Program $1 }
+Program     : Statements                    { Program $1 }
+
+Statements  : Statement                     { [$1] }
+            | Statement Statements          { $1:$2 }
+
+Statement   : Definition                    { StDef $1 }
+            | Expression                    { StExp $1 }
 
 Definitions : Definition                    { [$1] }
             | Definition Definitions        { $1:$2 }
 
-Definition  : Declaration '=' Expression    { Def $1 $3 }
-
-Declaration : ID ':' Type                   { Decl $1 $3 }
+Definition  : ID ':' Type '=' Expression    { Def $1 $3 $5 }
 
 Type        : TYPE                          { Data $1 }
             | FnType                        { $1 }
 
 FnType      : '(' Params ')' '->' Type      { Function $2 $5 }
 
-Params      : Declaration                   { [$1] }
-            | Declaration ',' Params        { $1:$3 }
+Param       : ID ':' Type                   { Param $1 $3 }
 
-Expression  : Primitive                     { Atom $1 }
+Params      : Param                         { [$1] }
+            | Param ',' Params              { $1:$3 }
+
+Expression  : NUM                           { ApolloInt $1 }
+            | BOOL                          { ApolloBool $1 }
             | ID                            { Name $1 }
             | Conditional                   { $1 }
             | UnOp                          { Unary $1 }
             | BinOp                         { Binary $1 }
             | Block                         { $1 }
             | '(' Expression ')'            { $2 }
-
-Primitive   : NUM                           { ApolloInt $1 }
-            | BOOL                          { ApolloBool $1 }
 
 Conditional : CASE '(' Expression ')' 
                 Expression 
@@ -77,7 +89,7 @@ Conditional : CASE '(' Expression ')'
                 Expression 
               Conditional                   { Cond $3 $5 $6 }
 
-UnOp        : '-' Expression                { Neg $2 }
+UnOp        : '-' Expression  %prec NEG     { Neg $2 }
             | '!' Expression                { Not $2 }
 
 BinOp       : Expression '+' Expression     { Add $1 $3 }
