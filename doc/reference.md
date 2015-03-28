@@ -36,22 +36,20 @@ the f in functional and the f-hole opening in the body of a cello.
 Paradigm
 --------
 
-Apollo is a functional programming language, and thus incorporates the
+Apollo is a purely functional programming language, and thus incorporates the
 following patterns.
 
 ### First-class functions
 
 Functions are first-class citizens in Apollo. This means that functions can be:
- * passed as function parameters
- * returned as values by other functions
+ * Passed as function parameters
+ * Returned as values by other functions
 
 ### Immutable data
 
-Apollo variables are not like C variables, which can be manipulated and be
-changed during the execution of a program. A value can be bound to a type and
-a variable only once. This allows programs to be more safe and easy to reason
-about. The return value of a function for a given input will always be the
-same, since there are is data mutation, or side effects.
+Apollo does not have variables. In other words, once an identifier is bound to
+a type and a value, this cannot be changed. As a result, Apollo programs are
+easy to reason about and their outputs are deterministic.
 
 Lexical Elements
 ----------------
@@ -448,10 +446,10 @@ expressions are `False`.
 | `>=`     | greater than or equal | 3          | left          |
 | `&&`     | logical AND           | 2          | left          |
 | `||`     | logical OR            | 1          | left          |
-| `=`      | assignment            | 0          | N/A[^assn]    |
+| `=`      | definition            | 0          | N/A[^assn]    |
 
-[^assn]: multiple-assignment is not allowed, so associativity rules are not
-applicable to the assignment operator.
+[^assn]: nested-definition is not allowed, so associativity rules are not
+applicable to the definition operator.
 
 Functions
 ---------
@@ -486,7 +484,7 @@ square: (x: Int) -> Int
 
 which reads as "square is a function that takes an Int whose identifier is x and returns an Int."
 
-The definition is whatever is to the right side of the assignment operator:
+The definition is whatever is to the right side of the definition operator:
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 x * x
@@ -529,39 +527,53 @@ loop, a recursive function can be defined. A simple example of a recursive
 loop:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-addX: (foo: Int, x: Int) = case x == 0 { foo }
+addX: (foo: Int, x: Int) = case (x == 0) { foo }
                            otherwise   { addX(foo + 1, x - 1) }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Expressions
+Statements
 -----------
 
-Apollo expressions can be broadly classified into two categories: assignments
-and values.
+There are two kinds of statements in Apollo:
+ * Expressions
+ * Definitions
 
-### Assignment Expressions
+#### Expressions
 
-An assignment consists of an identifier, a type, and a value.
+Expressions are statements with a value. Because Apollo imposes functional
+purity, a value expression can always be replaced with its value.
 
-The syntax for assignments is the following:
+The following are examples of expressions in Apollo:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<id>: <type> = <value>
+3 + 4
+x * x
+y > 18
+[1,2,3]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If, for example, we want to declare an `Int` *x* whose value is 4, we would
+### Definitions
+
+Definitions, unlike expressions, have no value. They consist of an identifier,
+a type, and an expression.
+
+The syntax for definitions is the following:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<id>: <type> = <expression>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If, for example, we want to define an `Int` *x* whose value is 4, we would
 write the following line:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 x: Int = 4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that assignment expressions have no value. Assignment expressions thus
-cannot be used for any kind of resulting value. As such, the following is
-invalid:
+Since definitions are value-less, nested definitions are invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int = x: Int = 4     -- invalid
+y: Int = (x: Int = 4)     -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because names are immutable in Apollo, any name must be defined in the same
@@ -572,26 +584,12 @@ so the following is invalid:
 y: Int                  -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#### Value Expressions
-
-Every other Apollo expression has a value. Essentially, if the expression is
-not an assignment, it has a value and will be evaluated. Because Apollo imposes
-functional purity, a value expression can in effect can always be replaced with
-its value.
-
-A block of code implicitly returns the value of its last expression. As such, a
-`return` keyword (as in the C programming language) is unnecessary. For
-example, any function will return the value of its final expression. Similarly,
-any branch of a conditional statement will return its final expression if that
-branch is evaluated.
-
 #### Blocks
 
-A block is a value expression consisting of one or more expressions and is
-delimited by curly braces. The value of a block is the value of its last
-expression. Therefore, the last expression of a block must be a value
-expression. The previous expressions, however, can be a combination of
-assignment and value expressions.
+A block is an expression consisting of one or more statements, delimited by
+curly braces. The last statement must be an expression, since it determines the
+value of the block. Any previous statements, however, can be a combination of
+expressions and definitions.
 
 Blocks can be used to declare local-scope auxiliary values or functions.
 Consider the following two versions of a function that computes the surface
@@ -602,7 +600,7 @@ area of a cylinder:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
     sideArea: Int = 2 * pi * r * h
-    baseArea: Int = 2 * pi * r * r
+    baseArea: Int = pi * r * r
     sideArea + 2 * baseArea
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -610,11 +608,24 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 ##### Two: without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cylinderArea: (r: Int, h: Int) -> Int = 2 * pi * r * h + 2 * (2 * pi * r * r)
+cylinderArea: (r: Int, h: Int) -> Int = 2 * pi * r * h + 2 * (pi * r * r)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Both versions produce the same result, but the first one is arguably more
-readable, modular, and easy to reason about.
+readable and modular.
+
+Now consider a tail-recursive implementation of factorial that uses a block to
+define an auxiliary function:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+factorial: (n: Int) -> Int = {
+    aux: (n: Int, acc: Int) -> Int = {
+        case (n == 0)   acc
+        otherwise       aux(n - 1, acc * n)
+    }
+    aux(n, 1)
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Control Flow
 ------------
@@ -640,7 +651,7 @@ foo: Int = case (1 > 2) { 1 }
 
 Here foo is an integer whose value is determined by a case statement. The first two case
 statements evaluate to `False` and their return value is ignored. The third statement is the 
-first one to evaluate to `True` and foo is therefore assigned the value `3`.
+first one to evaluate to `True` and foo is therefore bound to the value `3`.
 
 Program Structure and Scope
 ---------------------------
@@ -674,68 +685,11 @@ body of a function follows the rules of block scoping. This means that a
 function defined within a function creates a new block inside the parent
 function's block.
 
-Grammar
--------
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Program     : Expressions
-
-Expressions : Expression
-            | Expression Expressions
-
-Expression  : Assignment
-            | Value
-            | UnOp Value
-            | Value BinOp Value
-            | Block
-            | Conditional
-
-Assignment  : Declaration '=' Expression
-
-Declaration : ID ':' Type
-            | ID ':' FnType
-
-Type        : Int
-            | Bool 
-            | Pitch
-            | Duration
-            | Atom
-            | Music
-            | FnType
-
-FnType      : '(' Params ')' '->' ID
-
-Params      : Declaration
-            | Declaration ',' Params
-
-Value       : '(' Value ')'
-            | NUM
-            | Constructor '(' Vals ')'
-
-Vals        : Value
-            | Value ',' Vals
-
-UnOp        : '-' 
-            | '!'
-
-BinOp       : '+'
-            | '-'
-            | '*'
-            | '/'
-            | '%'
-            | '='
-            | '=='
-            | '!=' 
-            | '<'
-            | '>'
-            | '<=' 
-            | '>='
-            | '&&'
-            | '||'
-
-Block       : '{' Expressions '}'
-
-Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
-            | CASE '(' Expression ')' Expression Conditional
+f: (x: Int) -> Int = {
+    g: (x: Int) -> Int = {
+        x * x   -- x refers to parameter of g
+    }
+    g(x) + 3    -- x refers to parameter of f
+}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
