@@ -1,33 +1,56 @@
 module Expr where
 
 data Program
-    = Program [Expr]
+    = Program [Def]
+    deriving Show
+
+data Def
+    = Def Decl Expr
+    deriving Show
+
+data Decl
+    = Decl Id Type
+    deriving Show
+
+type Id = String
+
+data Type
+    = Data Id
+    | Function [Decl] Type
     deriving Show
 
 data Expr
-    = Val Int
-    | Assign Var Expr
-    | Block [Expr]
+    = Atom Primitive
+    | Name Id
+    | Block [Def] Expr
     | Cond Expr Expr Expr
+    | Unary UnOp
+    | Binary BinOp
     deriving Show
 
-data Var
-    = Var Id VarType
+data Primitive
+    = ApolloInt Int
+    | ApolloBool Bool
     deriving Show
 
-data VarType
-    = DataType Id
-    | FunctionType [Var] Id
+data UnOp
+    = Neg Expr
+    | Not Expr
     deriving Show
 
 data BinOp
-    = Add Expr Expr
-    | Sub Expr Expr
-    | Mul Expr Expr
+    = Add Expr Expr     -- +
+    | Sub Expr Expr     -- -
+    | Mul Expr Expr     -- *
+    | Div Expr Expr     -- /
+    | Mod Expr Expr     -- %
+    | Eq Expr Expr      -- ==
+    | NEq Expr Expr     -- !=
+    | Le Expr Expr      -- <
+    | Gr Expr Expr      -- >
+    | LEq Expr Expr     -- <=
+    | GEq Expr Expr     -- >=
+    | And Expr Expr     -- &&
+    | Or Expr Expr      -- ||
     deriving Show
-
-eval :: BinOp -> Expr
-eval (Add (Val a) (Val b)) = Val (a + b)
-
-type Id = String
 

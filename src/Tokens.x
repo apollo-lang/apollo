@@ -13,50 +13,95 @@ $commentable    = [. \n] # [\/ \*]
 
 tokens :-
 
-  $eol                              ;
-  $white+                           ;
-  "--".*                            ;   -- Single-line comments
-  "{-" ("{" | "-"* $commentable)*       -- Multi-line comments
-        "-"+ "}"                    ;
-  $digit+                           { \s -> TokenNum (read s) }
-  "->"                              { \s -> TokenArrow }
-  \=                                { \s -> TokenEq }
-  \+                                { \s -> TokenPlus }
-  \-                                { \s -> TokenMinus }
-  \*                                { \s -> TokenMult }
-  \%                                { \s -> TokenMod }
-  \:                                { \s -> TokenColon }
-  \,                                { \s -> TokenComma }
-  \(                                { \s -> TokenLParen }
-  \)                                { \s -> TokenRParen }
-  \{                                { \s -> TokenLBrack }
-  \}                                { \s -> TokenRBrack }
-  "case"                            { \s ->TokenCase }
-  "otherwise"                       { \s ->TokenOtherwise }
-  "True"                            { \s ->TokenTrue }
-  "False"                           { \s ->TokenFalse }
-  $alpha [$alpha $digit \_ \']*     { \s -> TokenId s }
+  $eol                          ;
+  $white+                       ;
+
+  -- Single-line comments
+  "--".*                        ;   
+
+  -- Multi-line comments
+  "{-" 
+  ("{" | "-"* $commentable)* 
+  "-"+ "}"                      ;
+
+  -- Reserved words
+  "case"                        { \s -> TokenCase }
+  "otherwise"                   { \s -> TokenOtherwise }
+
+  -- Identifiers
+  [a-z][$alpha $digit \']*      { \s -> TokenId s }
+
+  -- Integer Constants
+  $digit+                       { \s -> TokenNum (read s) }
+
+  -- Boolean Constants
+  "True"                        { \s -> TokenBool (True) }
+  "False"                       { \s -> TokenBool (False) }
+
+  -- Types
+  "Int"                         { \s -> TokenType s }
+  "Bool"                        { \s -> TokenType s }
+  "Pitch"                       { \s -> TokenType s }
+  "Duration"                    { \s -> TokenType s }
+  "Atom"                        { \s -> TokenType s }
+  "Music"                       { \s -> TokenType s }
+
+  -- Operators
+  \+                            { \s -> TokenPlus }
+  \-                            { \s -> TokenMinus }
+  \*                            { \s -> TokenMult }
+  \/                            { \s -> TokenDiv }
+  \%                            { \s -> TokenMod }
+  "=="                          { \s -> TokenEq }
+  "!="                          { \s -> TokenNEq }
+  \<                            { \s -> TokenLe }
+  \>                            { \s -> TokenGr }
+  "<="                          { \s -> TokenLEq }
+  ">="                          { \s -> TokenGEq }
+  "&&"                          { \s -> TokenAnd }
+  "||"                          { \s -> TokenOr }
+  \!                            { \s -> TokenNot }
+
+  -- Separators
+  \=                            { \s -> TokenDef }
+  "->"                          { \s -> TokenArrow }
+  \:                            { \s -> TokenColon }
+  \,                            { \s -> TokenComma }
+  \(                            { \s -> TokenLParen }
+  \)                            { \s -> TokenRParen }
+  \{                            { \s -> TokenLBrack }
+  \}                            { \s -> TokenRBrack }
 
 {
 
-data Token = TokenNum Int
-           | TokenId String
-           | TokenArrow
-           | TokenEq
+data Token = TokenId String
+           | TokenNum Int
+           | TokenBool Bool
+           | TokenType String
+           | TokenCase
+           | TokenOtherwise
            | TokenPlus
            | TokenMinus
            | TokenMult
+           | TokenDiv
            | TokenMod
+           | TokenEq
+           | TokenNEq
+           | TokenLe
+           | TokenGr
+           | TokenLEq
+           | TokenGEq
+           | TokenAnd
+           | TokenOr
+           | TokenNot
+           | TokenDef
+           | TokenArrow
            | TokenColon
            | TokenComma
            | TokenLParen
            | TokenRParen
            | TokenLBrack
            | TokenRBrack
-           | TokenCase
-           | TokenOtherwise
-           | TokenTrue
-           | TokenFalse
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens
