@@ -1,23 +1,22 @@
-module ApolloTypes where
+module Types where
 
 data Music
-    = Note
-    | Chord
-    | Phrase
+    = Music [Part]
 
-type Note = Int
+data Part
+    = Part [Atom]
 
-type Interval = Int
+data Atom
+    = Note Pitch Duration
+    | Rest Duration
+    | Chord [Pitch] Duration
+    deriving Show
+
+data Rhythm
+    = Rhythm [Duration]
+    deriving Show
+
+type Pitch = Int
 
 type Duration = Int
-
-data Chord
-    = Chord Note AbstractChord
-    | AbstractChord [Interval]
- 
-data Phrase
-    = AbstractPhrase [Interval]
-    | Phrase Note AbstractPhrase
-
-data Melody = Melody Note [Interval]
 
