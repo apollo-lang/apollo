@@ -1,22 +1,43 @@
 module Types where
 
-data Music
-    = Music [Part]
+-- Primitive type  
+data Pitch 
+        = Pitch Int
+        deriving (Show)
 
-data Part
-    = Part [Atom]
+data Duration 
+        = Duration Int
+        deriving (Show)
 
-data Atom
-    = Note Pitch Duration
-    | Rest Duration
-    | Chord [Pitch] Duration
-    deriving Show
+-- Derived types
+data Note 
+        = Note Pitch Duration
+        deriving (Show)
 
-data Rhythm
-    = Rhythm [Duration]
-    deriving Show
 
-type Pitch = Int
+data Chord 
+        = Chord [Pitch]
+        deriving (Show)
 
-type Duration = Int
+data Rest 
+        = Rest Duration
+        deriving (Show)
+
+data Atom 
+        = AtomNote Note 
+        | AtomChord Chord
+        | AtomRest Rest
+        deriving (Show)
+
+data Rythm 
+        = Rythm [Duration]
+        deriving (Show)
+
+data Part 
+        = Part [Atom]
+        deriving (Show)
+
+data Music 
+        = Music [Part]
+        deriving (Show)
 
