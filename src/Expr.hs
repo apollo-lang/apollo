@@ -1,5 +1,7 @@
 module Expr where
 
+import Types
+
 data Program
     = Program [Stmt]
     deriving Show
@@ -27,6 +29,8 @@ data Type
 data Expr
     = ApolloInt Int
     | ApolloBool Bool
+    | ApolloDuration Duration
+    | ApolloPitch Pitch
     | Name Id
     | Block [Def] Expr
     | Cond Expr Expr Expr
