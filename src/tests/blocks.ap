@@ -3,7 +3,7 @@ f: (m: Int) -> Int = {
     4
 }
 
-foo: Int = 
+foo: Int = {
     length: Int = 5
     bar: Int = 4
     length * bar

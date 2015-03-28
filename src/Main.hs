@@ -1,5 +1,4 @@
 import Parser
-import Expr
 
 ast :: String -> String
 ast = show . parseProgram
