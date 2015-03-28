@@ -1,6 +1,6 @@
 module Types where
 
--- Primitive type  
+-- Primitive types
 data Pitch 
         = Pitch Int
         deriving (Show)
