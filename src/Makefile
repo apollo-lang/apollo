@@ -9,12 +9,15 @@ MAIN    := Main.hs
 GFLAGS  := -Wall
 SOURCES := $(wildcard *.hs) $(GENERATED)
 
-.PHONY: all clean generated
+.PHONY: all clean clean-gen generated
 
-all: $(EXE)
+all: $(EXE) clean-gen
 
-clean:
-	rm -f *.hi *.o core $(GENERATED) $(EXE)
+clean-gen:
+	rm -f *.hi *.o core $(GENERATED)
+
+clean: clean-gen
+	rm -f $(EXE)
 
 generated: $(LEXER) $(PARSER)
 
