@@ -1,22 +1,29 @@
-apollo: apollo.hs Parser.hs Tokens.hs
-	ghc apollo.hs
+LEX_SPEC   := Lexer.x
+PARSE_SPEC := Parser.y
+LEXER      := $(LEX_SPEC:.x=.hs)
+PARSER     := $(PARSE_SPEC:.y=.hs)
+GENERATED  := $(LEXER) $(PARSER)
 
-Parser.hs: Parser.y
-	happy Parser.y
+EXE     := apollo
+MAIN    := Main.hs
+GFLAGS  := -Wall
+SOURCES := $(wildcard *.hs) $(GENERATED)
 
-Tokens.hs: Tokens.x
-	alex Tokens.x
+.PHONY: all clean generated
 
-.PHONY:
+all: $(EXE)
+
 clean:
-	rm -f *.hi *.o core apollo Parser.hs Tokens.hs
+	rm -f *.hi *.o core $(GENERATED) $(EXE)
 
-# `make nice` removes all intermediate compiled files, save for `apollo` executable.
-# Run it after `make` if you want your working directory to be nice and clean.
+generated: $(LEXER) $(PARSER)
 
-.PHONY:
-nice:
-	rm -f *.hi *.o core Parser.hs Tokens.hs
+$(LEXER): $(LEX_SPEC)
+	alex $(LEX_SPEC)
 
-.PHONY:
-all: clean apollo
+$(PARSER): $(PARSE_SPEC)
+	happy $(PARSE_SPEC)
+
+$(EXE): $(SOURCES)
+	ghc $(GFLAGS) $(MAIN) -o $@
+

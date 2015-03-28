@@ -1,7 +1,7 @@
 {
 module Parser where
 
-import Tokens
+import Lexer
 import Expr
 }
 
