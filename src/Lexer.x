@@ -24,18 +24,11 @@ tokens :-
     ("{"|"-"*$commentable)* 
     "-"+ "}"                      ;
 
-    -- Duration short-hand
+    -- Duration constant
     \\[0-9]+\.?                   { \s -> TokenDur s }
 
-    -- Pitch short-hand
+    -- Pitch constant
     `[A-G](\#|b)?[0-9]            { \s -> TokenPitch s }
-
-    -- Reserved words
-    "case"                        { \s -> TokenCase }
-    "otherwise"                   { \s -> TokenOtherwise }
-
-    -- Identifiers
-    [a-z][$alpha $digit \']*      { \s -> TokenId s }
 
     -- Integer Constants
     $digit+                       { \s -> TokenNum (read s) }
@@ -44,13 +37,15 @@ tokens :-
     "True"                        { \s -> TokenBool (True) }
     "False"                       { \s -> TokenBool (False) }
 
-    -- Types
-    "Int"                         { \s -> TokenType s }
-    "Bool"                        { \s -> TokenType s }
-    "Pitch"                       { \s -> TokenType s }
-    "Duration"                    { \s -> TokenType s }
-    "Atom"                        { \s -> TokenType s }
-    "Music"                       { \s -> TokenType s }
+    -- Reserved words
+    "case"                        { \s -> TokenCase }
+    "otherwise"                   { \s -> TokenOtherwise }
+
+    -- Identifiers
+    [a-z][$alpha $digit \']*      { \s -> TokenId s }
+
+    -- Type / Type Instance
+    [A-Z]$alpha*                  { \s -> TokenType s }
 
     -- Operators
     \+                            { \s -> TokenPlus }
@@ -75,8 +70,10 @@ tokens :-
     \,                            { \s -> TokenComma }
     \(                            { \s -> TokenLParen }
     \)                            { \s -> TokenRParen }
-    \{                            { \s -> TokenLBrack }
-    \}                            { \s -> TokenRBrack }
+    \[                            { \s -> TokenLBrack }
+    \]                            { \s -> TokenRBrack }
+    \{                            { \s -> TokenLBrace }
+    \}                            { \s -> TokenRBrace }
 
 {
 
@@ -110,6 +107,8 @@ data Token = TokenId String
            | TokenRParen
            | TokenLBrack
            | TokenRBrack
+           | TokenLBrace
+           | TokenRBrace
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens
