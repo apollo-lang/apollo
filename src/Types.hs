@@ -43,50 +43,46 @@ data Music
     deriving (Show)
 
 pitchClass :: String -> Int
-pitchClass s
-    | s == "C"  = 0
-    | s == "D"  = 2
-    | s == "E"  = 4
-    | s == "F"  = 5
-    | s == "G"  = 7
-    | s == "A"  = 9
-    | s == "B"  = 11
-    | otherwise = error "Invalid pitch class"
+pitchClass "C"  = 0
+pitchClass "D"  = 2
+pitchClass "E"  = 4
+pitchClass "F"  = 5
+pitchClass "G"  = 7
+pitchClass "A"  = 9
+pitchClass "B"  = 11
+pitchClass _    = error "Invalid pitch class"
 
 accidental :: String -> Int
-accidental s
-    | s == "b"  = -1
-    | s == "#"  = 1
-    | otherwise = 0
+accidental "b"  = -1
+accidental "#"  = 1
+accidental _    = 0
 
 pitchHeight :: Int -> Int -> Int -> Int
 pitchHeight pc acc octave = (pc + acc) + 12 * (octave + 1)
 
 matchPitch :: String -> [[String]]
-matchPitch s = s =~ regex
-    where regex = "`([A-G])(b|#)?([0-9])"
+matchPitch s = s =~ "`([A-G])(b|#)?([0-9])"
 
 parsePitch :: String -> Pitch
 parsePitch s = case matchPitch s of
-    [] -> error "Syntax error"
+    [] -> error "Invalid pitch"         -- no match
     ms -> case head ms of
         [_, pc, acc, octave] -> 
-            Pitch 
-                (pitchHeight 
-                    (pitchClass pc) 
-                    (accidental acc) 
-                    (read octave :: Int))
-        _ -> error "Syntax error"
+            Pitch $ pitchHeight 
+                (pitchClass pc) 
+                (accidental acc) 
+                (read octave :: Int)
+        _ -> error "Invalid pitch"      -- invalid match
 
 matchDuration :: String -> [[String]]
-matchDuration s = s =~ regex
-    where regex = "\\\\([0-9]+)(\\.?)"
+matchDuration s = s =~ "\\\\([0-9]+)(\\.?)"
 
 parseDuration :: String -> Duration
 parseDuration s = case matchDuration s of
-    [] -> error "Syntax error"
+    [] -> error "Invalid duration"      -- no match
     ms -> case head ms of
         [_, dur, dot] -> case dot of
-            ""  -> Duration $ 64 `div` (read dur :: Int)
-            _   -> Duration $ 64 `div` (read dur :: Int) * 3 `div` 2
-        _ -> error "Syntax error"
+            "." -> Duration $ 64 `div` (read dur :: Int) * 3 `div` 2
+            _   -> Duration $ 64 `div` (read dur :: Int)
+        _ -> error "Invalid duration"   -- invalid match
+
