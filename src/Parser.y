@@ -39,8 +39,10 @@ import Types
     ','         { TokenComma }
     '('         { TokenLParen }
     ')'         { TokenRParen }
-    '{'         { TokenLBrack }
-    '}'         { TokenRBrack }
+    '['         { TokenLBrack }
+    ']'         { TokenRBrack }
+    '{'         { TokenLBrace }
+    '}'         { TokenRBrace }
 
 %nonassoc '='
 %left '||'
@@ -63,9 +65,10 @@ Statement   : Definition                    { StDef $1 }
 Definitions : Definition                    { [$1] }
             | Definition Definitions        { $1:$2 }
 
-Definition  : ID ':' Type '=' Expression    { Def $1 $3 $5 }
+Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 
 Type        : TYPE                          { Data $1 }
+            | '[' TYPE ']'                  { ListT $2 }
             | FnType                        { $1 }
 
 FnType      : '(' Params ')' '->' Type      { Function $2 $5 }
@@ -75,11 +78,19 @@ Param       : ID ':' Type                   { Param $1 $3 }
 Params      : Param                         { [$1] }
             | Param ',' Params              { $1:$3 }
 
+Expressions : Expression                    { [$1] }
+            | Expression ',' Expressions    { $1:$3 }
+
 Expression  : NUM                           { ApolloInt $1 }
             | BOOL                          { ApolloBool $1 }
             | ID                            { Name $1 }
             | DUR                           { ApolloDuration $ parseDuration $1 }
             | PITCH                         { ApolloPitch $ parsePitch $1 }
+            | TYPE '(' Expressions ')'      { construct (Data $1) $3 }
+            | '(' Expressions ')'           { construct (Data "Note") $2 } -- note syntax sugar
+            | '{' Expressions '}'           { construct (Data "Chord") $2 } -- chord syntax sugar
+            | ID '(' Expressions ')'        { FnCall $1 $3 }
+            | '[' Expressions ']'           { ApolloList $2 }
             | Conditional                   { $1 }
             | UnOp                          { Unary $1 }
             | BinOp                         { Binary $1 }
@@ -112,7 +123,7 @@ BinOp       : Expression '+' Expression     { Add $1 $3 }
             | Expression '||' Expression    { Or $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
-            | '{' Definitions Expression '}'{ Block $2 $3 }
+            | '{' Statements Expression '}' { Block $2 $3 }
 
 {
 parseError :: [Token] -> a

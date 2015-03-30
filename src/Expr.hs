@@ -21,7 +21,8 @@ data Param
 type Id = String
 
 data Type
-    = Data Id
+    = Data String
+    | ListT String
     | Function [Param] Type
     deriving Show
 
@@ -30,11 +31,15 @@ data Expr
     | ApolloBool Bool
     | ApolloDuration Duration
     | ApolloPitch Pitch
+    | ApolloNote Pitch Duration
+    | ApolloChord [Pitch] Duration
+    | ApolloList [Expr]
     | Name Id
-    | Block [Def] Expr
+    | Block [Stmt] Expr
     | Cond Expr Expr Expr
     | Unary UnOp
     | Binary BinOp
+    | FnCall Id [Expr]
     deriving Show
 
 data UnOp
@@ -57,4 +62,32 @@ data BinOp
     | And Expr Expr     -- &&
     | Or Expr Expr      -- ||
     deriving Show
+
+define :: Id -> Type -> Expr -> Def
+-- Coerce Int to Pitch
+define i (Data "Pitch") (ApolloInt p) 
+    | p < 0 || p > 127  = error "Pitch out of range [0, 127]"
+    | otherwise = Def i (Data "Pitch") (ApolloPitch (Pitch p))
+-- Coerce Int to Duration
+define i (Data "Duration") (ApolloInt d) 
+    | d < 1 || d > 256  = error "Duration out of range [1, 256]"
+    | otherwise = Def i (Data "Duration") (ApolloDuration (Duration d))
+-- Otherwise
+define i t e           = Def i t e
+
+unpackList :: Expr -> [Expr]
+unpackList (ApolloList exprs) = exprs
+unpackList _ = error "Syntax error"
+
+unpackPitch :: Expr -> Pitch
+unpackPitch (ApolloPitch p) = p
+unpackPitch _ = error "Syntax error"
+
+construct :: Type -> [Expr] -> Expr
+construct (Data "Pitch") [ApolloInt p] = ApolloPitch (Pitch p)
+construct (Data "Note") [ApolloPitch p, ApolloDuration d] 
+    = ApolloNote p d
+construct (Data "Chord") [pitches, ApolloDuration dur] 
+    = ApolloChord (map unpackPitch (unpackList pitches)) dur
+construct _ _ = error "Syntax error"
 
