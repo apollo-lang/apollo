@@ -37,5 +37,5 @@ getInt x = case (eval x) of
 getBool :: Expr -> Bool
 getBool x = case (eval x) of
               (ApolloBool b) -> b
-              notInt         -> error $ "expected ApolloBool; instead got " ++ show notInt
+              notBool        -> error $ "expected ApolloBool; instead got " ++ show notInt
 
