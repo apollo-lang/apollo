@@ -8,11 +8,16 @@ eval val@(ApolloInt      _) = val
 eval val@(ApolloBool     _) = val
 eval val@(ApolloDuration _) = val
 eval val@(ApolloPitch    _) = val
+eval (Unary  unExp)         = evalUnOp unExp
 eval (Binary binExp)        = evalBinOp binExp
-eval (Cond tst csq alt)     = if getBool $ eval tst
+eval (Cond   tst csq alt)   = if getBool $ eval tst
                               then eval csq
                               else eval alt
 eval _ = error "evaluation error"
+
+evalUnOp :: UnOp -> Expr
+evalUnOp (Neg e) = ApolloInt  $ -   (getInt  e)
+evalUnOp (Not e) = ApolloBool $ not (getBool e)
 
 evalBinOp :: BinOp -> Expr
 evalBinOp (Add e1 e2) = ApolloInt  $ (+)  (getInt  e1) (getInt  e2)
