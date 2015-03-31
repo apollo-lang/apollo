@@ -7,26 +7,26 @@ main :: IO ()
 main = getArgs >>= handleArgs . getFirst
   where getFirst args = if null args then "" else head args
         handleArgs args = case args of
-                            "--ast" -> parseAst
-                            _       -> parseExpr
-
--- Evaluate a program:
-
-parseExpr :: IO ()
-parseExpr = getContents >>= putStrLn . readExpr
-
-readExpr :: String -> String
-readExpr = show . map (eval . getExpr) . getStmts . parseProgram
-  where getStmts (Program stmts) = stmts
-        getExpr x = case x of
-                      (StExp expr) -> expr
-                      (StDef _)    -> error "TODO: not ready to handle Defs yet"
+                            "--ast" -> putAst
+                            _       -> putExpr
 
 -- Parse a program's syntax tree:
 
-parseAst :: IO ()
-parseAst = getContents >>= putStrLn . ast
+putAst :: IO ()
+putAst = getContents >>= putStrLn . parseAst
 
-ast :: String -> String
-ast = show . parseProgram
+parseAst :: String -> String
+parseAst = show . parseProgram
+
+-- Parse and evaluate a program:
+
+putExpr :: IO ()
+putExpr = getContents >>= putStrLn . parseExpr
+
+parseExpr :: String -> String
+parseExpr = show . map (eval . getExpr) . getStmts . parseProgram
+  where getStmts (Program stmts) = stmts
+        getExpr x = case x of
+                      (StExp expr) -> expr
+                      (StDef _)    -> error "TODO: `Def` not implemented"
 
