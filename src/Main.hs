@@ -16,7 +16,7 @@ parseExpr :: IO ()
 parseExpr = getContents >>= putStrLn . readExpr
 
 readExpr :: String -> String
-readExpr = show . map eval . map getExpr . getStmts . parseProgram
+readExpr = show . map (eval . getExpr) . getStmts . parseProgram
   where getStmts (Program stmts) = stmts
         getExpr x = case x of
                       (StExp expr) -> expr
