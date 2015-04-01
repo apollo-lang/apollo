@@ -31,5 +31,7 @@ $(PARSER): $(PARSE_SPEC)
 	happy $(PARSE_SPEC)
 
 $(EXE): $(SOURCES)
+	alex $(LEX_SPEC)
+	happy $(PARSE_SPEC)
 	ghc $(GFLAGS) $(MAIN) -o $@
 
