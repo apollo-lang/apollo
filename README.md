@@ -1,7 +1,7 @@
 Apollo
 ======
 
-A programming language for algorithmic composition
+A programming language for algorithmic and musical composition.
 
 Contributors:
 
