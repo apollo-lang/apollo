@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
+## TODO: untested for edge cases like compile fail, etc.
 ## TODO: return proper exit status (0/1)
 ## TODO: set timer with `ulimit`
 ## TODO: error on `compare` if both args not present
+## TODO: make function for coloring a line
 
 c_gre="\033[0;32m"
+c_yel="\033[0;33m"
 c_red="\033[0;31m"
 c_def="\033[0m"
 
@@ -27,6 +30,11 @@ check() {
   local answ=${2}
   local name=${1/.ap/}
 
+  if test ! -e "$answ"; then
+    echo -e "  ${c_yel}⦸ $name (no answer file)${c_def}"
+    return
+  fi
+
   local interp=$(evaluate $test)
   local answer=$(cat $answ)
   local result=$(compare "$interp" "$answer")
@@ -45,12 +53,19 @@ check() {
 }
 
 main() {
-  local tests="*.ap"
+  local cwd=$(basename $(pwd))
+  local test_dir="tests"
+
+  if test ! "$cwd" = "$test_dir"; then
+    cd "$test_dir"
+    echo -e "changed dirs: $cwd -> $test_dir"
+  fi
+
+  local tests=$(ls *.ap)
 
   echo -e ""
 
-  for test in $tests
-  do
+  for test in $tests; do
     local answer=${test/.ap/.ans}
     check $test $answer
   done

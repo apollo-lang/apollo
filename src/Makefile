@@ -7,11 +7,14 @@ GENERATED  := $(LEXER) $(PARSER)
 EXE     := apollo
 MAIN    := Main.hs
 GFLAGS  := -Wall
-SOURCES := $(wildcard *.hs) $(GENERATED)
+SOURCES := $(wildcard *.hs) $(LEX_SPEC) $(PARSE_SPEC)
 
-.PHONY: all clean clean-gen generated
+.PHONY: all test clean clean-gen generated
 
 all: $(EXE) clean-gen
+
+test: all
+	tests/run.sh
 
 clean-gen:
 	rm -f *.hi *.o core $(GENERATED)
