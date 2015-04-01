@@ -39,3 +39,12 @@ $ cat tests/cond.ap | ./apollo --ast
 Program [StExp (Cond (ApolloBool False) (ApolloInt 1) (ApolloInt 2))]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Tests
+-----
+
+To run all integration tests, change to the `src/` directory and issue the command:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ make test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
