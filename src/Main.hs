@@ -21,12 +21,15 @@ parseAst = show . parseProgram
 -- Parse and evaluate a program:
 
 putExpr :: IO ()
-putExpr = getContents >>= putStrLn . parseExpr
+putExpr = getContents >>= putStr . parseExpr
 
 parseExpr :: String -> String
-parseExpr = show . map (eval . getExpr) . getStmts . parseProgram
+parseExpr = printList . map (eval . getExpr) . getStmts . parseProgram
   where getStmts (Program stmts) = stmts
         getExpr x = case x of
                       (StExp expr) -> expr
                       (StDef _)    -> error "TODO: `Def` not implemented"
+
+printList :: [Expr] -> String
+printList = foldr ((++) . (++ "\n") . show) ""
 
