@@ -40,7 +40,12 @@ data Expr
     | Unary UnOp
     | Binary BinOp
     | FnCall Id [Expr]
-    deriving Show
+
+instance Show Expr where
+  show (ApolloInt  i) = show i
+  show (ApolloBool b) = show b
+  show (ApolloList l) = show l
+  show otherVal       = show otherVal
 
 data UnOp
     = Neg Expr
@@ -65,11 +70,11 @@ data BinOp
 
 define :: Id -> Type -> Expr -> Def
 -- Coerce Int to Pitch
-define i (Data "Pitch") (ApolloInt p) 
+define i (Data "Pitch") (ApolloInt p)
     | p < 0 || p > 127  = error "Pitch out of range [0, 127]"
     | otherwise = Def i (Data "Pitch") (ApolloPitch (Pitch p))
 -- Coerce Int to Duration
-define i (Data "Duration") (ApolloInt d) 
+define i (Data "Duration") (ApolloInt d)
     | d < 1 || d > 256  = error "Duration out of range [1, 256]"
     | otherwise = Def i (Data "Duration") (ApolloDuration (Duration d))
 -- Otherwise
@@ -85,9 +90,9 @@ unpackPitch _ = error "Syntax error"
 
 construct :: Type -> [Expr] -> Expr
 construct (Data "Pitch") [ApolloInt p] = ApolloPitch (Pitch p)
-construct (Data "Note") [ApolloPitch p, ApolloDuration d] 
+construct (Data "Note") [ApolloPitch p, ApolloDuration d]
     = ApolloNote p d
-construct (Data "Chord") [pitches, ApolloDuration dur] 
+construct (Data "Chord") [pitches, ApolloDuration dur]
     = ApolloChord (map unpackPitch (unpackList pitches)) dur
 construct _ _ = error "Syntax error"
 
