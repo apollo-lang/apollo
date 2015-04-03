@@ -6,10 +6,9 @@ import Expr
 eval :: Expr -> Expr
 eval val@(ApolloInt      _) = val
 eval val@(ApolloBool     _) = val
-eval val@(ApolloDuration _) = val
-eval val@(ApolloPitch    _) = val
 eval (Unary  unExp)         = evalUnOp unExp
 eval (Binary binExp)        = evalBinOp binExp
+eval (ApolloList xs)        = ApolloList $ map eval xs
 eval (Cond   tst csq alt)   = if getBool $ eval tst
                               then eval csq
                               else eval alt
