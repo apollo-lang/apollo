@@ -31,5 +31,5 @@ parseExpr = printList . map (eval . getExpr) . getStmts . parseProgram
                       (StDef _)    -> error "TODO: `Def` not implemented"
 
 printList :: [Expr] -> String
-printList = foldr ((++) . (++ "\n") . show) ""
+printList = foldr1 (++) . map (++ "\n") . map show
 
