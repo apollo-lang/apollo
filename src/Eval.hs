@@ -57,12 +57,12 @@ getInt x = do
   e <- eval x
   case e of
     (ApolloInt i) -> return i
-    notInt        -> throwError $ TypeMismatch "ApolloInt" notInt
+    notInt        -> throwError $ TypeMismatch "Integer" notInt
 
 getBool :: Expr -> ThrowsError Bool
 getBool x = do
   e <- eval x
   case e of
     (ApolloBool b) -> return b
-    notBool        -> throwError $ TypeMismatch "ApolloBool" notBool
+    notBool        -> throwError $ TypeMismatch "Boolean" notBool
 

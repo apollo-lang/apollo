@@ -1,6 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 module Expr where
-import Data.Typeable
 import Types
 
 data Program
@@ -57,13 +55,18 @@ data Expr
     | GEq Expr Expr     -- >=
     | And Expr Expr     -- &&
     | Or Expr Expr      -- ||
-    deriving Typeable
 
 instance Show Expr where
   show (ApolloInt  i) = show i
   show (ApolloBool b) = show b
   show (ApolloList l) = show l
   show otherVal       = show otherVal
+
+typeOf :: Expr -> String
+typeOf (ApolloInt _)  = "Integer"
+typeOf (ApolloBool _) = "Boolean"
+typeOf (ApolloList _) = "List"
+typeOf todoVal        = "TODO: `typeOf` for " ++ show todoVal
 
 define :: Id -> Type -> Expr -> Def
 -- Coerce Int to Pitch
