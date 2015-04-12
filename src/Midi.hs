@@ -1,5 +1,6 @@
 module Midi where
 import Codec.Midi
+import Types
 
 
 --------------------------------------------------------------
