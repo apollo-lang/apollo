@@ -5,8 +5,7 @@ module Error
 , trapError
 ) where
 import Control.Monad.Error
-import Data.Typeable (typeOf)
-import Expr (Expr (..))
+import Expr
 
 type ThrowsError = Either ApolloError
 
@@ -19,7 +18,7 @@ instance Error ApolloError where
   strMsg = Default
 
 instance Show ApolloError where
-  show (TypeMismatch expected found) = "Invalid type: expected " ++ expected ++ ", found " ++ show (typeOf found) ++ " (" ++ show found ++ ")"
+  show (TypeMismatch expected found) = "Invalid type: expected " ++ expected ++ ", found " ++ typeOf found ++ " (" ++ show found ++ ")"
   show (Default  msg) = msg
 
 trapError :: (MonadError e m, Show e) => m String -> m String
