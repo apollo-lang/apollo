@@ -39,24 +39,12 @@ data Expr
     | Name Id
     | Block [Stmt] Expr
     | Cond Expr Expr Expr
-    | Unary UnOp
-    | Binary BinOp
     | FnCall Id [Expr]
-    deriving Typeable
-
-instance Show Expr where
-  show (ApolloInt  i) = show i
-  show (ApolloBool b) = show b
-  show (ApolloList l) = show l
-  show otherVal       = show otherVal
-
-data UnOp
-    = Neg Expr
-    | Not Expr
-    deriving Show
-
-data BinOp
-    = Add Expr Expr     -- +
+    -- Unary Operators
+    | Neg Expr          -- -
+    | Not Expr          -- !
+    -- Binary Operators
+    | Add Expr Expr     -- +
     | Sub Expr Expr     -- -
     | Mul Expr Expr     -- *
     | Div Expr Expr     -- /
@@ -69,7 +57,13 @@ data BinOp
     | GEq Expr Expr     -- >=
     | And Expr Expr     -- &&
     | Or Expr Expr      -- ||
-    deriving Show
+    deriving Typeable
+
+instance Show Expr where
+  show (ApolloInt  i) = show i
+  show (ApolloBool b) = show b
+  show (ApolloList l) = show l
+  show otherVal       = show otherVal
 
 define :: Id -> Type -> Expr -> Def
 -- Coerce Int to Pitch
