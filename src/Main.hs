@@ -1,3 +1,4 @@
+import Control.Monad (liftM)
 import System.Environment
 import Parser
 import Eval
@@ -22,15 +23,21 @@ parseAst = show . parseProgram
 -- Parse and evaluate a program:
 
 putExpr :: IO ()
-putExpr = getContents >>= putStr . parseExpr
+putExpr = do
+  src <- getContents
+  results <- return $ parseExpr src
+  putStr . printList $ map showResult results
 
-parseExpr :: String -> String
-parseExpr = printList . map (eval . getExpr) . getStmts . parseProgram
+parseExpr :: String -> [ThrowsError Expr]
+parseExpr = map (eval . getExpr) . getStmts . parseProgram
   where getStmts (Program stmts) = stmts
         getExpr x = case x of
                       (StExp expr) -> expr
                       (StDef _)    -> error "TODO: `Def` not implemented"
 
-printList :: [ThrowsError Expr] -> String
-printList = foldr1 (++) . map ((++ "\n") . show)
+showResult :: ThrowsError Expr -> String
+showResult = extractValue . trapError . (liftM show)
+
+printList :: [String] -> String
+printList = foldr1 (++) . map (++ "\n")
 
