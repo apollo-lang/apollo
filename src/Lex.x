@@ -1,6 +1,6 @@
 {
 {-# OPTIONS_GHC -w #-}
-module Lexer (Token(..),scanTokens) where
+module Lex (Token(..),scanTokens) where
 import Expr
 }
 

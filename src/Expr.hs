@@ -2,7 +2,7 @@ module Expr where
 import Types
 
 data Program
-    = Program [Stmt]
+    = Program { getProgram :: [Stmt] }
     deriving Show
 
 data Stmt
