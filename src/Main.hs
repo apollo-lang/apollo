@@ -2,6 +2,7 @@ import System.Environment
 import Parser
 import Eval
 import Expr
+import Error
 
 main :: IO ()
 main = getArgs >>= handleArgs . getFirst
@@ -30,6 +31,6 @@ parseExpr = printList . map (eval . getExpr) . getStmts . parseProgram
                       (StExp expr) -> expr
                       (StDef _)    -> error "TODO: `Def` not implemented"
 
-printList :: [Expr] -> String
-printList = foldr1 (++) . map (++ "\n") . map show
+printList :: [ThrowsError Expr] -> String
+printList = foldr1 (++) . map ((++ "\n") . show)
 
