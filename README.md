@@ -28,15 +28,23 @@ Usage
 By default, `apollo` will evaluate a program sent through `stdin`:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ cat tests/cond.ap | ./apollo
-[ApolloInt 2]
+$ echo "1 + 1" | ./apollo
+2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To parse a program's abstract syntax tree, use the `--ast` flag:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ cat tests/cond.ap | ./apollo --ast
+$ echo "case (False) 1 otherwise 2" | ./apollo --ast
 Program [StExp (Cond (ApolloBool False) (ApolloInt 1) (ApolloInt 2))]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To use the Apollo Read-Evaluate-Print Loop (REPL), use the `--repl` flag:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ ./apollo --repl
+apollo> 1 + 1
+2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Tests
