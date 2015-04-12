@@ -17,7 +17,7 @@ data Note
     deriving (Show)
 
 data Chord 
-    = Chord [Pitch]
+    = Chord [Pitch] Duration
     deriving (Show)
 
 data Rest 
