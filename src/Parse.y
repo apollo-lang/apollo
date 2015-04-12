@@ -1,7 +1,7 @@
 {
-module Parser where
+module Parse where
 
-import Lexer
+import Lex
 import Expr
 import Types
 }
@@ -129,6 +129,14 @@ Block       : '{' Expression '}'            { Block [] $2 }
 parseError :: [Token] -> a
 parseError = error "Parse error"
 
-parseProgram :: String -> Program
-parseProgram = program . scanTokens
+parse :: String -> [Expr]
+parse = map getExpr . getProgram . program . scanTokens
+
+-- Becuase `apollo` cannot yet handle defs, this fn
+-- is used deconstruct a statement and ensure no defs are found
+-- TODO: fix!
+
+getExpr :: Stmt -> Expr
+getExpr (StExp e) = e
+getExpr (StDef d) = error $ "TODO: not yet able to handle Defs (" ++ show d ++ ")"
 }

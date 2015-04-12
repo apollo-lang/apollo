@@ -1,5 +1,5 @@
-LEX_SPEC   := Lexer.x
-PARSE_SPEC := Parser.y
+LEX_SPEC   := Lex.x
+PARSE_SPEC := Parse.y
 LEXER      := $(LEX_SPEC:.x=.hs)
 PARSER     := $(PARSE_SPEC:.y=.hs)
 GENERATED  := $(LEXER) $(PARSER)
