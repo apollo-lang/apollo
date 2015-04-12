@@ -35,11 +35,11 @@ data Rythm
     deriving (Show)
 
 data Part 
-    = Part [Atom]
+    = Part { atoms :: [Atom] }
     deriving (Show)
 
 data Music 
-    = Music [Part]
+    = Music { parts :: [Part] }
     deriving (Show)
 
 pitchClass :: String -> Int
