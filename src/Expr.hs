@@ -1,4 +1,6 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Expr where
+import Data.Typeable
 import Types
 
 data Program
@@ -40,6 +42,7 @@ data Expr
     | Unary UnOp
     | Binary BinOp
     | FnCall Id [Expr]
+    deriving Typeable
 
 instance Show Expr where
   show (ApolloInt  i) = show i
