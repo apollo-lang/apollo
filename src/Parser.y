@@ -92,8 +92,8 @@ Expression  : NUM                           { ApolloInt $1 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { ApolloList $2 }
             | Conditional                   { $1 }
-            | UnOp                          { Unary $1 }
-            | BinOp                         { Binary $1 }
+            | UnOp                          { $1 }
+            | BinOp                         { $1 }
             | Block                         { $1 }
             | '(' Expression ')'            { $2 }
 
