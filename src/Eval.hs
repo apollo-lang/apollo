@@ -7,33 +7,38 @@ import Expr
 import Error
 
 eval :: Expr -> ThrowsError Expr
-eval val@(ApolloInt      _) = return val
-eval val@(ApolloBool     _) = return val
-eval (Unary      unExp)     = evalUnOp unExp
-eval (Binary    binExp)     = evalBinOp binExp
-eval (ApolloList    xs)     = liftM ApolloList (mapM eval xs)
-eval (Cond tst csq alt)     = getBool tst >>= (\b -> eval $ if b then csq else alt)
-eval _                      = error "TODO: evaluation error"
+eval val@(ApolloInt  _) = return val
+eval val@(ApolloBool _) = return val
+eval (ApolloList    xs) = liftM ApolloList (mapM eval xs)
+eval (Cond tst csq alt) = getBool tst >>= (\b -> eval $ if b then csq else alt)
 
-evalUnOp :: UnOp -> ThrowsError Expr
-evalUnOp (Not e) = liftM (ApolloBool . not) (getBool e)
-evalUnOp (Neg e) = liftM (ApolloInt  . neg) (getInt  e)
+-- Unary operations:
+
+eval (Not e) = liftM (ApolloBool . not) (getBool e)
+eval (Neg e) = liftM (ApolloInt  . neg) (getInt  e)
   where neg i = -i
 
-evalBinOp :: BinOp -> ThrowsError Expr
-evalBinOp (Add e1 e2) = applyI (+)  e1 e2
-evalBinOp (Sub e1 e2) = applyI (-)  e1 e2
-evalBinOp (Mul e1 e2) = applyI (*)  e1 e2
-evalBinOp (Div e1 e2) = applyI div  e1 e2
-evalBinOp (Mod e1 e2) = applyI mod  e1 e2
-evalBinOp (Eq  e1 e2) = applyB (==) e1 e2
-evalBinOp (NEq e1 e2) = applyB (/=) e1 e2
-evalBinOp (Le  e1 e2) = applyB (<)  e1 e2
-evalBinOp (Gr  e1 e2) = applyB (>)  e1 e2
-evalBinOp (LEq e1 e2) = applyB (<=) e1 e2
-evalBinOp (GEq e1 e2) = applyB (>=) e1 e2
-evalBinOp (And e1 e2) = applyB (&&) e1 e2
-evalBinOp (Or  e1 e2) = applyB (||) e1 e2
+-- Binary operations:
+
+eval (Add e1 e2) = applyI (+)  e1 e2
+eval (Sub e1 e2) = applyI (-)  e1 e2
+eval (Mul e1 e2) = applyI (*)  e1 e2
+eval (Div e1 e2) = applyI div  e1 e2
+eval (Mod e1 e2) = applyI mod  e1 e2
+eval (Eq  e1 e2) = applyB (==) e1 e2
+eval (NEq e1 e2) = applyB (/=) e1 e2
+eval (Le  e1 e2) = applyB (<)  e1 e2
+eval (Gr  e1 e2) = applyB (>)  e1 e2
+eval (LEq e1 e2) = applyB (<=) e1 e2
+eval (GEq e1 e2) = applyB (>=) e1 e2
+eval (And e1 e2) = applyB (&&) e1 e2
+eval (Or  e1 e2) = applyB (||) e1 e2
+
+-- Handle case for not-yet-implemented types:
+
+eval _                      = error "evaluation error: not yet implemented"
+
+-- Helper functions:
 
 applyI :: (Int -> Int -> Int) -> Expr -> Expr -> ThrowsError Expr
 applyI op e1 e2 = do
