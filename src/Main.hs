@@ -14,13 +14,11 @@ main = getArgs >>= handleArgs . getFirst
                             "--repl" -> runRepl
                             _        -> putExpr
 
+
 -- Parse a program's syntax tree --------------------------------------------
 
 putAst :: IO ()
-putAst = getContents >>= putStrLn . parseAst
-
-parseAst :: String -> String
-parseAst = show . parse
+putAst = getContents >>= print . parse
 
 
 -- Parse and evaluate a program ---------------------------------------------
