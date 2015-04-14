@@ -1,1 +1,3 @@
 case (False) 1 otherwise 2
+case (False) 1 case (True) 2 otherwise 3
+case (False) 1 case (False) 2 otherwise 3

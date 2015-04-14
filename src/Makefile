@@ -13,8 +13,8 @@ SOURCES := $(wildcard *.hs) $(LEX_SPEC) $(PARSE_SPEC)
 
 all: $(EXE) clean-gen
 
-test: all
-	tests/run.sh
+test: $(EXE)
+	@tests/run.sh
 
 clean-gen:
 	rm -f *.hi *.o core $(GENERATED)
