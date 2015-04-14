@@ -58,7 +58,6 @@ main() {
 
   if test ! "$cwd" = "$test_dir"; then
     cd "$test_dir"
-    echo -e "changed dirs: $cwd -> $test_dir"
   fi
 
   local tests=$(ls *.ap)
