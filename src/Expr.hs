@@ -43,12 +43,14 @@ data Expr
     | GEq Expr Expr     -- >=
     | And Expr Expr     -- &&
     | Or Expr Expr      -- ||
+    deriving Show
 
-instance Show Expr where
-  show (ApolloInt  i) = show i
-  show (ApolloBool b) = show b
-  show (ApolloList l) = show l
-  show otherVal       = show otherVal
+showVal :: Expr -> String
+showVal (ApolloInt  i) = show i
+showVal (ApolloBool b) = show b
+showVal (ApolloList l) = "[" ++ commaDelim l  ++ "]"
+  where commaDelim = init . concatMap ((++ ",") . showVal)
+showVal otherVal       = show otherVal
 
 typeOf :: Expr -> String
 typeOf (ApolloInt _)  = "Integer"
