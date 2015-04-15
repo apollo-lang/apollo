@@ -1,19 +1,6 @@
 module Expr where
 import Types
 
-data Program
-    = Program { getProgram :: [Stmt] }
-    deriving Show
-
-data Stmt
-    = StDef Def
-    | StExp Expr
-    deriving Show
-
-data Def
-    = Def Id Type Expr
-    deriving Show
-
 data Param
     = Param Id Type
     deriving Show
@@ -34,8 +21,9 @@ data Expr
     | ApolloNote Pitch Duration
     | ApolloChord [Pitch] Duration
     | ApolloList [Expr]
+    | Def Id Type Expr
     | Name Id
-    | Block [Stmt] Expr
+    | Block [Expr] Expr
     | Cond Expr Expr Expr
     | FnCall Id [Expr]
     -- Unary Operators
@@ -68,7 +56,7 @@ typeOf (ApolloBool _) = "Boolean"
 typeOf (ApolloList _) = "List"
 typeOf todoVal        = "TODO: `typeOf` for " ++ show todoVal
 
-define :: Id -> Type -> Expr -> Def
+define :: Id -> Type -> Expr -> Expr
 -- Coerce Int to Pitch
 define i (Data "Pitch") (ApolloInt p)
     | p < 0 || p > 127  = error "Pitch out of range [0, 127]"
