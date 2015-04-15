@@ -30,7 +30,7 @@ showResults :: [ThrowsError Expr] -> String
 showResults = concatMap ((++ "\n") . showResult)
 
 showResult :: ThrowsError Expr -> String
-showResult = extractValue . trapError . liftM show
+showResult = extractValue . trapError . liftM showVal
 
 
 -- Read-Evaluate-print Loop -------------------------------------------------
