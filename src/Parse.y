@@ -35,7 +35,7 @@ import Types
     '!'         { TokenNot }
     '='         { TokenDef }
     '->'        { TokenArrow }
-    ':'         { TokenColon } 
+    ':'         { TokenColon }
     ','         { TokenComma }
     '('         { TokenLParen }
     ')'         { TokenRParen }
@@ -54,16 +54,11 @@ import Types
 
 %%
 
-Program     : Statements                    { Program $1 }
-
 Statements  : Statement                     { [$1] }
             | Statement Statements          { $1:$2 }
 
-Statement   : Definition                    { StDef $1 }
-            | Expression                    { StExp $1 }
-
-Definitions : Definition                    { [$1] }
-            | Definition Definitions        { $1:$2 }
+Statement   : Definition                    { $1 }
+            | Expression                    { $1 }
 
 Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 
@@ -97,12 +92,12 @@ Expression  : NUM                           { ApolloInt $1 }
             | Block                         { $1 }
             | '(' Expression ')'            { $2 }
 
-Conditional : CASE '(' Expression ')' 
-                Expression 
-              OTHERWISE 
+Conditional : CASE '(' Expression ')'
+                Expression
+              OTHERWISE
                 Expression                  { Cond $3 $5 $7 }
-            | CASE '(' Expression ')' 
-                Expression 
+            | CASE '(' Expression ')'
+                Expression
               Conditional                   { Cond $3 $5 $6 }
 
 UnOp        : '-' Expression  %prec NEG     { Neg $2 }
@@ -130,13 +125,5 @@ parseError :: [Token] -> a
 parseError = error "Parse error"
 
 parse :: String -> [Expr]
-parse = map getExpr . getProgram . program . scanTokens
-
--- Becuase `apollo` cannot yet handle defs, this fn
--- is used deconstruct a statement and ensure no defs are found
--- TODO: fix!
-
-getExpr :: Stmt -> Expr
-getExpr (StExp e) = e
-getExpr (StDef d) = error $ "TODO: not yet able to handle Defs (" ++ show d ++ ")"
+parse = program . scanTokens
 }
