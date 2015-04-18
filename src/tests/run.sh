@@ -31,7 +31,7 @@ check() {
   local name=${1/.ap/}
 
   if test ! -e "$answ"; then
-    echo -e "  ${c_yel}⦸ $name (no answer file)${c_def}"
+    echo -e "  ${c_yel}ALRT ${c_def} $name (no answer file)${c_def}"
     return
   fi
 
@@ -41,14 +41,14 @@ check() {
   local divider=$(printf '~%.0s' {1..68})
 
   if test -n "$result"; then
-    echo -e "  ${c_red}✗ $name ($test $answ)${c_def}"
+    echo -e "  ${c_red}FAIL ${c_def} $name ($test $answ)${c_def}"
     echo -e "${c_red}"
     echo -e "    $divider"
     printr "${result}"
     echo -e "    $divider"
     echo -e "${c_def}"
   else
-    echo -e "  ${c_gre}✔︎ $name ($test $answ)${c_def}"
+    echo -e "  ${c_gre}PASS ${c_def} $name ($test $answ)${c_def}"
   fi
 }
 
