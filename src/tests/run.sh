@@ -14,13 +14,9 @@ error=0
 compile_error=0
 
 evaluate() {
-  if test -e /tmp/apollo_error ; then
-    rm -f /tmp/apollo_error
-  fi
-
-  ../apollo < ${1} 2> /tmp/apollo_error
+  ../apollo < ${1} 2> /dev/null
   
-  if test -s /tmp/apollo_error ; then
+  if test $? -eq 1 ; then
     echo "Compilation error!"
   fi
 }
