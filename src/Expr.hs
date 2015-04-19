@@ -14,75 +14,68 @@ data Type
     deriving Show
 
 data Expr
-    = ApolloInt Int
-    | ApolloBool Bool
-    | ApolloDuration Duration
-    | ApolloPitch Pitch
-    | ApolloNote Pitch Duration
-    | ApolloChord [Pitch] Duration
-    | ApolloList [Expr]
+    = VInt Int
+    | VBool Bool
+    | VDuration Duration
+    | VPitch Pitch
+    | VNote Pitch Duration
+    | VChord [Pitch] Duration
+    | VList [Expr]
     | Def Id Type Expr
     | Name Id
     | Block [Expr] Expr
-    | Cond Expr Expr Expr
+    | If Expr Expr Expr
     | FnCall Id [Expr]
-    -- Unary Operators
-    | Neg Expr          -- -
-    | Not Expr          -- !
-    -- Binary Operators
-    | Add Expr Expr     -- +
-    | Sub Expr Expr     -- -
-    | Mul Expr Expr     -- *
-    | Div Expr Expr     -- /
-    | Mod Expr Expr     -- %
-    | Eq Expr Expr      -- ==
-    | NEq Expr Expr     -- !=
-    | Le Expr Expr      -- <
-    | Gr Expr Expr      -- >
-    | LEq Expr Expr     -- <=
-    | GEq Expr Expr     -- >=
-    | And Expr Expr     -- &&
-    | Or Expr Expr      -- ||
+    | Neg Expr
+    | Not Expr
+    | IntOp IOpr Expr Expr
+    | BoolOp BOpr Expr Expr
+    deriving Show
+
+data IOpr = Add | Sub | Mul | Div | Mod
+  deriving Show
+
+data BOpr = Eq | NEq | Le | Gr | LEq | GEq | And | Or
     deriving Show
 
 showVal :: Expr -> String
-showVal (ApolloInt  i) = show i
-showVal (ApolloBool b) = show b
-showVal (ApolloList l) = "[" ++ commaDelim l  ++ "]"
+showVal (VInt  i) = show i
+showVal (VBool b) = show b
+showVal (VList l) = "[" ++ commaDelim l  ++ "]"
   where commaDelim = init . concatMap ((++ ",") . showVal)
 showVal otherVal       = show otherVal
 
 typeOf :: Expr -> String
-typeOf (ApolloInt _)  = "Integer"
-typeOf (ApolloBool _) = "Boolean"
-typeOf (ApolloList _) = "List"
+typeOf (VInt _)  = "Integer"
+typeOf (VBool _) = "Boolean"
+typeOf (VList _) = "List"
 typeOf todoVal        = "TODO: `typeOf` for " ++ show todoVal
 
 define :: Id -> Type -> Expr -> Expr
 -- Coerce Int to Pitch
-define i (Data "Pitch") (ApolloInt p)
+define i (Data "Pitch") (VInt p)
     | p < 0 || p > 127  = error "Pitch out of range [0, 127]"
-    | otherwise = Def i (Data "Pitch") (ApolloPitch (Pitch p))
+    | otherwise = Def i (Data "Pitch") (VPitch (Pitch p))
 -- Coerce Int to Duration
-define i (Data "Duration") (ApolloInt d)
+define i (Data "Duration") (VInt d)
     | d < 1 || d > 256  = error "Duration out of range [1, 256]"
-    | otherwise = Def i (Data "Duration") (ApolloDuration (Duration d))
+    | otherwise = Def i (Data "Duration") (VDuration (Duration d))
 -- Otherwise
 define i t e           = Def i t e
 
 unpackList :: Expr -> [Expr]
-unpackList (ApolloList exprs) = exprs
+unpackList (VList exprs) = exprs
 unpackList _ = error "Syntax error"
 
 unpackPitch :: Expr -> Pitch
-unpackPitch (ApolloPitch p) = p
+unpackPitch (VPitch p) = p
 unpackPitch _ = error "Syntax error"
 
 construct :: Type -> [Expr] -> Expr
-construct (Data "Pitch") [ApolloInt p] = ApolloPitch (Pitch p)
-construct (Data "Note") [ApolloPitch p, ApolloDuration d]
-    = ApolloNote p d
-construct (Data "Chord") [pitches, ApolloDuration dur]
-    = ApolloChord (map unpackPitch (unpackList pitches)) dur
+construct (Data "Pitch") [VInt p] = VPitch (Pitch p)
+construct (Data "Note") [VPitch p, VDuration d]
+    = VNote p d
+construct (Data "Chord") [pitches, VDuration dur]
+    = VChord (map unpackPitch (unpackList pitches)) dur
 construct _ _ = error "Syntax error"
 

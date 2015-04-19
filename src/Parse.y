@@ -76,16 +76,16 @@ Params      : Param                         { [$1] }
 Expressions : Expression                    { [$1] }
             | Expression ',' Expressions    { $1:$3 }
 
-Expression  : NUM                           { ApolloInt $1 }
-            | BOOL                          { ApolloBool $1 }
+Expression  : NUM                           { VInt $1 }
+            | BOOL                          { VBool $1 }
             | ID                            { Name $1 }
-            | DUR                           { ApolloDuration $ parseDuration $1 }
-            | PITCH                         { ApolloPitch $ parsePitch $1 }
+            | DUR                           { VDuration $ parseDuration $1 }
+            | PITCH                         { VPitch $ parsePitch $1 }
             | TYPE '(' Expressions ')'      { construct (Data $1) $3 }
             | '(' Expressions ')'           { construct (Data "Note") $2 } -- note syntax sugar
             | '{' Expressions '}'           { construct (Data "Chord") $2 } -- chord syntax sugar
             | ID '(' Expressions ')'        { FnCall $1 $3 }
-            | '[' Expressions ']'           { ApolloList $2 }
+            | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
             | UnOp                          { $1 }
             | BinOp                         { $1 }
@@ -95,27 +95,27 @@ Expression  : NUM                           { ApolloInt $1 }
 Conditional : CASE '(' Expression ')'
                 Expression
               OTHERWISE
-                Expression                  { Cond $3 $5 $7 }
+                Expression                  { If $3 $5 $7 }
             | CASE '(' Expression ')'
                 Expression
-              Conditional                   { Cond $3 $5 $6 }
+              Conditional                   { If $3 $5 $6 }
 
 UnOp        : '-' Expression  %prec NEG     { Neg $2 }
             | '!' Expression                { Not $2 }
 
-BinOp       : Expression '+' Expression     { Add $1 $3 }
-            | Expression '-' Expression     { Sub $1 $3 }
-            | Expression '*' Expression     { Mul $1 $3 }
-            | Expression '/' Expression     { Div $1 $3 }
-            | Expression '%' Expression     { Mod $1 $3 }
-            | Expression '==' Expression    { Eq $1 $3 }
-            | Expression '!=' Expression    { NEq $1 $3 }
-            | Expression '<' Expression     { Le $1 $3 }
-            | Expression '>' Expression     { Gr $1 $3 }
-            | Expression '<=' Expression    { LEq $1 $3 }
-            | Expression '>=' Expression    { GEq $1 $3 }
-            | Expression '&&' Expression    { And $1 $3 }
-            | Expression '||' Expression    { Or $1 $3 }
+BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
+            | Expression '-'  Expression    { IntOp  Sub $1 $3 }
+            | Expression '*'  Expression    { IntOp  Mul $1 $3 }
+            | Expression '/'  Expression    { IntOp  Div $1 $3 }
+            | Expression '%'  Expression    { IntOp  Mod $1 $3 }
+            | Expression '==' Expression    { BoolOp Eq  $1 $3 }
+            | Expression '!=' Expression    { BoolOp NEq $1 $3 }
+            | Expression '<'  Expression    { BoolOp Le  $1 $3 }
+            | Expression '>'  Expression    { BoolOp Gr  $1 $3 }
+            | Expression '<=' Expression    { BoolOp LEq $1 $3 }
+            | Expression '>=' Expression    { BoolOp GEq $1 $3 }
+            | Expression '&&' Expression    { BoolOp And $1 $3 }
+            | Expression '||' Expression    { BoolOp Or  $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Statements Expression '}' { Block $2 $3 }
