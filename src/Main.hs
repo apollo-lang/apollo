@@ -1,3 +1,6 @@
+module Main
+( main
+) where
 import Control.Monad (liftM, unless)
 import System.Environment
 import System.IO
@@ -7,13 +10,12 @@ import Expr
 import Error
 
 main :: IO ()
-main = getArgs >>= handleArgs . getFirst
-  where getFirst args = if null args then "" else head args
-        handleArgs args = case args of
-                            "--ast"  -> putAst
-                            "--repl" -> runRepl
-                            _        -> putExpr
-
+main = getArgs >>= \args ->
+       case args of
+         ["--ast"]  -> putAst
+         ["--repl"] -> runRepl
+         []         -> putExpr
+         _          -> putStrLn "Invalid arguments"
 
 -- Parse a program's syntax tree --------------------------------------------
 
