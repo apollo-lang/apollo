@@ -26,14 +26,15 @@ solA = AtomNote (Note sol short)
 laA = AtomNote (Note la short)
 siA = AtomNote (Note si short)
 
-cI = AtomChord (Chord [mi, sol] mid)
+cI = AtomChord (Chord [doe, mi, sol] mid)
 cIV = AtomChord (Chord [fa, la, doe] mid)
+cVI = AtomChord (Chord [la, doe, mi] mid)
 cV = AtomChord (Chord [sol, si, re, fa] mid)
 
-melody = Part [doeA, doeA, reA, miA, doeA, miA, reA]
-chords = Part [cI, cV, cIV]
+--melody = Part [doeA, doeA, reA, miA, doeA, miA, reA]
+chords = Part [cI, cIV, cVI, cV, cI]
 
-song = Music [melody, chords]
+song = Music [chords]
 
 main :: IO ()
 main = do exportMusic song tempo "test.mid"
