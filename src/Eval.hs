@@ -1,68 +1,60 @@
 module Eval
 ( eval
 ) where
-import Control.Monad.Error (throwError)
 import Control.Monad (liftM)
 import Expr
 import Error
 
 eval :: Expr -> ThrowsError Expr
-eval val@(ApolloInt  _) = return val
-eval val@(ApolloBool _) = return val
-eval (ApolloList    xs) = liftM ApolloList (mapM eval xs)
-eval (Cond tst csq alt) = getBool tst >>= (\b -> eval $ if b then csq else alt)
+eval expr = case expr of
+  VInt i -> return $ VInt i
 
--- Unary operations:
+  VBool b -> return $ VBool b
 
-eval (Not e) = liftM (ApolloBool . not) (getBool e)
-eval (Neg e) = liftM (ApolloInt  . neg) (getInt  e)
-  where neg i = -i
+  VList xs -> liftM VList (mapM eval xs)
 
--- Binary operations:
+  If test tr fl -> do
+    VBool b <- eval test
+    if b
+    then eval tr
+    else eval fl
 
-eval (Add e1 e2) = applyI (+)  e1 e2
-eval (Sub e1 e2) = applyI (-)  e1 e2
-eval (Mul e1 e2) = applyI (*)  e1 e2
-eval (Div e1 e2) = applyI div  e1 e2
-eval (Mod e1 e2) = applyI mod  e1 e2
-eval (Eq  e1 e2) = applyB (==) e1 e2
-eval (NEq e1 e2) = applyB (/=) e1 e2
-eval (Le  e1 e2) = applyB (<)  e1 e2
-eval (Gr  e1 e2) = applyB (>)  e1 e2
-eval (LEq e1 e2) = applyB (<=) e1 e2
-eval (GEq e1 e2) = applyB (>=) e1 e2
-eval (And e1 e2) = applyB (&&) e1 e2
-eval (Or  e1 e2) = applyB (||) e1 e2
+  Not e -> do
+    VBool b <- eval e
+    return . VBool $ not b
 
--- Handle case for not-yet-implemented types:
+  Neg e -> do
+    VInt i <- eval e
+    return . VInt $ -i
 
-eval _                      = error "evaluation error: not yet implemented"
+  IntOp op a b -> do
+    VInt a' <- eval a
+    VInt b' <- eval b
+    return . VInt $ applyI op a' b'
 
--- Helper functions:
+  BoolOp op a b -> do
+    VBool a' <- eval a
+    VBool b' <- eval b
+    return . VBool $ applyB op a' b'
 
-applyI :: (Int -> Int -> Int) -> Expr -> Expr -> ThrowsError Expr
-applyI op e1 e2 = do
-  i1 <- getInt e1
-  i2 <- getInt e2
-  return . ApolloInt $ op i1 i2
+  other -> error $ "not yet implemented: " ++ show other
 
-applyB :: (Bool -> Bool -> Bool) -> Expr -> Expr -> ThrowsError Expr
-applyB op e1 e2 = do
-  b1 <- getBool e1
-  b2 <- getBool e2
-  return . ApolloBool $ op b1 b2
+applyI :: IOpr -> Int -> Int -> Int
+applyI op a b = case op of
+  Add -> a + b
+  Mul -> a * b
+  Sub -> a - b
+  Div -> a `div` b
+  Mod -> a `mod` b
 
-getInt :: Expr -> ThrowsError Int
-getInt x = do
-  e <- eval x
-  case e of
-    (ApolloInt i) -> return i
-    notInt        -> throwError $ TypeMismatch "Integer" notInt
-
-getBool :: Expr -> ThrowsError Bool
-getBool x = do
-  e <- eval x
-  case e of
-    (ApolloBool b) -> return b
-    notBool        -> throwError $ TypeMismatch "Boolean" notBool
+applyB :: BOpr -> Bool -> Bool -> Bool
+applyB op a b = case op of
+  Eq  -> a == b
+  NEq -> a /= b
+  Le  -> a < b
+  Gr  -> a > b
+  LEq -> a <= b
+  GEq -> a >= b
+  And -> a && b
+  Or  -> a || b
 
