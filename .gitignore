@@ -1,4 +1,17 @@
+# Generated files:
+
+Lex.hs
+Parse.hs
+
+# Executible:
+
+apollo
+
+# Other:
+
+core
 *.o
 *.hi
 *~
 *.pdf
+src/tmp/

@@ -9,29 +9,26 @@ MAIN    := Main.hs
 GFLAGS  := -Wall
 SOURCES := $(wildcard *.hs) $(LEX_SPEC) $(PARSE_SPEC)
 
-.PHONY: all test clean clean-gen generated
+.PHONY: all test clean generated
 
-all: $(EXE) clean-gen
+all: $(EXE)
 
 test: $(EXE)
 	@tests/run.sh
 
-clean-gen:
-	rm -f *.hi *.o core $(GENERATED)
-
-clean: clean-gen
+clean:
+	rm -rf tmp/
+	rm -f $(GENERATED)
 	rm -f $(EXE)
 
 generated: $(LEXER) $(PARSER)
 
 $(LEXER): $(LEX_SPEC)
-	alex $(LEX_SPEC)
+	alex $< --outfile=$@
 
 $(PARSER): $(PARSE_SPEC)
-	happy $(PARSE_SPEC)
+	happy $< --outfile=$@
 
 $(EXE): $(SOURCES)
-	alex $(LEX_SPEC)
-	happy $(PARSE_SPEC)
-	ghc $(GFLAGS) $(MAIN) -o $@
+	ghc $(GFLAGS) --make $(MAIN) -o $@ -outputdir tmp/
 
