@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-## TODO: set timer with `ulimit`
 ## TODO: error on `compare` if both args not present
 ## TODO: make function for coloring a line
 
@@ -17,7 +16,7 @@ usage() {
     echo ""
     echo "  Description: tests apollo against all available test cases"
     echo ""
-    echo "  Usage: run [-qh]"
+    echo "  Usage: run.sh [-qh]"
     echo ""
     echo "  Options:"
     echo ""
@@ -27,6 +26,9 @@ usage() {
 }
 
 evaluate() {
+  # We limit apollo to run for at most 60 seconds - to catch infinite loops
+  ulimit -t 60
+
   ../apollo < ${1} 2> /dev/null
   
   if test $? -eq 1 ; then
