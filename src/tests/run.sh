@@ -11,9 +11,18 @@ c_red="\033[0;31m"
 c_def="\033[0m"
 
 error=0
+compile_error=0
 
 evaluate() {
-  cat ${1} | ../apollo
+  if test -e /tmp/apollo_error ; then
+    rm -f /tmp/apollo_error
+  fi
+
+  ../apollo < ${1} 2> /tmp/apollo_error
+  
+  if test -s /tmp/apollo_error ; then
+    echo "Compilation error!"
+  fi
 }
 
 compare() {
