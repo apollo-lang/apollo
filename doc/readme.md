@@ -16,7 +16,7 @@ Getting Pandoc Ready for Your Shit
 
 > *Install pandoc and its bullshit dependencies.*
 
-Installing Pandoc is a bitch. I like you, so I wrote up some instructions to make it easy for you. If you follow these exactly, you should be okay if you're on a Mac. If you're not on a Mac, you're fucked.
+Installing Pandoc is a bitch. I like you, so I wrote up some instructions to make it easy for you. If you follow these exactly, you should be okay if you're on a Mac. If you're not on a Mac, you're fucked. *
 
 First, install MacTex:
 
@@ -45,3 +45,13 @@ You're welcome.
 
 [stack exchange link]: http://tex.stackexchange.com/questions/163849
 
+* Actually, if you're on linux, you're not fucked.
+--------------------------------------------------
+
+If you're on Debian/Ubuntu, just run:
+
+    $ sudo apt-get install texlive
+    $ cabal install pandoc
+    $ sudo ln -s /home/{your username}/.cabal/bin/pandoc /usr/bin/pandoc
+
+Waay easier than on Mac. Fuck Mac.
