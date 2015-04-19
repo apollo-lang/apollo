@@ -13,6 +13,19 @@ error=0
 quiet=0
 compile_error=0
 
+usage() {
+    echo ""
+    echo "  Description: tests apollo against all available test cases"
+    echo ""
+    echo "  Usage: run [-qh]"
+    echo ""
+    echo "  Options:"
+    echo ""
+    echo "    -q, --quiet           supresses error messages"
+    echo "    -h, --help            output help and usage"
+    echo ""
+}
+
 evaluate() {
   ../apollo < ${1} 2> /dev/null
   
@@ -74,8 +87,13 @@ main() {
   case "${arg}" in
     # flags
     -q|--quiet)
-        quiet=1
-        ;;
+      quiet=1
+      ;;
+
+    -h|--help)
+      usage
+      return 0
+      ;;
   esac
 
   local cwd=$(basename $(pwd))
