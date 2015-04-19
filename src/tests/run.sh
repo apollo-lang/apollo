@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 ## TODO: untested for edge cases like compile fail, etc.
-## TODO: return proper exit status (0/1)
 ## TODO: set timer with `ulimit`
 ## TODO: error on `compare` if both args not present
 ## TODO: make function for coloring a line
@@ -10,6 +9,8 @@ c_gre="\033[0;32m"
 c_yel="\033[0;33m"
 c_red="\033[0;31m"
 c_def="\033[0m"
+
+error=0
 
 evaluate() {
   cat ${1} | ../apollo
@@ -32,12 +33,12 @@ check() {
 
   if test ! -e "$answ"; then
     echo -e "  ${c_yel}WARN ${c_def} $name (no answer file)"
-    return
+    return 0
   fi
 
   if test ! -s "$answ"; then
     echo -e "  ${c_yel}WARN ${c_def} $name (answer file empty)"
-    return
+    return 0
   fi
 
   local interp=$(evaluate $test)
@@ -52,8 +53,10 @@ check() {
     printr "${result}"
     echo -e "    $divider"
     echo -e "${c_def}"
+    return 1
   else
     echo -e "  ${c_gre}PASS ${c_def} $name ($test $answ)"
+    return 0
   fi
 }
 
@@ -72,6 +75,9 @@ main() {
   for test in $tests; do
     local answer=${test/.ap/.ans}
     check $test $answer
+    if test $? -eq 1 ; then
+      error=1
+    fi
   done
 
   echo -e ""
@@ -81,6 +87,6 @@ if [[ ${BASH_SOURCE[0]} != $0 ]]; then
   export -f run-integrations
 else
   main "${@}"
-  exit $?
+  exit $error
 fi
 
