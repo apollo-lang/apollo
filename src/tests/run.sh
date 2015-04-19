@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-## TODO: untested for edge cases like compile fail, etc.
 ## TODO: set timer with `ulimit`
 ## TODO: error on `compare` if both args not present
 ## TODO: make function for coloring a line
@@ -11,6 +10,7 @@ c_red="\033[0;31m"
 c_def="\033[0m"
 
 error=0
+quiet=0
 compile_error=0
 
 evaluate() {
@@ -53,11 +53,13 @@ check() {
 
   if test -n "$result"; then
     echo -e "  ${c_red}FAIL ${c_def} $name ($test $answ)"
-    echo -e "${c_red}"
-    echo -e "    $divider"
-    printr "${result}"
-    echo -e "    $divider"
-    echo -e "${c_def}"
+    if test $quiet -eq 0; then
+      echo -e "${c_red}"
+      echo -e "    $divider"
+      printr "${result}"
+      echo -e "    $divider"
+      echo -e "${c_def}"
+    fi
     return 1
   else
     echo -e "  ${c_gre}PASS ${c_def} $name ($test $answ)"
@@ -66,6 +68,16 @@ check() {
 }
 
 main() {
+  local arg="$1"
+  shift
+
+  case "${arg}" in
+    # flags
+    -q|--quiet)
+        quiet=1
+        ;;
+  esac
+
   local cwd=$(basename $(pwd))
   local test_dir="tests"
 
