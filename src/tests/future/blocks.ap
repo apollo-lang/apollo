@@ -14,3 +14,9 @@ volumeCylinder: (r: Int, b: Int, h: Int) -> Int = {
     circleArea: Int = 2 * pi * r * r
     sideArea + circleArea
 }
+
+case (True) {
+	2
+} otherwise {
+	3
+}
