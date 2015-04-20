@@ -1,38 +1,50 @@
 #!/usr/bin/env bash
 
-## TODO: error on `compare` if both args not present
-## TODO: make function for coloring a line
-
-c_gre="\033[0;32m"
-c_yel="\033[0;33m"
-c_red="\033[0;31m"
-c_def="\033[0m"
-
-error=0
+os=$(uname -s)
+indent="  "
 quiet=0
+exit_status=0
 compile_error=0
 
+green() {
+  printf "${indent}\033[0;32m%s\033[0m %s\n" "$1" "$2"
+}
+
+yellow() {
+  printf "${indent}\033[0;33m%s\033[0m %s\n" "$1" "$2"
+}
+
+red() {
+  printf "${indent}\033[0;31m%s\033[0m %s\n" "$1" "$2"
+}
+
+error () {
+  {
+    printf "${indent}%s\n" "$@"
+  } >&2
+}
+
 usage() {
-    echo ""
-    echo "  Description: tests apollo against all available test cases"
-    echo ""
-    echo "  Usage: run.sh [-qh]"
-    echo ""
-    echo "  Options:"
-    echo ""
-    echo "    -q, --quiet           supresses error messages"
-    echo "    -h, --help            output help and usage"
-    echo ""
+  echo
+  echo "${indent}Description: run all integration tests"
+  echo
+  echo "${indent}Usage: run.sh [-qh]"
+  echo
+  echo "${indent}Options:"
+  echo
+  echo "${indent}  -q, --quiet           suppress error messages"
+  echo "${indent}  -h, --help            output help and usage"
+  echo
 }
 
 evaluate() {
-  # We limit apollo to run for at most 60 seconds - to catch infinite loops
-  ulimit -t 60
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
 
-  ../apollo < ${1} 2> /dev/null
-  
-  if test $? -eq 1 ; then
-    echo "Compilation error!"
+  ../apollo $2 < "$1" 2> /dev/null
+
+  if test $? -eq 1; then
+    echo "<compilation error>"
   fi
 }
 
@@ -42,88 +54,117 @@ compare() {
 
 printr() {
   while read -r line; do
-      printf "    $line\n"
+      red "  $line"
   done <<< "$1"
 }
 
 check() {
+  if test "$os" == "Darwin"; then
+    local pass="✔︎"
+    local warn="⦸"
+    local fail="✗"
+  else
+    local pass="PASS "
+    local warn="WARN "
+    local fail="FAIL "
+  fi
+
   local test=${1}
-  local answ=${2}
+  local answ=${test/.ap/.ans}
   local name=${1/.ap/}
+  local ast=0
 
   if test ! -e "$answ"; then
-    echo -e "  ${c_yel}WARN ${c_def} $name (no answer file)"
+    local answ=${test/.ap/.ast}
+    local ast=1
+  fi
+
+  if test ! -e "$answ"; then
+    yellow "$warn $name" "(no answer file)"
     return 0
   fi
 
   if test ! -s "$answ"; then
-    echo -e "  ${c_yel}WARN ${c_def} $name (answer file empty)"
+    yellow "$warn $name" "(answer file empty)"
     return 0
   fi
 
-  local interp=$(evaluate $test)
+  if test "$ast" -eq 1; then
+    local interp=$(evaluate $test --ast)
+  else
+    local interp=$(evaluate $test)
+  fi
+
   local answer=$(cat $answ)
   local result=$(compare "$interp" "$answer")
   local divider=$(printf '~%.0s' {1..68})
 
   if test -n "$result"; then
-    echo -e "  ${c_red}FAIL ${c_def} $name ($test $answ)"
+    red "$fail $name" "($test $answ)"
     if test $quiet -eq 0; then
-      echo -e "${c_red}"
-      echo -e "    $divider"
-      printr "${result}"
-      echo -e "    $divider"
-      echo -e "${c_def}"
+      red
+      red "  $divider"
+      printr "$result"
+      red "  $divider"
+      red
     fi
     return 1
   else
-    echo -e "  ${c_gre}PASS ${c_def} $name ($test $answ)"
+    green "$pass $name" "($test $answ)"
     return 0
   fi
 }
 
-main() {
-  local arg="$1"
-  shift
-
-  case "${arg}" in
-    # flags
+handle_flags() {
+  case "$1" in
     -q|--quiet)
       quiet=1
       ;;
 
     -h|--help)
       usage
-      return 0
+      exit 0
+      ;;
+
+    *)
+      if test ! -z "$1"; then
+        error "Unknown option: $1"
+        exit 1
+      fi
       ;;
   esac
+}
 
+change_dir_if_necessary() {
   local cwd=$(basename $(pwd))
   local test_dir="tests"
 
   if test ! "$cwd" = "$test_dir"; then
     cd "$test_dir"
   fi
+}
 
+run_tests() {
   local tests=$(ls *.ap)
 
-  echo -e ""
+  echo
 
   for test in $tests; do
-    local answer=${test/.ap/.ans}
-    check $test $answer
-    if test $? -eq 1 ; then
-      error=1
+    check $test
+    if test $? -eq 1; then
+      exit_status=1
     fi
   done
 
-  echo -e ""
+  echo
 }
 
-if [[ ${BASH_SOURCE[0]} != $0 ]]; then
-  export -f run-integrations
-else
-  main "${@}"
-  exit $error
-fi
+main() {
+  handle_flags $@
+  change_dir_if_necessary
+  run_tests
+}
+
+main $@
+exit $exit_status
 
