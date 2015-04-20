@@ -1,12 +1,17 @@
 {
-module Parse where
-
+module Parse
+( parse
+, parseRepl
+) where
+import Control.Monad.Error
 import Lex
 import Expr
 import Types
+import Error
 }
 
 %name           program
+%monad          { ThrowsError }
 %tokentype      { Token }
 %error          { parseError }
 
@@ -121,9 +126,13 @@ Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Statements Expression '}' { Block $2 $3 }
 
 {
-parseError :: [Token] -> a
-parseError = error "Parse error"
+-- TODO: improve
+parseError (token:whatever) = Left . ParseErr $ show whatever
 
-parse :: String -> [Expr]
+parse :: String -> ThrowsError [Expr]
 parse = program . scanTokens
+
+-- TODO: implement single expr constraint at parse level
+parseRepl :: String -> ThrowsError Expr
+parseRepl = liftM head . parse
 }
