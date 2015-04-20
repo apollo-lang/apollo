@@ -11,6 +11,9 @@ type ThrowsError = Either ApolloError
 
 data ApolloError
   = TypeMismatch String Expr
+  | UnboundVar String String
+  | RedefVar String
+  | ParseErr String
   | Default String
 
 instance Error ApolloError where
@@ -19,7 +22,10 @@ instance Error ApolloError where
 
 instance Show ApolloError where
   show (TypeMismatch expected found) = "Invalid type: expected " ++ expected ++ ", found " ++ typeOf found ++ " (" ++ show found ++ ")"
-  show (Default  msg) = msg
+  show (UnboundVar       action var) = action ++ " an unbound variable: " ++ var
+  show (RedefVar                var) = "Multiple declaration: redefining variable " ++ var
+  show (ParseErr                val) = "Parse error: unexpected token " ++ show val
+  show (Default                 msg) = msg
 
 trapError :: (MonadError e m, Show e) => m String -> m String
 trapError action = catchError action (return . show)
