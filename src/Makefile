@@ -29,6 +29,6 @@ $(LEXER): $(LEX_SPEC)
 $(PARSER): $(PARSE_SPEC)
 	happy $< --outfile=$@
 
-$(EXE): $(SOURCES)
+$(EXE): $(SOURCES) generated
 	ghc $(GFLAGS) --make $(MAIN) -o $@ -outputdir tmp/
 
