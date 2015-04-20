@@ -2,10 +2,10 @@ module Main
 ( main
 ) where
 import Control.Monad (liftM, unless)
+import Control.Monad.Trans.Error (runErrorT)
 import System.Environment
 import System.IO
 import Parse
-import Error
 import Expr
 import Eval
 import Env
@@ -29,22 +29,20 @@ parseAndEval :: String -> IO ()
 parseAndEval src = do
   env <- nullEnv
   case (parse src) of
-    (Left err)    -> undefined
-    (Right exprs) -> nullEnv >>= \env -> execute "" env exprs >>= putStrLn
+    (Left err)    -> putStrLn $ show err
+    (Right exprs) -> execute env exprs >>= putStrLn . concatMap (++ "\n")
 
 -- TODO: does this allow env to be mutated? (never explicitly passed to recurse
 -- in new form). can we maybe use a simpler state representation and just pass
 -- it out of eval (along with play's durrent value)
 
-execute :: String -> Env -> [Expr] -> IO String
--- execute _   [] = undefined
-execute acc env (e:exprs) =
-  case (eval env e) of
-    (Left err)  -> showResult err >>= \e -> return $ addResult e acc
-    (Right val) -> showResult val >>= \v -> execute (addResult v acc) env exprs
-
-addResult :: String -> String -> String
-addResult str accum = str ++ "\n" ++ accum
+execute :: Env -> [Expr] -> IO [String]
+execute _   []        = return []
+execute env (e:exprs) =
+  (runErrorT (eval env e)) >>= \res->
+  case res of
+    (Left err)  -> return $ [show err]
+    (Right val) -> liftM ([showVal val] ++) (execute env exprs)
 
 showResult :: IOThrowsError Expr -> IO String
 showResult = runIOThrows . liftM showVal
