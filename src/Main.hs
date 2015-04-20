@@ -21,7 +21,9 @@ main = getArgs >>= \args ->
 -- Parse a program's syntax tree --------------------------------------------
 
 putAst :: IO ()
-putAst = getContents >>= print . parse
+putAst = getContents >>= \x -> putStrLn $ case (parse x) of
+                                 (Left  err) -> show err
+                                 (Right ast) -> show ast
 
 -- Parse and evaluate a program ---------------------------------------------
 
