@@ -37,6 +37,8 @@ eval env expr = case expr of
     VBool b' <- eval env b
     return . VBool $ applyB op a' b'
 
+  Block body ret -> mapM (eval env) body >> eval env ret
+
   Def name typ e -> do
     ex <- eval env e
     defineVar env name ex
