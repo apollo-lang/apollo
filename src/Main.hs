@@ -15,7 +15,7 @@ main = getArgs >>= \args ->
        case args of
          ["--ast"]  -> putAst
          ["--repl"] -> runRepl
---         []         -> putExpr
+         []         -> getContents >>= parseAndEval
          _          -> putStrLn "Invalid arguments"
 
 -- Parse a program's syntax tree --------------------------------------------
@@ -25,18 +25,26 @@ putAst = getContents >>= print . parse
 
 -- Parse and evaluate a program ---------------------------------------------
 
-{-
-putExpr :: IO ()
-putExpr = do
-  src <- getContents
+parseAndEval :: String -> IO ()
+parseAndEval src = do
   env <- nullEnv
-  let exprs = liftThrows $ parse src
-  let results = map (eval env) exprs
-  putStr $ showResults results
+  case (parse src) of
+    (Left err)    -> undefined
+    (Right exprs) -> nullEnv >>= \env -> execute "" env exprs >>= putStrLn
 
-showResults :: [IOThrowsError Expr] -> IO String
-showResults = mapM showResult >>= return . concatMap (++ "\n")
--}
+-- TODO: does this allow env to be mutated? (never explicitly passed to recurse
+-- in new form). can we maybe use a simpler state representation and just pass
+-- it out of eval (along with play's durrent value)
+
+execute :: String -> Env -> [Expr] -> IO String
+-- execute _   [] = undefined
+execute acc env (e:exprs) =
+  case (eval env e) of
+    (Left err)  -> showResult err >>= \e -> return $ addResult e acc
+    (Right val) -> showResult val >>= \v -> execute (addResult v acc) env exprs
+
+addResult :: String -> String -> String
+addResult str accum = str ++ "\n" ++ accum
 
 showResult :: IOThrowsError Expr -> IO String
 showResult = runIOThrows . liftM showVal

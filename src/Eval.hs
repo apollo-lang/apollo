@@ -37,9 +37,9 @@ eval env expr = case expr of
     VBool b' <- eval env b
     return . VBool $ applyB op a' b'
 
-  Def name typ exp -> do
-    e <- eval env exp
-    defineVar env name e
+  Def name typ e -> do
+    ex <- eval env e
+    defineVar env name ex
 
   Name name -> getVar env name
 
