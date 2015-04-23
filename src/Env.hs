@@ -5,7 +5,7 @@ import Data.IORef
 import Error
 import Expr
 
-type Env = IORef [(String, IORef Expr)]
+type Env = IORef [(String, IORef (Type, Expr))]
 
 nullEnv :: IO Env
 nullEnv = newIORef []
@@ -22,7 +22,7 @@ runIOThrows action = liftM extractValue (runErrorT $ trapError action)
 isBound :: Env -> String -> IO Bool
 isBound envRef var = liftM (isJust . lookup var) (readIORef envRef)
 
-getVar :: Env -> String -> IOThrowsError Expr
+getVar :: Env -> String -> IOThrowsError (Type, Expr)
 getVar envRef var = do
   env <- liftIO $ readIORef envRef
   maybe (throwError $ UnboundVar "Getting" var)
@@ -32,15 +32,15 @@ getVar envRef var = do
 -- TODO: note, `setVar` only for use in defineVar; not for mutable vars....until we get to play fn?
 -- TODO: `setVar` and `defineVar` shouldn't return a value (type changes to `-> IOThrowsError ()`?)
 
-setVar :: Env -> String -> Expr -> IOThrowsError Expr
+setVar :: Env -> String -> (Type, Expr) -> IOThrowsError Expr
 setVar envRef var value = do
   env <- liftIO $ readIORef envRef
   maybe (throwError $ UnboundVar "Setting" var)
         (liftIO . flip writeIORef value)
         (lookup var env)
-  return value
+  return $ snd value
 
-defineVar :: Env -> String -> Expr -> IOThrowsError Expr
+defineVar :: Env -> String -> (Type, Expr) -> IOThrowsError Expr
 defineVar envRef var value = do
      alreadyDefined <- liftIO $ isBound envRef var
      if alreadyDefined
@@ -49,9 +49,9 @@ defineVar envRef var value = do
              valueRef <- newIORef value
              env <- readIORef envRef
              writeIORef envRef ((var, valueRef) : env)
-             return value
+             return $ snd value
 
-bindVars :: Env -> [(String, Expr)] -> IO Env
+bindVars :: Env -> [(String, (Type, Expr))] -> IO Env
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
      where extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
            addBinding (var, value) = do ref <- newIORef value
