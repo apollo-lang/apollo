@@ -47,6 +47,11 @@ eval env expr = case expr of
     VPitch b' <- eval env b
     return . VPitch $ applyP op a' b'
 
+  DurOp op a b -> do
+    VDuration a' <- eval env a
+    VDuration b' <- eval env b
+    return . VDuration $ applyD op a' b'
+
   Block body ret -> mapM (eval env) body >> eval env ret
 
   Def name typ e -> do
@@ -79,17 +84,17 @@ applyB op a b = case op of
 
 applyP :: IOpr -> Pitch -> Pitch -> Pitch
 applyP op a b = case op of
-  Add -> Pitch $ ((pitch a) + (pitch b)) `mod` 128
-  Mul -> Pitch $ ((pitch a) * (pitch b)) `mod` 128
-  Sub -> Pitch $ ((pitch a) - (pitch b)) `mod` 128
-  Div -> Pitch $ (pitch a) `div` (pitch b)
-  Mod -> Pitch $ (pitch a) `mod` (pitch b)
+  Add -> Pitch $ ((pitchInt a) + (pitchInt b)) `mod` 128
+  Mul -> Pitch $ ((pitchInt a) * (pitchInt b)) `mod` 128
+  Sub -> Pitch $ ((pitchInt a) - (pitchInt b)) `mod` 128
+  Div -> Pitch $ (pitchInt a) `div` (pitchInt b)
+  Mod -> Pitch $ (pitchInt a) `mod` (pitchInt b)
 
 applyD :: IOpr -> Duration -> Duration -> Duration
 applyD op a b = case op of
-  Add -> Duration $ ((duration a) + (duration b))
-  Mul -> Duration $ ((duration a) * (duration b)) 
-  Sub -> Duration $ ((duration a) - (duration b))
-  Div -> Duration $ (duration a) `div` (duration b)
-  Mod -> Duration $ (duration a) `mod` (duration b)
+  Add -> Duration $ ((durationInt a) + (durationInt b))
+  Mul -> Duration $ ((durationInt a) * (durationInt b)) 
+  Sub -> Duration $ ((durationInt a) - (durationInt b))
+  Div -> Duration $ (durationInt a) `div` (durationInt b)
+  Mod -> Duration $ (durationInt a) `mod` (durationInt b)
 
