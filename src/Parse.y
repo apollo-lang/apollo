@@ -4,9 +4,9 @@ module Parse
 , parseRepl
 ) where
 import Control.Monad.Error
+import Util
 import Lex
 import Expr
-import Types
 import Error
 }
 
@@ -67,11 +67,11 @@ Statement   : Definition                    { $1 }
 
 Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 
-Type        : TYPE                          { Data $1 }
-            | '[' TYPE ']'                  { ListT $2 }
+Type        : TYPE                          { TData $1 }
+            | '[' TYPE ']'                  { TList $2 }
             | FnType                        { $1 }
 
-FnType      : '(' Params ')' '->' Type      { Function $2 $5 }
+FnType      : '(' Params ')' '->' Type      { TFunc $2 $5 }
 
 Param       : ID ':' Type                   { Param $1 $3 }
 
@@ -86,9 +86,9 @@ Expression  : NUM                           { VInt $1 }
             | ID                            { Name $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
-            | TYPE '(' Expressions ')'      { construct (Data $1) $3 }
-            | '(' Expressions ')'           { construct (Data "Note") $2 } -- note syntax sugar
-            | '{' Expressions '}'           { construct (Data "Chord") $2 } -- chord syntax sugar
+            | TYPE '(' Expressions ')'      { construct (TData $1) $3 }
+            | '(' Expressions ')'           { construct (TData "Note") $2 } -- note syntax sugar
+            | '{' Expressions '}'           { construct (TData "Chord") $2 } -- chord syntax sugar
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
