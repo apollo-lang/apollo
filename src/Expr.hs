@@ -16,10 +16,10 @@ data Type
 data Expr
     = VInt Int
     | VBool Bool
-    | VDuration Duration
-    | VPitch Pitch
-    | VNote Pitch Duration
-    | VChord [Pitch] Duration
+    | VDuration {duration :: Duration}
+    | VPitch {pitch :: Pitch }
+    | VNote Note
+    | VChord Chord
     | VList [Expr]
     | Def Id Type Expr
     | Name Id
@@ -77,8 +77,8 @@ unpackPitch _ = error "Syntax error"
 construct :: Type -> [Expr] -> Expr
 construct (Data "Pitch") [VInt p] = VPitch (Pitch p)
 construct (Data "Note") [VPitch p, VDuration d]
-    = VNote p d
+    = VNote (Note p d)
 construct (Data "Chord") [pitches, VDuration dur]
-    = VChord (map unpackPitch (unpackList pitches)) dur
+    = VChord (Chord (map unpackPitch (unpackList pitches)) dur)
 construct _ _ = error "Syntax error"
 
