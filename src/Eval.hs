@@ -39,11 +39,9 @@ eval env expr = case expr of
 
   Block body ret -> mapM (eval env) body >> eval env ret
 
-  Def name typ e -> do
-    ex <- eval env e
-    defineVar env name ex
+  Def name typ ex -> defineVar env name ex
 
-  Name name -> getVar env name
+  Name name -> getVar env name >>= eval env
 
   -- TODO: handle cases with undefined; also handle errors
   other -> error $ "not yet implemented: " ++ show other
