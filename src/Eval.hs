@@ -37,11 +37,11 @@ eval env expr = case expr of
     VBool b' <- eval env b
     return . VBool $ applyB op a' b'
 
-  Block body ret -> mapM (eval env) body >> eval env ret
+  Block body ret -> mapM_ (eval env) body >> eval env ret
 
-  Def name typ ex -> defineVar env name ex
+  Def name typ ex -> defineVar env name (typ, ex)
 
-  Name name -> getVar env name >>= eval env
+  Name name -> getVar env name >>= eval env . snd
 
   -- TODO: handle cases with undefined; also handle errors
   other -> error $ "not yet implemented: " ++ show other
