@@ -30,6 +30,8 @@ data Expr
     | Not Expr
     | IntOp IOpr Expr Expr
     | BoolOp BOpr Expr Expr
+    | PitchOp IOpr Expr Expr
+    | DurOp IOpr Expr Expr
     deriving Show
 
 data IOpr = Add | Sub | Mul | Div | Mod
@@ -37,6 +39,7 @@ data IOpr = Add | Sub | Mul | Div | Mod
 
 data BOpr = Eq | NEq | Le | Gr | LEq | GEq | And | Or
     deriving Show
+
 
 showVal :: Expr -> String
 showVal (VInt  i) = show i
