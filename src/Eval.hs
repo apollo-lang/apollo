@@ -43,7 +43,7 @@ eval env expr = case expr of
     b' <- eval env b
     return . VBool $ applyC op a' b'
 
-  PitchOp op a@(VPitch p) b@(VPitch q) -> do
+  PitchOp op a b -> do
     VPitch (Pitch a') <- eval env a
     VPitch (Pitch b') <- eval env b
     return . VPitch $ applyP op a' b'
