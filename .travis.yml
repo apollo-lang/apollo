@@ -1,4 +1,3 @@
 language: haskell
 ghc: 7.8
-before_install: cd src/
-script: make test
+script: cd src/ && make test
