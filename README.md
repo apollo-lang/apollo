@@ -1,5 +1,6 @@
-Apollo
+Apollo [![Build Status](https://travis-ci.org/apollo-lang/apollo.svg?branch=master)](https://travis-ci.org/apollo-lang/apollo)
 ======
+
 
 A programming language for algorithmic and musical composition.
 
@@ -11,14 +12,21 @@ Contributors:
  * Roberto Jose De Amorim (rja2139@columbia.edu)
  * Souren Sarkis Papazian (ssp2155@columbia.edu)
 
-Building
---------
+Getting Started
+---------------
 
-To build the `apollo` compiler, change to the `src/` directory and issue the command:
+Apollo requires [Haskell Platform][]. Once you have that installed, the
+following series of commands will install all necessary dependencies, build
+the compiler, and run the integration test suite in that order:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$ cabal install --only-dependencies
+$ cd src/
 $ make
+$ make test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[haskell platform]: https://www.haskell.org/platform
 
 Usage
 -----
@@ -39,20 +47,10 @@ $ echo "case (False) 1 otherwise 2" | ./apollo --ast
 Program [StExp (Cond (ApolloBool False) (ApolloInt 1) (ApolloInt 2))]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the Apollo Read-Evaluate-Print Loop (REPL), use the `--repl` flag:
+To use Apollo's Read-Evaluate-Print Loop, use the `--repl` flag:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ ./apollo --repl
 apollo> 1 + 1
 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Tests
------
-
-To run all integration tests, change to the `src/` directory and issue the command:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ make test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
