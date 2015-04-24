@@ -1,4 +1,16 @@
-module Expr where
+module Expr
+( Param(..)
+, Id
+, Type(..)
+, Expr(..)
+, IOpr(..)
+, BOpr(..)
+, COpr(..)
+, Pitch(..)
+, Duration(..)
+, showVal
+, typeOf
+) where
 
 data Param
   = Param Id Type

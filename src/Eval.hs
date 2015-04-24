@@ -50,19 +50,16 @@ eval env expr = case expr of
 
   Name name -> getVar env name >>= eval env . snd
 
-  -- TODO: should `id` be a Name type
-  -- TODO: typecheck
-  -- TODO: before typecheck, check type is TFunc to be safe? or is there a more concise way to be safe about this?
-  -- TODO: does closure need more than just env?
-
   FnCall name args -> do
-    ((TFunc params typ), body) <- getVar env name
+    ((TFunc params _), body) <- getVar env name
     args' <- mapM (eval env) args
     apply name params body env args'
 
-  -- TODO: handle cases with undefined; also handle errors
-
-  other -> error $ "not yet implemented: " ++ show other
+  VDuration _ -> throwError $ Default "Error: Duration not yet implemented"
+  VPitch _    -> throwError $ Default "Error: Pitch not yet implemented"
+  VNote _ _   -> throwError $ Default "Error: Note not yet implemented"
+  VChord _ _  -> throwError $ Default "Error: Chord not yet implemented"
+  Empty       -> throwError $ Default "Error: eval called on Empty"
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
