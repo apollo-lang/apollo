@@ -13,6 +13,10 @@ eval env expr = case expr of
 
   VBool b -> return $ VBool b
 
+  VPitch p -> return $ VPitch p
+
+  VDuration d -> return $ VDuration d
+
   VList xs -> liftM VList (mapM (eval env) xs)
 
   If test tr fl -> do
@@ -29,11 +33,6 @@ eval env expr = case expr of
     VInt i <- eval env e
     return . VInt $ -i
 
-  IntOp op a b -> do
-    VInt a' <- eval env a
-    VInt b' <- eval env b
-    return . VInt $ applyI op a' b'
-
   BoolOp op a b -> do
     VBool a' <- eval env a
     VBool b' <- eval env b
@@ -44,25 +43,37 @@ eval env expr = case expr of
     b' <- eval env b
     return . VBool $ applyC op a' b'
 
+  PitchOp op a@(VPitch p) b@(VPitch q) -> do
+    VPitch (Pitch a') <- eval env a
+    VPitch (Pitch b') <- eval env b
+    return . VPitch $ applyP op a' b'
+
+  IntOp op a b -> do
+    VInt a' <- eval env a
+    VInt b' <- eval env b
+    return . VInt $ applyI op a' b'
+
+  DurOp op a b -> do
+    VDuration (Duration a') <- eval env a
+    VDuration (Duration b') <- eval env b
+    return . VDuration $ applyD op a' b'
+
+
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
   Def name typ ex -> defineVar env name (typ, ex)
 
   Name name -> getVar env name >>= eval env . snd
 
-  -- TODO: should `id` be a Name type
-  -- TODO: typecheck
-  -- TODO: before typecheck, check type is TFunc to be safe? or is there a more concise way to be safe about this?
-  -- TODO: does closure need more than just env?
-
   FnCall name args -> do
-    ((TFunc params typ), body) <- getVar env name
+    ((TFunc params _), body) <- getVar env name
     args' <- mapM (eval env) args
     apply name params body env args'
 
-  -- TODO: handle cases with undefined; also handle errors
+  VNote _  -> throwError $ Default "Error: Note not yet implemented"
+  VChord _ -> throwError $ Default "Error: Chord not yet implemented"
+  Empty    -> throwError $ Default "Error: eval called on Empty"
 
-  other -> error $ "not yet implemented: " ++ show other
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
@@ -94,4 +105,20 @@ apply name paramList body closure args =
     where num = toInteger . length
           params = map (\(Param n _) -> n) paramList
           createEnv = liftIO . bindVars closure . zip params . map (\a -> (TData "TODO", a))
+
+applyP :: IOpr -> Int -> Int -> Pitch
+applyP op a b = case op of
+  Add -> Pitch $ (a + b) `mod` 128
+  Mul -> Pitch $ (a * b) `mod` 128
+  Sub -> Pitch $ (a - b) `mod` 128
+  Div -> Pitch $ (a `div` b)
+  Mod -> Pitch $ (a `mod` b)
+
+applyD :: IOpr -> Int -> Int -> Duration
+applyD op a b = case op of
+  Add -> Duration $ a + b
+  Mul -> Duration $ a * b
+  Sub -> Duration $ a - b
+  Div -> Duration $ a `div` b  
+  Mod -> Duration $ a `mod` b
 

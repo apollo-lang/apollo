@@ -1,4 +1,18 @@
-module Expr where
+module Expr
+( Param(..)
+, Id
+, Type(..)
+, Expr(..)
+, IOpr(..)
+, BOpr(..)
+, COpr(..)
+, Pitch(..)
+, Duration(..)
+, Note(..)
+, Chord(..)
+, showVal
+, typeOf
+) where
 
 data Param
   = Param Id Type
@@ -13,25 +27,27 @@ data Type
   deriving (Eq, Ord, Show)
 
 data Expr
-  = VInt Int
-  | VBool Bool
-  | VDuration Duration
-  | VPitch Pitch
-  | VNote Pitch Duration
-  | VChord [Pitch] Duration
-  | VList [Expr]
-  | Def Id Type Expr
-  | Name Id
-  | Block [Expr] Expr
-  | If Expr Expr Expr
-  | FnCall Id [Expr]
-  | Neg Expr
-  | Not Expr
-  | IntOp IOpr Expr Expr
-  | BoolOp BOpr Expr Expr
-  | CompOp COpr Expr Expr
-  | Empty
-  deriving (Eq, Ord, Show)
+    = VInt Int
+    | VBool Bool
+    | VDuration Duration
+    | VPitch Pitch
+    | VNote Note
+    | VChord Chord
+    | VList [Expr]
+    | Def Id Type Expr
+    | Name Id
+    | Block [Expr] Expr
+    | If Expr Expr Expr
+    | FnCall Id [Expr]
+    | Neg Expr
+    | Not Expr
+    | IntOp IOpr Expr Expr
+    | BoolOp BOpr Expr Expr
+    | CompOp COpr Expr Expr
+    | PitchOp IOpr Expr Expr
+    | DurOp IOpr Expr Expr
+    | Empty
+    deriving (Eq, Ord, Show)
 
 data IOpr = Add | Sub | Mul | Div | Mod
   deriving (Eq, Ord, Show)
@@ -44,6 +60,14 @@ data COpr = Eq | NEq | Le | Gr | LEq | GEq
 
 data Pitch = Pitch Int deriving (Eq, Ord, Show)
 data Duration = Duration Int deriving (Eq, Ord, Show)
+
+-- Derived types
+data Note = Note Pitch Duration deriving (Eq, Ord, Show)
+
+data Chord = Chord [Pitch] Duration deriving (Eq, Ord, Show)
+
+data Rest = Rest Duration deriving (Eq, Ord, Show)
+
 
 showVal :: Expr -> String
 showVal (VInt  i) = show i
@@ -58,4 +82,3 @@ typeOf (VInt _)  = "Integer"
 typeOf (VBool _) = "Boolean"
 typeOf (VList _) = "List"
 typeOf todoVal   = "TODO: `typeOf` for " ++ show todoVal
-
