@@ -30,6 +30,7 @@ data Expr
   | IntOp IOpr Expr Expr
   | BoolOp BOpr Expr Expr
   | CompOp COpr Expr Expr
+  | Empty
   deriving (Eq, Ord, Show)
 
 data IOpr = Add | Sub | Mul | Div | Mod
@@ -49,6 +50,7 @@ showVal (VInt  i) = show i
 showVal (VBool b) = show b
 showVal (VList l) = "[" ++ commaDelim l  ++ "]"
   where commaDelim = init . concatMap ((++ ",") . showVal)
+showVal (Empty)   = ""
 showVal otherVal  = show otherVal
 
 typeOf :: Expr -> String

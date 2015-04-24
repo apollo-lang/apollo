@@ -38,7 +38,7 @@ setVar envRef var value = do
   maybe (throwError $ UnboundVar "Setting" var)
         (liftIO . flip writeIORef value)
         (lookup var env)
-  return $ snd value
+  return Empty
 
 defineVar :: Env -> String -> (Type, Expr) -> IOThrowsError Expr
 defineVar envRef var value = do
@@ -49,7 +49,7 @@ defineVar envRef var value = do
              valueRef <- newIORef value
              env <- readIORef envRef
              writeIORef envRef ((var, valueRef) : env)
-             return $ snd value
+             return Empty
 
 bindVars :: Env -> [(String, (Type, Expr))] -> IO Env
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
