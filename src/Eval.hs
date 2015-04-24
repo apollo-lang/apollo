@@ -39,6 +39,11 @@ eval env expr = case expr of
     VBool b' <- eval env b
     return . VBool $ applyB op a' b'
 
+  CompOp op a b -> do
+    a' <- eval env a
+    b' <- eval env b
+    return . VBool $ applyC op a' b'
+
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
   Def name typ ex -> defineVar env name (typ, ex)
@@ -52,7 +57,8 @@ eval env expr = case expr of
 
   FnCall name args -> do
     ((TFunc params typ), body) <- getVar env name
-    apply name params body env args
+    args' <- mapM (eval env) args
+    apply name params body env args'
 
   -- TODO: handle cases with undefined; also handle errors
 
@@ -68,14 +74,17 @@ applyI op a b = case op of
 
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of
+  And -> a && b
+  Or  -> a || b
+
+applyC :: COpr -> Expr -> Expr -> Bool
+applyC op a b = case op of
   Eq  -> a == b
   NEq -> a /= b
   Le  -> a < b
   Gr  -> a > b
   LEq -> a <= b
   GEq -> a >= b
-  And -> a && b
-  Or  -> a || b
 
 apply :: String -> [Param] -> Expr -> Env -> [Expr] -> IOThrowsError Expr
 apply name paramList body closure args =

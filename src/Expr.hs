@@ -2,7 +2,7 @@ module Expr where
 
 data Param
   = Param Id Type
-  deriving Show
+  deriving (Eq, Ord, Show)
 
 type Id = String
 
@@ -10,7 +10,7 @@ data Type
   = TData String
   | TList String
   | TFunc [Param] Type
-  deriving Show
+  deriving (Eq, Ord, Show)
 
 data Expr
   = VInt Int
@@ -29,16 +29,20 @@ data Expr
   | Not Expr
   | IntOp IOpr Expr Expr
   | BoolOp BOpr Expr Expr
-  deriving Show
+  | CompOp COpr Expr Expr
+  deriving (Eq, Ord, Show)
 
 data IOpr = Add | Sub | Mul | Div | Mod
-  deriving Show
+  deriving (Eq, Ord, Show)
 
-data BOpr = Eq | NEq | Le | Gr | LEq | GEq | And | Or
-  deriving Show
+data BOpr = And | Or
+  deriving (Eq, Ord, Show)
 
-data Pitch = Pitch Int deriving Show
-data Duration = Duration Int deriving Show
+data COpr = Eq | NEq | Le | Gr | LEq | GEq
+  deriving (Eq, Ord, Show)
+
+data Pitch = Pitch Int deriving (Eq, Ord, Show)
+data Duration = Duration Int deriving (Eq, Ord, Show)
 
 showVal :: Expr -> String
 showVal (VInt  i) = show i
