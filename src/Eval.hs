@@ -2,6 +2,8 @@ module Eval
 ( eval
 ) where
 import Control.Monad (liftM)
+import Control.Monad.Error (throwError, liftIO)
+import Error
 import Expr
 import Env
 
@@ -43,7 +45,17 @@ eval env expr = case expr of
 
   Name name -> getVar env name >>= eval env . snd
 
+  -- TODO: should `id` be a Name type
+  -- TODO: typecheck
+  -- TODO: before typecheck, check type is TFunc to be safe? or is there a more concise way to be safe about this?
+  -- TODO: does closure need more than just env?
+
+  FnCall name args -> do
+    ((TFunc params typ), body) <- getVar env name
+    apply name params body env args
+
   -- TODO: handle cases with undefined; also handle errors
+
   other -> error $ "not yet implemented: " ++ show other
 
 applyI :: IOpr -> Int -> Int -> Int
@@ -64,4 +76,13 @@ applyB op a b = case op of
   GEq -> a >= b
   And -> a && b
   Or  -> a || b
+
+apply :: String -> [Param] -> Expr -> Env -> [Expr] -> IOThrowsError Expr
+apply name paramList body closure args =
+  if num params /= num args
+  then throwError $ ArgMismatch name (num params) args
+  else createEnv args >>= (flip eval) body
+    where num = toInteger . length
+          params = map (\(Param n _) -> n) paramList
+          createEnv = liftIO . bindVars closure . zip params . map (\a -> (TData "TODO", a))
 
