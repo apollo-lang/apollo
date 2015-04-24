@@ -127,7 +127,7 @@ Block       : '{' Expression '}'            { Block [] $2 }
 
 {
 -- TODO: improve
-parseError (token:whatever) = Left . ParseErr $ show whatever
+parseError (token:whatever) = Left . ParseErr $ show token
 
 parse :: String -> ThrowsError [Expr]
 parse = program . scanTokens
