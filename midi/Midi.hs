@@ -48,8 +48,8 @@ atomToTrack (AtomChord c) = chordToTrack c
 
 -- Takes Chord and outputs a list of Tracks with its notes
 chordToTrack :: Chord -> [[(Ticks, Message)]]
-chordToTrack (Chord pitches d) = chords
-                               where chords = [ckvtToTrack 0 (pitch p) 60 (duration d)  | p <- pitches] -- ++ [(0, TrackEnd)]
+chordToTrack (Chord pitches (Duration d)) = chords
+                               where chords = [ckvtToTrack 0 p 60 d  | (Pitch p) <- pitches] -- ++ [(0, TrackEnd)]
 
 -- Takes Note and outputs a Track with the note
 noteToTrack :: Note -> [(Ticks, Message)]
@@ -57,7 +57,7 @@ noteToTrack (Note (Pitch p) (Duration d)) = ckvtToTrack 0 p 60 d
 
 -- Takes Rest and outputs a Track with the rest
 restToTrack :: Rest -> [(Ticks, Message)]
-restToTrack (Rest d) = ckvtToTrack 0 0 0 (duration d)
+restToTrack (Rest (Duration d)) = ckvtToTrack 0 0 0 d
 
 -- Takes root, duration, pitch list and returns a midi track of the pitches in sequence for duration
 nSeqTrack :: [Note] -> [(Ticks, Message)]
