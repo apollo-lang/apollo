@@ -1,0 +1,2 @@
+fib: (n: Int) -> Int = case (n <= 1) { n } otherwise { fib(n-1) + fib(n-2) }
+fib(10)

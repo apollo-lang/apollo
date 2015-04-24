@@ -40,6 +40,7 @@ execute env (e:exprs) =
   (runErrorT (eval env e)) >>= \res->
   case res of
     (Left err)  -> return $ [show err]
+    (Right Empty) -> execute env exprs
     (Right val) -> liftM ([showVal val] ++) (execute env exprs)
 
 -- Read-Evaluate-print Loop -------------------------------------------------
@@ -60,7 +61,9 @@ flushStr :: String -> IO ()
 flushStr str = putStr str >> hFlush stdout
 
 evalAndPrint :: Env -> String -> IO ()
-evalAndPrint env str = evalString env str >>= putStrLn
+evalAndPrint env str = evalString env str >>= \s -> case s of
+                                                      ""       -> putStr ""
+                                                      notEmpty -> putStrLn notEmpty
 
 evalString :: Env -> String -> IO String
 evalString env expr = showResult $ (liftThrows $ parseRepl expr) >>= eval env
