@@ -32,22 +32,22 @@ eval env expr = case expr of
     VInt i <- eval env e
     return . VInt $ -i
 
-  IntOp op a b -> do
-    VInt a' <- eval env a
-    VInt b' <- eval env b
-    return . VInt $ applyI op a' b'
-
   BoolOp op a b -> do
     VBool a' <- eval env a
     VBool b' <- eval env b
     return . VBool $ applyB op a' b'
 
-  PitchOp op a b -> do
+  IntOp op a@(VInt i) b -> do
+    VInt a' <- eval env a
+    VInt b' <- eval env b
+    return . VInt $ applyI op a' b'
+
+  PitchOp op a@(VPitch p) b -> do
     VPitch a' <- eval env a
     VPitch b' <- eval env b
     return . VPitch $ applyP op a' b'
 
-  DurOp op a b -> do
+  DurOp op a@(VDuration d) b -> do
     VDuration a' <- eval env a
     VDuration b' <- eval env b
     return . VDuration $ applyD op a' b'
