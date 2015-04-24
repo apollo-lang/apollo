@@ -10,7 +10,7 @@ import Expr
 type ThrowsError = Either ApolloError
 
 data ApolloError
-  = TypeMismatch String Expr
+  = TypeMismatch String String Expr
   | UnboundVar String String
   | ArgMismatch String Integer [Expr]
   | RedefVar String
@@ -22,7 +22,7 @@ instance Error ApolloError where
   strMsg = Default
 
 instance Show ApolloError where
-  show (TypeMismatch     expected found) = "Invalid type: expected " ++ expected ++ ", found " ++ typeOf found ++ " (" ++ showVal found ++ ")"
+  show (TypeMismatch  fn expected found) = "Invalid type: for " ++ fn ++ " expected " ++ expected ++ ", found " ++ typeOf found ++ " (" ++ showVal found ++ ")"
   show (UnboundVar           action var) = action ++ " an unbound variable: " ++ var
   show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected
                                         ++ " arguments; found (" ++ init (concatMap (++ ",") (map showVal found)) ++ ")"

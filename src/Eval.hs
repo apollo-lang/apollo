@@ -46,7 +46,7 @@ eval env expr = case expr of
   IntOp op a b -> do
     a' <- eval env a
     b' <- eval env b
-    return $ matchI op a' b'
+    matchI op a' b'
 
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
@@ -63,26 +63,6 @@ eval env expr = case expr of
   VChord _ -> throwError $ Default "Error: Chord not yet implemented"
   Empty    -> throwError $ Default "Error: eval called on Empty"
 
-matchI :: IOpr -> Expr -> Expr -> Expr
-matchI op (VInt a) (VInt b) =
-  VInt $ applyI op a b
-
-matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
-  VPitch . Pitch . (`mod` 128) $ applyI op a b
-
-matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
-  VDuration . Duration　$ applyI op a b
-
-matchI _ _ _ = error "TODO: apply failure err"
-
-applyI :: IOpr -> Int -> Int -> Int
-applyI op a b = case op of
-  Add -> a + b
-  Mul -> a * b
-  Sub -> a - b
-  Div -> a `div` b
-  Mod -> a `mod` b
-
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of
   And -> a && b
@@ -96,6 +76,27 @@ applyC op a b = case op of
   Gr  -> a > b
   LEq -> a <= b
   GEq -> a >= b
+
+matchI :: IOpr -> Expr -> Expr -> IOThrowsError Expr
+matchI op (VInt a) (VInt b) =
+  return . VInt $ applyI op a b
+
+matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
+  return . VPitch . Pitch . (`mod` 128) $ applyI op a b
+
+matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
+  return .VDuration . Duration　$ applyI op a b
+
+matchI op a b =
+  throwError $ TypeMismatch (show op) (typeOf a) (b)
+
+applyI :: IOpr -> Int -> Int -> Int
+applyI op a b = case op of
+  Add -> a + b
+  Mul -> a * b
+  Sub -> a - b
+  Div -> a `div` b
+  Mod -> a `mod` b
 
 apply :: String -> [Param] -> Expr -> Env -> [Expr] -> IOThrowsError Expr
 apply name paramList body closure args =
