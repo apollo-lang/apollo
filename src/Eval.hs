@@ -82,10 +82,11 @@ matchI op (VInt a) (VInt b) =
   return . VInt $ applyI op a b
 
 matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
-  return . VPitch . Pitch . (`mod` 128) $ applyI op a b
+  return . VPitch . Pitch . (`mod` pitchLimit) $ applyI op a b
+    where pitchLimit = 128
 
 matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
-  return .VDuration . Duration　$ applyI op a b
+  return . VDuration . Duration $ applyI op a b
 
 matchI op a b =
   throwError $ TypeMismatch (show op) (typeOf a) (b)

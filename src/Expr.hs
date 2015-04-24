@@ -70,8 +70,22 @@ showVal (Empty)   = ""
 showVal otherVal  = show otherVal
 
 typeOf :: Expr -> String
-typeOf (VInt _)  = "Integer"
-typeOf (VBool _) = "Boolean"
-typeOf (VList _) = "List"
-typeOf todoVal   = "TODO: `typeOf` for " ++ show todoVal
+typeOf VInt{}      = "Integer"
+typeOf VBool{}     = "Boolean"
+typeOf VDuration{} = "Duration"
+typeOf VPitch{}    = "Pitch"
+typeOf VNote{}     = "Note"
+typeOf VChord{}    = "Chord"
+typeOf VList{}     = "List"
+typeOf Block{}     = "Block"
+typeOf If{}        = "Conditional"
+typeOf Def{}       = error "Error: typeOf called on Def"
+typeOf Name{}      = error "Error: typeOf called on Name"
+typeOf FnCall{}    = error "Error: typeOf called on FnCall"
+typeOf Neg{}       = error "Error: typeOf called on Neg"
+typeOf Not{}       = error "Error: typeOf called on Not"
+typeOf IntOp{}     = error "Error: typeOf called on IntOp"
+typeOf BoolOp{}    = error "Error: typeOf called on BoolOp"
+typeOf CompOp{}    = error "Error: typeOf called on CompOp"
+typeOf Empty       = error "Error: typeOf called on Empty"
 
