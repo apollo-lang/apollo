@@ -1,7 +1,16 @@
-module Env where
+module Env
+( Env
+, nullEnv
+, IOThrowsError
+, liftThrows
+, runIOThrows
+, getVar
+, defineVar
+, bindVars
+) where
+import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
 import Data.Maybe (isJust)
-import Control.Monad.Error
-import Data.IORef
+import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Error
 import Expr
 
@@ -28,9 +37,6 @@ getVar envRef var = do
   maybe (throwError $ UnboundVar "Getting" var)
         (liftIO . readIORef)
         (lookup var env)
-
--- TODO: note, `setVar` only for use in defineVar; not for mutable vars....until we get to play fn?
--- TODO: `setVar` and `defineVar` shouldn't return a value (type changes to `-> IOThrowsError ()`?)
 
 setVar :: Env -> String -> (Type, Expr) -> IOThrowsError Expr
 setVar envRef var value = do

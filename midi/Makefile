@@ -1,7 +1,7 @@
 HC := ghc
 
 midi: 
-	$(HC) testM.hs
+	$(HC) -i../src testM.hs
 	./testM
 	rm -f *.hi *.o testM
 

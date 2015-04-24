@@ -19,9 +19,9 @@ construct :: Type -> [Expr] -> Expr
 construct (TData "Pitch") [VInt p]
   = VPitch (Pitch p)
 construct (TData "Note") [VPitch p, VDuration d]
-  = VNote p d
+  = VNote (Note p d)
 construct (TData "Chord") [pitches, VDuration dur]
-  = VChord (map unpackPitch (unpackList pitches)) dur
+  = VChord  (Chord (map unpackPitch (unpackList pitches)) dur)
     where unpackList (VList exprs) = exprs
           unpackList _ = error "Syntax error"
           unpackPitch (VPitch p) = p
