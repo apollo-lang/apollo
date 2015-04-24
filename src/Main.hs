@@ -34,10 +34,6 @@ parseAndEval src = do
     (Left err)    -> putStrLn $ show err
     (Right exprs) -> execute env exprs >>= putStrLn . concatMap (++ "\n")
 
--- TODO: does this allow env to be mutated? (never explicitly passed to recurse
--- in new form). can we maybe use a simpler state representation and just pass
--- it out of eval (along with play's durrent value)
-
 execute :: Env -> [Expr] -> IO [String]
 execute _   []        = return []
 execute env (e:exprs) =
@@ -45,9 +41,6 @@ execute env (e:exprs) =
   case res of
     (Left err)  -> return $ [show err]
     (Right val) -> liftM ([showVal val] ++) (execute env exprs)
-
-showResult :: IOThrowsError Expr -> IO String
-showResult = runIOThrows . liftM showVal
 
 -- Read-Evaluate-print Loop -------------------------------------------------
 
@@ -71,4 +64,7 @@ evalAndPrint env str = evalString env str >>= putStrLn
 
 evalString :: Env -> String -> IO String
 evalString env expr = showResult $ (liftThrows $ parseRepl expr) >>= eval env
+
+showResult :: IOThrowsError Expr -> IO String
+showResult = runIOThrows . liftM showVal
 

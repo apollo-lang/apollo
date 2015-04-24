@@ -45,11 +45,11 @@ showVal (VInt  i) = show i
 showVal (VBool b) = show b
 showVal (VList l) = "[" ++ commaDelim l  ++ "]"
   where commaDelim = init . concatMap ((++ ",") . showVal)
-showVal otherVal       = show otherVal
+showVal otherVal  = show otherVal
 
 typeOf :: Expr -> String
 typeOf (VInt _)  = "Integer"
 typeOf (VBool _) = "Boolean"
 typeOf (VList _) = "List"
-typeOf todoVal        = "TODO: `typeOf` for " ++ show todoVal
+typeOf todoVal   = "TODO: `typeOf` for " ++ show todoVal
 
