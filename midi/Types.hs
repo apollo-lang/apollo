@@ -4,11 +4,11 @@ import Text.Regex.Posix -- for parsing short-hand notation
 
 -- Primitive types
 data Pitch 
-    = Pitch { pitch :: Int }
+    = Pitch Int
     deriving (Show)
 
 data Duration 
-    = Duration { duration :: Int }
+    = Duration Int
     deriving (Show)
 
 -- Derived types
