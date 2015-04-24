@@ -113,12 +113,12 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '*'  Expression    { IntOp  Mul $1 $3 }
             | Expression '/'  Expression    { IntOp  Div $1 $3 }
             | Expression '%'  Expression    { IntOp  Mod $1 $3 }
-            | Expression '==' Expression    { BoolOp Eq  $1 $3 }
-            | Expression '!=' Expression    { BoolOp NEq $1 $3 }
-            | Expression '<'  Expression    { BoolOp Le  $1 $3 }
-            | Expression '>'  Expression    { BoolOp Gr  $1 $3 }
-            | Expression '<=' Expression    { BoolOp LEq $1 $3 }
-            | Expression '>=' Expression    { BoolOp GEq $1 $3 }
+            | Expression '==' Expression    { CompOp Eq  $1 $3 }
+            | Expression '!=' Expression    { CompOp NEq $1 $3 }
+            | Expression '<'  Expression    { CompOp Le  $1 $3 }
+            | Expression '>'  Expression    { CompOp Gr  $1 $3 }
+            | Expression '<=' Expression    { CompOp LEq $1 $3 }
+            | Expression '>=' Expression    { CompOp GEq $1 $3 }
             | Expression '&&' Expression    { BoolOp And $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
 
