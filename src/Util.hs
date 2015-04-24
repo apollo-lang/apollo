@@ -1,4 +1,14 @@
-module Util where
+module Util
+( define
+, construct
+, pitchClass
+, accidental
+, pitchHeight
+, parsePitch
+, matchPitch
+, parseDuration
+, matchDuration
+) where
 import Text.Regex.Posix
 import Expr
 
