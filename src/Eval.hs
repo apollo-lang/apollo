@@ -43,22 +43,10 @@ eval env expr = case expr of
     b' <- eval env b
     return . VBool $ applyC op a' b'
 
-  IntOp op a@(VInt _) b@(VInt _) -> do
-    VInt a' <- eval env a
-    VInt b' <- eval env b
-    return . VInt $ applyI op a' b'
-
-  IntOp op a@(VPitch _) b@(VPitch _) -> do
-    VPitch (Pitch a') <- eval env a
-    VPitch (Pitch b') <- eval env b
-    let res = applyI op a' b'
-    return . VPitch . Pitch $ res `mod` 128
-
-  DurOp op a b -> do
-    VDuration (Duration a') <- eval env a
-    VDuration (Duration b') <- eval env b
-    let res = applyI op a' b'
-    return . VDuration . Duration $ res
+  IntOp op a b -> do
+    a' <- eval env a
+    b' <- eval env b
+    return $ matchI op a' b'
 
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
@@ -75,6 +63,17 @@ eval env expr = case expr of
   VChord _ -> throwError $ Default "Error: Chord not yet implemented"
   Empty    -> throwError $ Default "Error: eval called on Empty"
 
+matchI :: IOpr -> Expr -> Expr -> Expr
+matchI op (VInt a) (VInt b) =
+  VInt $ applyI op a b
+
+matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
+  VPitch . Pitch . (`mod` 128) $ applyI op a b
+
+matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
+  VDuration . Duration　$ applyI op a b
+
+matchI _ _ _ = error "TODO: apply failure err"
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
