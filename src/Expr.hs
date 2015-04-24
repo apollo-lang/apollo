@@ -14,17 +14,16 @@ module Expr
 , typeOf
 ) where
 
-data Param
-  = Param Id Type
-  deriving (Eq, Ord, Show)
-
-type Id = String
-
 data Type
   = TData String
   | TList String
   | TFunc [Param] Type
   deriving (Eq, Ord, Show)
+
+data Param = Param Id Type
+  deriving (Eq, Ord, Show)
+
+type Id = String
 
 data Expr
     = VInt Int
@@ -44,8 +43,6 @@ data Expr
     | IntOp IOpr Expr Expr
     | BoolOp BOpr Expr Expr
     | CompOp COpr Expr Expr
-    | PitchOp IOpr Expr Expr
-    | DurOp IOpr Expr Expr
     | Empty
     deriving (Eq, Ord, Show)
 
@@ -58,16 +55,11 @@ data BOpr = And | Or
 data COpr = Eq | NEq | Le | Gr | LEq | GEq
   deriving (Eq, Ord, Show)
 
-data Pitch = Pitch Int deriving (Eq, Ord, Show)
-data Duration = Duration Int deriving (Eq, Ord, Show)
-
--- Derived types
-data Note = Note Pitch Duration deriving (Eq, Ord, Show)
-
-data Chord = Chord [Pitch] Duration deriving (Eq, Ord, Show)
-
-data Rest = Rest Duration deriving (Eq, Ord, Show)
-
+data Pitch    = Pitch Int              deriving (Eq, Ord, Show)
+data Duration = Duration Int           deriving (Eq, Ord, Show)
+data Note     = Note Pitch Duration    deriving (Eq, Ord, Show)
+data Chord    = Chord [Pitch] Duration deriving (Eq, Ord, Show)
+data Rest     = Rest Duration          deriving (Eq, Ord, Show)
 
 showVal :: Expr -> String
 showVal (VInt  i) = show i
@@ -82,3 +74,4 @@ typeOf (VInt _)  = "Integer"
 typeOf (VBool _) = "Boolean"
 typeOf (VList _) = "List"
 typeOf todoVal   = "TODO: `typeOf` for " ++ show todoVal
+

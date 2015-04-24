@@ -43,21 +43,22 @@ eval env expr = case expr of
     b' <- eval env b
     return . VBool $ applyC op a' b'
 
-  PitchOp op a b -> do
-    VPitch (Pitch a') <- eval env a
-    VPitch (Pitch b') <- eval env b
-    return . VPitch $ applyP op a' b'
-
-  IntOp op a b -> do
+  IntOp op a@(VInt _) b@(VInt _) -> do
     VInt a' <- eval env a
     VInt b' <- eval env b
     return . VInt $ applyI op a' b'
 
+  IntOp op a@(VPitch _) b@(VPitch _) -> do
+    VPitch (Pitch a') <- eval env a
+    VPitch (Pitch b') <- eval env b
+    let res = applyI op a' b'
+    return . VPitch . Pitch $ res `mod` 128
+
   DurOp op a b -> do
     VDuration (Duration a') <- eval env a
     VDuration (Duration b') <- eval env b
-    return . VDuration $ applyD op a' b'
-
+    let res = applyI op a' b'
+    return . VDuration . Duration $ res
 
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
@@ -105,20 +106,4 @@ apply name paramList body closure args =
     where num = toInteger . length
           params = map (\(Param n _) -> n) paramList
           createEnv = liftIO . bindVars closure . zip params . map (\a -> (TData "TODO", a))
-
-applyP :: IOpr -> Int -> Int -> Pitch
-applyP op a b = case op of
-  Add -> Pitch $ (a + b) `mod` 128
-  Mul -> Pitch $ (a * b) `mod` 128
-  Sub -> Pitch $ (a - b) `mod` 128
-  Div -> Pitch $ (a `div` b)
-  Mod -> Pitch $ (a `mod` b)
-
-applyD :: IOpr -> Int -> Int -> Duration
-applyD op a b = case op of
-  Add -> Duration $ a + b
-  Mul -> Duration $ a * b
-  Sub -> Duration $ a - b
-  Div -> Duration $ a `div` b  
-  Mod -> Duration $ a `mod` b
 
