@@ -3,11 +3,11 @@ module Parse
 ( parse
 , parseRepl
 ) where
-import Control.Monad.Error
+import Control.Monad.Error (liftM)
+import Error
+import Expr
 import Util
 import Lex
-import Expr
-import Error
 }
 
 %name           program
