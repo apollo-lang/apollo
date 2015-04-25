@@ -19,24 +19,29 @@ import Expr
 
 define :: Id -> Type -> Expr -> Expr
 define i (TData "Pitch") (VInt p)
-  | p < 0 || p > 127 = error "Pitch out of range [0, 127]"
-  | otherwise        = Def i (TData "Pitch") (VPitch (Pitch p))
+    = Def i (TData "Pitch") (VPitch $ Pitch $ p `mod` 128)
 define i (TData "Duration") (VInt d)
-  | d < 1 || d > 256 = error "Duration out of range [1, 256]"
-  | otherwise        = Def i (TData "Duration") (VDuration (Duration d))
+    | d < 1 || d > 256 = error "Duration out of range [1, 256]"
+    | otherwise        = Def i (TData "Duration") (VDuration (Duration d))
 define i t e = Def i t e
 
+unpackInt :: Expr -> Int
+unpackInt (VInt i)                  = i
+unpackInt (VPitch (Pitch p))        = p
+unpackInt (VDuration (Duration d))  = d
+unpackInt _                         = error "Expected int, pitch, or duration"
+
+unpackList :: Expr -> [Expr]
+unpackList (VList exprs) = exprs
+unpackList _ = error "Expected expression list"
+
 construct :: Type -> [Expr] -> Expr
-construct (TData "Pitch") [VInt p]
-  = VPitch (Pitch p)
-construct (TData "Note") [VPitch p, VDuration d]
-  = VNote (Note p d)
-construct (TData "Chord") [pitches, VDuration dur]
-  = VChord  (Chord (map unpackPitch (unpackList pitches)) dur)
-    where unpackList (VList exprs) = exprs
-          unpackList _ = error "Syntax error"
-          unpackPitch (VPitch p) = p
-          unpackPitch _ = error "Syntax error"
+construct (TData "Pitch") [pitch]
+    = VPitch $ Pitch $ unpackInt pitch
+construct (TData "Note") [pitch, dur]
+    = VNote $ Note (Pitch $ unpackInt pitch) (Duration $ unpackInt dur)
+construct (TData "Chord") [pitches, dur]
+    = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
 construct _ _ = error "Syntax error"
 
 pitchClass :: String -> Int
@@ -69,7 +74,7 @@ parsePitch s = case matchPitch s of
         _ -> error "Invalid pitch (invalid match)"
 
 matchPitch :: String -> [[String]]
-matchPitch s = s =~ "`([A-G])(b|#)?([0-9])"
+matchPitch s = s =~ "([A-G])(b|#)?([0-9])"
 
 parseDuration :: String -> Duration
 parseDuration s = case matchDuration s of

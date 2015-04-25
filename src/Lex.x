@@ -1,6 +1,10 @@
 {
 {-# OPTIONS_GHC -w #-}
-module Lex (Token(..),scanTokens) where
+module Lex
+    ( Token(..)
+    , scanTokens
+    ) where
+
 import Expr
 }
 
@@ -29,7 +33,7 @@ tokens :-
     \\[0-9]+\.?                     { \s -> TokenDur s }
 
     -- Pitch constant
-    `[A-G](\#|b)?[0-9]              { \s -> TokenPitch s }
+    [A-G](\#|b)?[0-9]              { \s -> TokenPitch s }
 
     -- Integer Constants
     $digit+                         { \s -> TokenNum (read s) }
