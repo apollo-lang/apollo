@@ -1,8 +1,9 @@
 {
 module Parse
-( parse
-, parseRepl
-) where
+    ( parse
+    , parseRepl
+    ) where
+
 import Control.Monad.Error (liftM)
 import Error
 import Expr
@@ -91,8 +92,10 @@ Expression  : NUM                           { VInt $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | TYPE '(' Expressions ')'      { construct (TData $1) $3 }
-            | '(' PITCH ',' DUR ')'         { VNote $ Note (parsePitch $2) (parseDuration $4) }
-            | '{' Expressions '}'           { construct (TData "Chord") $2 } 
+            | '(' Expression 
+              ',' Expression ')'            { construct (TData "Note") [$2, $4] }
+            | '{' Expression 
+              ',' Expression '}'            { construct (TData "Chord") [$2, $4] } 
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
@@ -100,7 +103,6 @@ Expression  : NUM                           { VInt $1 }
             | BinOp                         { $1 }
             | Block                         { $1 }
             | '(' Expression ')'            { $2 }
-
 
 Conditional : CASE '(' Expression ')'
                 Expression
