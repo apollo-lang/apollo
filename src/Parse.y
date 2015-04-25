@@ -24,6 +24,7 @@ import Lex
     PITCH       { TokenPitch $$ }
     CASE        { TokenCase }
     OTHERWISE   { TokenOtherwise }
+    WHERE       { TokenWhere }
     '+'         { TokenPlus }
     '-'         { TokenMinus }
     '*'         { TokenMult }
@@ -49,7 +50,7 @@ import Lex
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
 
-%nonassoc '='
+%nonassoc '=' '->'
 %left '||'
 %left '&&'
 %left '==' '!=' '<' '>' '<=' '>='
@@ -64,6 +65,9 @@ Statements  : Statement                     { [$1] }
 
 Statement   : Definition                    { $1 }
             | Expression                    { $1 }
+
+Definitions : Definition                    { [$1] }
+            | Definition Definitions        { $1:$2 }
 
 Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 
@@ -84,11 +88,11 @@ Expressions : Expression                    { [$1] }
 Expression  : NUM                           { VInt $1 }
             | BOOL                          { VBool $1 }
             | ID                            { Name $1 }
-            | DUR                           { VDuration $ parseDuration $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
+            | DUR                           { VDuration $ parseDuration $1 }
             | TYPE '(' Expressions ')'      { construct (TData $1) $3 }
-            | '(' Expressions ')'           { construct (TData "Note") $2 } -- note syntax sugar
-            | '{' Expressions '}'           { construct (TData "Chord") $2 } -- chord syntax sugar
+            | '(' PITCH ',' DUR ')'         { VNote $ Note (parsePitch $2) (parseDuration $4) }
+            | '{' Expressions '}'           { construct (TData "Chord") $2 } 
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
@@ -96,6 +100,7 @@ Expression  : NUM                           { VInt $1 }
             | BinOp                         { $1 }
             | Block                         { $1 }
             | '(' Expression ')'            { $2 }
+
 
 Conditional : CASE '(' Expression ')'
                 Expression
@@ -123,11 +128,13 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
-            | '{' Statements Expression '}' { Block $2 $3 }
+            | '{' Expression 
+              WHERE Definitions '}'         { Block $4 $2 }
 
 {
 -- TODO: improve
 parseError (token:whatever) = Left . ParseErr $ show token
+parseError _ = Left . ParseErr $ "other"
 
 parse :: String -> ThrowsError [Expr]
 parse = program . scanTokens
