@@ -42,6 +42,8 @@ construct (TData "Note") [pitch, dur]
     = VNote $ Note (Pitch $ unpackInt pitch) (Duration $ unpackInt dur)
 construct (TData "Chord") [pitches, dur]
     = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
+construct (TData "Part") _ = error "Constructor for Part not implemented"
+construct (TData "Music") _ = error "Constructor for Music not implemented"
 construct _ _ = error "Syntax error"
 
 pitchClass :: String -> Int
