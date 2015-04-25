@@ -72,6 +72,7 @@ The list of keywords is:
  * `False`
  * `case`
  * `otherwise`
+ * `where`
  * `List`
  * `Pitch`
  * `Note`
@@ -97,7 +98,6 @@ Data Types).
 #### Boolean Constant
 
 Either `True` or `False`.
-
 
 ### Operators
 
@@ -144,44 +144,40 @@ pitch, or the height of a note on a musical staff.
 
 ##### Short-hand notation
 
-A backtick, followed by a single letter character indicating the note, followed
-by an optional `#` or `b` character indicating the accidental (sharp or flat,
-respectively), followed by a number indicating the octave.
+A backtick, followed by a single upper-case letter from A to G indicating the
+pitch, followed by an optional `#` or `b` character indicating the accidental
+(sharp or flat, respectively), followed by a number indicating the octave.
 
 For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`a#5
+`A#5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The backtick indicates that you are defining a pitch.
-
-The character for the note must be in the range `[a-g]`. In this case it is the
-note `a`.
+This is the pitch corresponding to A# in the fifth octave.
 
 Not including an accidental indicates that the note is natural. In this case we
 make the pitch a sharp by using `#`. The integer for the octave must be in the
-range `[0-10]`. In this case we use the pitch `a` in the fifth octave.
+range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
 
-|    | c   | c# db | d   | d# eb | e   | f   | f# gb | g   | g# ab | a   | a# bb | b   |
+|oct.| c   | c#/db | d   | d#/eb | e   | f   | f#/gb | g   | g#/ab | a   | a#/bb | b   |
 |----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
-| 0  | 0   | 1     | 2   | 3     | 4   | 5   | 6     | 7   | 8     | 9   | 10    | 11  |
-| 1  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
-| 2  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
-| 3  | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
-| 4  | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
-| 5  | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
-| 6  | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
-| 7  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
-| 8  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
-| 9  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-| 10 | 120 | 121   | 122 | 123   | 124 | 125 |       |     |       |     |       |     |
+| 0  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
+| 1  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
+| 2  | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
+| 3  | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
+| 4  | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
+| 5  | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
+| 6  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
+| 7  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
+| 8  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
+| 9  | 120 | 121   | 122 | 123   | 124 | 125 |       |     |       |     |       |     |
 
-This notation is inspired by the way notes are defined in MIDI. It can be
-described by the regular expression
+This notation is inspired by the way notes are defined in MIDI. It is generated
+by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`[a-g](#|b)?[0-9]
+`[A-G](#|b)?[0-9]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ##### Duration
@@ -244,8 +240,8 @@ one exception is lists, which are declared using brackets: `[...]`.
     `Atom` can be either a `Note`, a `Chord`, or a `Rest`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Atom = Note(`a5, \8)
-	c: Atom = Chord([`a5, `c#5, `e5], \4)
+	n: Atom = Note(`A5, \8)
+	c: Atom = Chord([`A5, `C#5, `E5], \4)
 	r: Atom = Rest(\4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -253,14 +249,14 @@ one exception is lists, which are declared using brackets: `[...]`.
    `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Atom = Note(`a5, \4)
+	n: Atom = Note(`A5, \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Chord`: an instance of the `Atom` type consisting of a list of `Pitch`es
     and a `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	c: Atom = Chord([`a5, `c#5, `e5], \4)
+	c: Atom = Chord([`A5, `C#5, `E5], \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Rest`: an instance of the `Atom` type consisting of `Duration`. A `Rest`
@@ -280,7 +276,7 @@ one exception is lists, which are declared using brackets: `[...]`.
    separate but simultaneously-occurring lines of music. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	p: Part = Part([Note(`a5, 1), Note(`c#5, 2)])
+	p: Part = Part([Note(`A5, 1), Note(`C#5, 2)])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Music`: the `Music` data type is initialized with a list containing all
@@ -289,12 +285,12 @@ one exception is lists, which are declared using brackets: `[...]`.
    example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	aMajor: Atom = Chord([`a5, `c#5, `e5], \4)
-	bMinor: Atom = Chord([`b5, `d#5, `f#5], \4)
-	eMajor: Atom = Chord([`e5, `g#5, `b5], \4)
+	aMajor: Atom = Chord([`A5, `C#5, `E5], \4)
+	bMinor: Atom = Chord([`B5, `D#5, `F#5], \4)
+	eMajor: Atom = Chord([`E5, `G#5, `B5], \4)
 
 	back: Part = Part([aMajor, bMinor, eMajor])
-	lead: Part = Part([Note(`a5, \4), Note(`f#5, \4), Note(`e4, \4)])
+	lead: Part = Part([Note(`A5, \4), Note(`F#5, \4), Note(`E4, \4)])
 
 	song: Music = Music([lead, back])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -586,12 +582,8 @@ y: Int                  -- invalid
 
 #### Blocks
 
-A block is an expression consisting of one or more statements, delimited by
-curly braces. The last statement must be an expression, since it determines the
-value of the block. Any previous statements, however, can be a combination of
-expressions and definitions.
-
-Blocks can be used to declare local-scope auxiliary values or functions.
+A block is an expression delimited by curly braces. Using the `where` keyword,
+blocks can be used to declare local-scope auxiliary values or functions.
 Consider the following two versions of a function that computes the surface
 area of a cylinder:
 
@@ -599,9 +591,10 @@ area of a cylinder:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
-    sideArea: Int = 2 * pi * r * h
-    baseArea: Int = pi * r * r
-    sideArea + 2 * baseArea
+    sideArea + (2 * baseArea)
+    where
+        sideArea: Int = 2 * pi * r * h
+        baseArea: Int = pi * r * r
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -619,11 +612,12 @@ define an auxiliary function:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 factorial: (n: Int) -> Int = {
-    aux: (n: Int, acc: Int) -> Int = {
-        case (n == 0)   acc
-        otherwise       aux(n - 1, acc * n)
-    }
     aux(n, 1)
+    where
+        aux: (n: Int, acc: Int) -> Int = {
+            case (n == 0)   acc
+            otherwise       aux(n - 1, acc * n)
+        }
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -642,11 +636,11 @@ be evaluated. Note that this means if multiple case conditions evaluate to
 Consider the following example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-foo: Int = case (1 > 2) { 1 }
-           case (False) { 2 }
-           case (True)  { 3 }
-           case (True)  { 4 }
-           otherwise    { 5 }
+foo: Int = case (1 > 2) 1
+           case (False) 2
+           case (True)  3
+           case (True)  4
+           otherwise    5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here foo is an integer whose value is determined by a case statement. The first two case
@@ -661,7 +655,7 @@ begins in a main variable, which is of type Music and is required for a program
 to compile. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = Music([Part([Note(`a5, \4)])])
+main: Music = Music([Part([Note(`A5, \4)])])
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The program will compile to a MIDI file containing a single note -- an a in the
@@ -687,9 +681,8 @@ function's block.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 f: (x: Int) -> Int = {
-    g: (x: Int) -> Int = {
-        x * x   -- x refers to parameter of g
-    }
-    g(x) + 3    -- x refers to parameter of f
+    g(x) + 3                        -- x refers to parameter of f
+    where
+        g: (x: Int) -> Int = x * x  -- x refers to parameter of g
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
