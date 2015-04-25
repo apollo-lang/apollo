@@ -1,13 +1,14 @@
 module Env
-( Env
-, nullEnv
-, IOThrowsError
-, liftThrows
-, runIOThrows
-, getVar
-, defineVar
-, bindVars
-) where
+    ( Env
+    , nullEnv
+    , IOThrowsError
+    , liftThrows
+    , runIOThrows
+    , getVar
+    , defineVar
+    , bindVars
+    ) where
+
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
 import Data.Maybe (isJust)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)

@@ -1,6 +1,7 @@
 module Main
-( main
-) where
+    ( main
+    ) where
+
 import Control.Monad (liftM, unless)
 import Control.Monad.Trans.Error (runErrorT)
 import System.Environment

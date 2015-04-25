@@ -1,9 +1,10 @@
 module Error
-( ApolloError (..)
-, ThrowsError
-, trapError
-, extractValue
-) where
+    ( ApolloError (..)
+    , ThrowsError
+    , trapError
+    , extractValue
+    ) where
+
 import Control.Monad.Error (Error(noMsg,strMsg), MonadError, catchError)
 import Expr
 
