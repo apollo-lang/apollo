@@ -18,6 +18,8 @@ eval env expr = case expr of
 
   VDuration d -> return $ VDuration d
 
+  VRest r -> return $ VRest r
+
   VNote n -> return $ VNote n
 
   VChord c -> return $ VChord c
