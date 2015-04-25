@@ -13,67 +13,69 @@ $commentable    = [. \n] # [\/ \*]
 
 tokens :-
 
-    $eol                          ;
-    $white+                       ;
+    --^$eol\$?                      ;
+    --$eol                          { \s -> TokenEOL }     
+    $white+                         ;
 
     -- Single-line comments
-    "--".*                        ;   
+    "--".*                          ;
 
     -- Multi-line comments
     "{-" 
     ("{"|"-"*$commentable)* 
-    "-"+ "}"                      ;
+    "-"+ "}"                        ;
 
     -- Duration constant
-    \\[0-9]+\.?                   { \s -> TokenDur s }
+    \\[0-9]+\.?                     { \s -> TokenDur s }
 
     -- Pitch constant
-    `[A-G](\#|b)?[0-9]            { \s -> TokenPitch s }
+    `[A-G](\#|b)?[0-9]              { \s -> TokenPitch s }
 
     -- Integer Constants
-    $digit+                       { \s -> TokenNum (read s) }
+    $digit+                         { \s -> TokenNum (read s) }
 
     -- Boolean Constants
-    "True"                        { \s -> TokenBool (True) }
-    "False"                       { \s -> TokenBool (False) }
+    "True"                          { \s -> TokenBool (True) }
+    "False"                         { \s -> TokenBool (False) }
 
     -- Reserved words
-    "case"                        { \s -> TokenCase }
-    "otherwise"                   { \s -> TokenOtherwise }
+    "case"                          { \s -> TokenCase }
+    "otherwise"                     { \s -> TokenOtherwise }
+    "where"                         { \s -> TokenWhere }
 
     -- Identifiers
-    [a-z][$alpha $digit \']*      { \s -> TokenId s }
+    [a-z][$alpha $digit \']*        { \s -> TokenId s }
 
     -- Type / Type Instance
-    [A-Z]$alpha*                  { \s -> TokenType s }
+    [A-Z]$alpha*                    { \s -> TokenType s }
 
     -- Operators
-    \+                            { \s -> TokenPlus }
-    \-                            { \s -> TokenMinus }
-    \*                            { \s -> TokenMult }
-    \/                            { \s -> TokenDiv }
-    \%                            { \s -> TokenMod }
-    "=="                          { \s -> TokenEq }
-    "!="                          { \s -> TokenNEq }
-    \<                            { \s -> TokenLe }
-    \>                            { \s -> TokenGr }
-    "<="                          { \s -> TokenLEq }
-    ">="                          { \s -> TokenGEq }
-    "&&"                          { \s -> TokenAnd }
-    "||"                          { \s -> TokenOr }
-    \!                            { \s -> TokenNot }
+    \+                              { \s -> TokenPlus }
+    \-                              { \s -> TokenMinus }
+    \*                              { \s -> TokenMult }
+    \/                              { \s -> TokenDiv }
+    \%                              { \s -> TokenMod }
+    "=="                            { \s -> TokenEq }
+    "!="                            { \s -> TokenNEq }
+    \<                              { \s -> TokenLe }
+    \>                              { \s -> TokenGr }
+    "<="                            { \s -> TokenLEq }
+    ">="                            { \s -> TokenGEq }
+    "&&"                            { \s -> TokenAnd }
+    "||"                            { \s -> TokenOr }
+    \!                              { \s -> TokenNot }
 
     -- Separators
-    \=                            { \s -> TokenDef }
-    "->"                          { \s -> TokenArrow }
-    \:                            { \s -> TokenColon }
-    \,                            { \s -> TokenComma }
-    \(                            { \s -> TokenLParen }
-    \)                            { \s -> TokenRParen }
-    \[                            { \s -> TokenLBrack }
-    \]                            { \s -> TokenRBrack }
-    \{                            { \s -> TokenLBrace }
-    \}                            { \s -> TokenRBrace }
+    \=                              { \s -> TokenDef }
+    "->"                            { \s -> TokenArrow }
+    \:                              { \s -> TokenColon }
+    \,                              { \s -> TokenComma }
+    \(                              { \s -> TokenLParen }
+    \)                              { \s -> TokenRParen }
+    \[                              { \s -> TokenLBrack }
+    \]                              { \s -> TokenRBrack }
+    \{                              { \s -> TokenLBrace }
+    \}                              { \s -> TokenRBrace }
 
 {
 
@@ -85,6 +87,7 @@ data Token = TokenId String
            | TokenPitch String
            | TokenCase
            | TokenOtherwise
+           | TokenWhere
            | TokenPlus
            | TokenMinus
            | TokenMult
@@ -109,6 +112,7 @@ data Token = TokenId String
            | TokenRBrack
            | TokenLBrace
            | TokenRBrace
+           | TokenEOL
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens
