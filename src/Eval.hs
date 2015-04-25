@@ -1,6 +1,7 @@
 module Eval
-( eval
-) where
+    ( eval
+    ) where
+
 import Control.Monad (liftM)
 import Control.Monad.Error (throwError, liftIO)
 import Error

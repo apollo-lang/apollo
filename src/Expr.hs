@@ -1,18 +1,18 @@
 module Expr
-( Param(..)
-, Id
-, Type(..)
-, Expr(..)
-, IOpr(..)
-, BOpr(..)
-, COpr(..)
-, Pitch(..)
-, Duration(..)
-, Note(..)
-, Chord(..)
-, showVal
-, typeOf
-) where
+    ( Param(..)
+    , Id
+    , Type(..)
+    , Expr(..)
+    , IOpr(..)
+    , BOpr(..)
+    , COpr(..)
+    , Pitch(..)
+    , Duration(..)
+    , Note(..)
+    , Chord(..)
+    , showVal
+    , typeOf
+    ) where
 
 data Type
   = TData String
