@@ -3,7 +3,7 @@ module Parse
 ( parse
 , parseRepl
 ) where
-import Control.Monad.Error (liftM)
+import Control.Monad.Error (liftM, throwError)
 import Error
 import Expr
 import Util
@@ -92,7 +92,7 @@ Expression  : NUM                           { VInt $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | TYPE '(' Expressions ')'      { construct (TData $1) $3 }
             | '(' PITCH ',' DUR ')'         { VNote $ Note (parsePitch $2) (parseDuration $4) }
-            | '{' Expressions '}'           { construct (TData "Chord") $2 } 
+            | '{' Expressions '}'           { construct (TData "Chord") $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
@@ -128,13 +128,12 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
-            | '{' Expression 
+            | '{' Expression
               WHERE Definitions '}'         { Block $4 $2 }
 
 {
--- TODO: improve
-parseError (token:whatever) = Left . ParseErr $ show token
-parseError _ = Left . ParseErr $ "other"
+parseError (t:ts) = throwError . ParseErr $ "token " ++ show t
+parseError []     = throwError . ParseErr $ "end of input"
 
 parse :: String -> ThrowsError [Expr]
 parse = program . scanTokens

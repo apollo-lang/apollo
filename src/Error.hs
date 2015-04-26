@@ -28,7 +28,7 @@ instance Show ApolloError where
   show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelimit found ++ ")"
     where commaDelimit = init . concatMap ((++ ",") . showVal)
   show (RedefVar                    var) = "Multiple declaration: redefining variable " ++ var
-  show (ParseErr                    val) = "Parse error: unexpected token " ++ show val
+  show (ParseErr                    val) = "Parse error: unexpected " ++ val
   show (Default                     msg) = msg
 
 trapError :: (MonadError e m, Show e) => m String -> m String
