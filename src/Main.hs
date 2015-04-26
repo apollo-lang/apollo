@@ -7,6 +7,8 @@ import Control.Monad.Trans.Error (runErrorT)
 import System.Environment
 import System.IO
 import Parse
+import Check
+import Error
 import Expr
 import Eval
 import Env
@@ -31,16 +33,17 @@ putAst = getContents >>= \x -> putStrLn $ case (parse x) of
 parseAndEval :: String -> IO ()
 parseAndEval src = do
   env <- nullEnv
-  case (parse src) of
-    (Left err)    -> putStrLn $ show err
-    (Right exprs) -> execute env exprs >>= putStrLn . concatMap (++ "\n")
+  let res = parse src >>= \ast -> mapM_ typecheck ast >> return ast
+  case res of
+    (Left err)    -> print err
+    (Right exprs) -> execute env exprs >>= putStrLn . unlines
 
 execute :: Env -> [Expr] -> IO [String]
 execute _   []        = return []
 execute env (e:exprs) =
   (runErrorT (eval env e)) >>= \res->
   case res of
-    (Left err)  -> return $ [show err]
+    (Left err)  -> return [show err]
     (Right Empty) -> execute env exprs
     (Right val) -> liftM ([showVal val] ++) (execute env exprs)
 
@@ -66,8 +69,11 @@ evalAndPrint env str = evalString env str >>= \s -> case s of
                                                       ""       -> putStr ""
                                                       notEmpty -> putStrLn notEmpty
 
+parseCheck :: String -> ThrowsError Expr
+parseCheck s = parseRepl s >>= \ast -> typecheck ast >> return ast
+
 evalString :: Env -> String -> IO String
-evalString env expr = showResult $ (liftThrows $ parseRepl expr) >>= eval env
+evalString env expr = showResult $ (liftThrows (parseCheck expr)) >>= eval env
 
 showResult :: IOThrowsError Expr -> IO String
 showResult = runIOThrows . liftM showVal

@@ -12,6 +12,7 @@ type ThrowsError = Either ApolloError
 
 data ApolloError
   = TypeMismatch String String Expr
+  | TypeExcept String
   | UnboundVar String String
   | ArgMismatch String Integer [Expr]
   | RedefVar String
@@ -24,6 +25,7 @@ instance Error ApolloError where
 
 instance Show ApolloError where
   show (TypeMismatch  fn expected found) = "Invalid type: for " ++ fn ++ " expected " ++ expected ++ ", found " ++ typeOf found ++ " (" ++ showVal found ++ ")"
+  show (TypeExcept                  msg) = "Type exception: " ++ show msg
   show (UnboundVar           action var) = action ++ " an unbound variable: " ++ var
   show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelimit found ++ ")"
     where commaDelimit = init . concatMap ((++ ",") . showVal)

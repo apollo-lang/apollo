@@ -38,7 +38,7 @@ eval env expr = case expr of
 
   Neg e -> do
     VInt i <- eval env e
-    return . VInt $ -i
+    return . VInt $ negate i
 
   BoolOp op a b -> do
     VBool a' <- eval env a
