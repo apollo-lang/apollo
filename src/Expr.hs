@@ -8,6 +8,7 @@ module Expr
     , COpr(..)
     , Pitch(..)
     , Duration(..)
+    , Rest(..)
     , Note(..)
     , Chord(..)
     , showVal
@@ -30,6 +31,7 @@ data Expr
     | VBool Bool
     | VDuration Duration
     | VPitch Pitch
+    | VRest Rest
     | VNote Note
     | VChord Chord
     | VList [Expr]
@@ -62,18 +64,24 @@ data Chord    = Chord [Pitch] Duration deriving (Eq, Ord, Show)
 data Rest     = Rest Duration          deriving (Eq, Ord, Show)
 
 showVal :: Expr -> String
-showVal (VInt  i) = show i
-showVal (VBool b) = show b
-showVal (VList l) = "[" ++ commaDelim l  ++ "]"
+showVal (VInt  i)       = show i
+showVal (VBool b)       = show b
+showVal (VList l)       = "[" ++ commaDelim l  ++ "]"
   where commaDelim = init . concatMap ((++ ",") . showVal)
-showVal (Empty)   = ""
-showVal otherVal  = show otherVal
+showVal (VDuration d)   = show d
+showVal (VPitch p)      = show p
+showVal (VRest r)       = show r
+showVal (VNote n)       = show n
+showVal (VChord c)      = show c
+showVal (Empty)         = ""
+showVal otherVal        = show otherVal
 
 typeOf :: Expr -> String
 typeOf VInt{}      = "Integer"
 typeOf VBool{}     = "Boolean"
 typeOf VDuration{} = "Duration"
 typeOf VPitch{}    = "Pitch"
+typeOf VRest{}     = "Rest"
 typeOf VNote{}     = "Note"
 typeOf VChord{}    = "Chord"
 typeOf VList{}     = "List"

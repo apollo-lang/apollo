@@ -18,6 +18,12 @@ eval env expr = case expr of
 
   VDuration d -> return $ VDuration d
 
+  VRest r -> return $ VRest r
+
+  VNote n -> return $ VNote n
+
+  VChord c -> return $ VChord c
+
   VList xs -> liftM VList (mapM (eval env) xs)
 
   If test tr fl -> do
@@ -60,8 +66,6 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply name params body env args'
 
-  VNote _  -> throwError $ Default "Error: Note not yet implemented"
-  VChord _ -> throwError $ Default "Error: Chord not yet implemented"
   Empty    -> throwError $ Default "Error: eval called on Empty"
 
 applyB :: BOpr -> Bool -> Bool -> Bool
