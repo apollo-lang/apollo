@@ -1,6 +1,10 @@
 {
 {-# OPTIONS_GHC -w #-}
-module Lex (Token(..),scanTokens) where
+module Lex
+    ( Token(..)
+    , scanTokens
+    ) where
+
 import Expr
 }
 
@@ -25,11 +29,14 @@ tokens :-
     ("{"|"-"*$commentable)* 
     "-"+ "}"                        ;
 
-    -- Duration constant
+    -- Duration literal
     \\[0-9]+\.?                     { \s -> TokenDur s }
 
-    -- Pitch constant
-    `[A-G](\#|b)?[0-9]              { \s -> TokenPitch s }
+    -- Pitch literal
+    [A-G](\#|b)?[0-9]               { \s -> TokenPitch s }
+
+    -- Rest literal (single quote + duration literal)
+    '\\[0-9]+\.?                    { \s -> TokenRest s }
 
     -- Integer Constants
     $digit+                         { \s -> TokenNum (read s) }
@@ -85,6 +92,7 @@ data Token = TokenId String
            | TokenType String
            | TokenDur String
            | TokenPitch String
+           | TokenRest String
            | TokenCase
            | TokenOtherwise
            | TokenWhere
