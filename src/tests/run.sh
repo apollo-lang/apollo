@@ -84,14 +84,7 @@ check() {
   local test=${1}
   local ast=0
   local aps=0
-  if [[ $test == *".ap" ]]; then
-    local answ=${test/.ap/.ans}
-    local name=${1/.ap/}
-    if test ! -e "$answ"; then
-      local answ=${test/.ap/.ast}
-      local ast=1
-    fi
-  else
+  if [[ $test == *".aps" ]]; then
     local answ=${test/.aps/.ans}
     local name=${1/.aps/}
     if test ! -e "$answ"; then
@@ -99,6 +92,13 @@ check() {
       local ast=1
     fi
     local aps=1
+  else
+    local answ=${test/.ap/.ans}
+    local name=${1/.ap/}
+    if test ! -e "$answ"; then
+      local answ=${test/.ap/.ast}
+      local ast=1
+    fi
   fi
 
   if test ! -e "$answ"; then
