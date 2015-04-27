@@ -111,7 +111,7 @@ check() {
     return 0
   fi
 
-  
+
   if test $aps -eq 1; then
     local lineno=0
     while read line; do
@@ -191,19 +191,11 @@ change_dir_if_necessary() {
 }
 
 run_tests() {
-  local tests=$(ls *.ap)
+  local tests=$(ls *.ap *.aps)
 
   echo
 
   for test in $tests; do
-    check $test
-    if test $? -eq 1; then
-      exit_status=1
-    fi
-  done
-
-  local linetests=$(ls *.aps)
-  for test in $linetests; do
     check $test
     if test $? -eq 1; then
       exit_status=1
