@@ -113,9 +113,9 @@ check() {
 
   
   if test $aps -eq 1; then
-    local i=0
+    local lineno=0
     while read line; do
-      let i=i+1
+      let lineno=lineno+1
 
       if test "$ast" -eq 1; then
         local interp=$(evalAPS "$line" --ast)
@@ -123,13 +123,12 @@ check() {
         local interp=$(evalAPS "$line")
       fi
 
-      local answer=$(awk "NR==$i" "$answ")
+      local answer=$(awk "NR==$lineno" "$answ")
       local result=$(compare "$interp" "$answer")
       if test -n "$result"; then
         break
       fi
     done < $test
-    
   else
     if test "$ast" -eq 1; then
       local interp=$(evaluate $test --ast)
@@ -148,7 +147,7 @@ check() {
     if test $quiet -eq 0; then
       red
       if test $aps -eq 1; then
-        red "  Error in line: $i"
+        red "  Error in line: $lineno"
       fi
       red "  $divider"
       printr "$result"
