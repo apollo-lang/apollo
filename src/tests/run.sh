@@ -70,13 +70,23 @@ check() {
   fi
 
   local test=${1}
-  local answ=${test/.ap/.ans}
-  local name=${1/.ap/}
   local ast=0
-
-  if test ! -e "$answ"; then
-    local answ=${test/.ap/.ast}
-    local ast=1
+  local aps=0
+  if [[ $test == *".ap" ]]; then
+    local answ=${test/.ap/.ans}
+    local name=${1/.ap/}
+    if test ! -e "$answ"; then
+      local answ=${test/.ap/.ast}
+      local ast=1
+    fi
+  else
+    local answ=${test/.aps/.ans}
+    local name=${1/.aps/}
+    if test ! -e "$answ"; then
+      local answ=${test/.aps/.ast}
+      local ast=1
+    fi
+    local aps=1
   fi
 
   if test ! -e "$answ"; then
@@ -89,20 +99,45 @@ check() {
     return 0
   fi
 
-  if test "$ast" -eq 1; then
-    local interp=$(evaluate $test --ast)
+  
+  if test $aps -eq 1; then
+    local i=0
+    while read line; do
+      let i=i+1
+
+      if test "$ast" -eq 1; then
+        local interp=$(evaluate $test --ast)
+      else
+        local interp=$(evaluate $test)
+      fi
+
+      local answer=$(awk "NR==$i" "$answ")
+      local result=$(compare "$interp" "$answer")
+      if test -n "$result"; then
+        break
+      fi
+    done < $test
+    
   else
-    local interp=$(evaluate $test)
+    if test "$ast" -eq 1; then
+      local interp=$(evaluate $test --ast)
+    else
+      local interp=$(evaluate $test)
+    fi
+
+    local answer=$(cat $answ)
+    local result=$(compare "$interp" "$answer")
   fi
 
-  local answer=$(cat $answ)
-  local result=$(compare "$interp" "$answer")
   local divider=$(printf '~%.0s' {1..68})
 
   if test -n "$result"; then
     red "$fail $name" "($test $answ)"
     if test $quiet -eq 0; then
       red
+      if test $aps -eq 1; then
+        red "  Error in aps file line: $i"
+      fi
       red "  $divider"
       printr "$result"
       red "  $divider"
@@ -150,6 +185,14 @@ run_tests() {
   echo
 
   for test in $tests; do
+    check $test
+    if test $? -eq 1; then
+      exit_status=1
+    fi
+  done
+
+  local linetests=$(ls *.aps)
+  for test in $linetests; do
     check $test
     if test $? -eq 1; then
       exit_status=1
