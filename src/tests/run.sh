@@ -48,6 +48,18 @@ evaluate() {
   fi
 }
 
+evalAPS() {
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
+
+  echo "$1" | ../apollo $2 2> /dev/null
+
+  if test $? -eq 1; then
+    echo "<compilation error>"
+  fi
+}
+
+
 compare() {
   diff -Bw <(echo "${1}") <(echo "${2}")
 }
@@ -106,9 +118,9 @@ check() {
       let i=i+1
 
       if test "$ast" -eq 1; then
-        local interp=$(evaluate $test --ast)
+        local interp=$(evalAPS "$line" --ast)
       else
-        local interp=$(evaluate $test)
+        local interp=$(evalAPS "$line")
       fi
 
       local answer=$(awk "NR==$i" "$answ")
@@ -136,7 +148,7 @@ check() {
     if test $quiet -eq 0; then
       red
       if test $aps -eq 1; then
-        red "  Error in aps file line: $i"
+        red "  Error in line: $i"
       fi
       red "  $divider"
       printr "$result"
