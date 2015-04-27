@@ -1,5 +1,5 @@
 2
-Type exception: "mistmatch"
+Type exception: "mismatch"
 [1,2,1]
 Type exception: "list is irregular"
 [[1],[1]]
