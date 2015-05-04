@@ -48,6 +48,18 @@ evaluate() {
   fi
 }
 
+evalAPS() {
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
+
+  echo "$1" | ../apollo $2 2> /dev/null
+
+  if test $? -eq 1; then
+    echo "<compilation error>"
+  fi
+}
+
+
 compare() {
   diff -Bw <(echo "${1}") <(echo "${2}")
 }
@@ -70,13 +82,23 @@ check() {
   fi
 
   local test=${1}
-  local answ=${test/.ap/.ans}
-  local name=${1/.ap/}
   local ast=0
-
-  if test ! -e "$answ"; then
-    local answ=${test/.ap/.ast}
-    local ast=1
+  local aps=0
+  if [[ $test == *".aps" ]]; then
+    local answ=${test/.aps/.ans}
+    local name=${1/.aps/}
+    if test ! -e "$answ"; then
+      local answ=${test/.aps/.ast}
+      local ast=1
+    fi
+    local aps=1
+  else
+    local answ=${test/.ap/.ans}
+    local name=${1/.ap/}
+    if test ! -e "$answ"; then
+      local answ=${test/.ap/.ast}
+      local ast=1
+    fi
   fi
 
   if test ! -e "$answ"; then
@@ -89,20 +111,44 @@ check() {
     return 0
   fi
 
-  if test "$ast" -eq 1; then
-    local interp=$(evaluate $test --ast)
+
+  if test $aps -eq 1; then
+    local lineno=0
+    while read line; do
+      let lineno=lineno+1
+
+      if test "$ast" -eq 1; then
+        local interp=$(evalAPS "$line" --ast)
+      else
+        local interp=$(evalAPS "$line")
+      fi
+
+      local answer=$(awk "NR==$lineno" "$answ")
+      local result=$(compare "$interp" "$answer")
+      if test -n "$result"; then
+        break
+      fi
+    done < $test
   else
-    local interp=$(evaluate $test)
+    if test "$ast" -eq 1; then
+      local interp=$(evaluate $test --ast)
+    else
+      local interp=$(evaluate $test)
+    fi
+
+    local answer=$(cat $answ)
+    local result=$(compare "$interp" "$answer")
   fi
 
-  local answer=$(cat $answ)
-  local result=$(compare "$interp" "$answer")
   local divider=$(printf '~%.0s' {1..68})
 
   if test -n "$result"; then
     red "$fail $name" "($test $answ)"
     if test $quiet -eq 0; then
       red
+      if test $aps -eq 1; then
+        red "  Error in line: $lineno"
+      fi
       red "  $divider"
       printr "$result"
       red "  $divider"
@@ -145,7 +191,7 @@ change_dir_if_necessary() {
 }
 
 run_tests() {
-  local tests=$(ls *.ap)
+  local tests=$(ls *.ap *.aps)
 
   echo
 

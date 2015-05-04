@@ -36,7 +36,7 @@ parseAndEval src = do
   let res = parse src >>= \ast -> mapM_ typecheck ast >> return ast
   case res of
     (Left err)    -> print err
-    (Right exprs) -> execute env exprs >>= putStrLn . unlines
+    (Right exprs) -> execute env exprs >>= putStr . unlines
 
 execute :: Env -> [Expr] -> IO [String]
 execute _   []        = return []

@@ -63,14 +63,14 @@ typecheck expr = case expr of
     case (ta, tb) of
       (Int, Int)   -> return Int
       (Bool, Bool) -> return Bool
-      _            -> throwError $ TypeExcept "mistmatch"
+      _            -> throwError $ TypeExcept "mismatch"
 
   IntOp op a b -> do
     ta <- typecheck a
     tb <- typecheck b
     case (ta, tb) of
       (Int, Int) -> return Int
-      _          -> throwError $ TypeExcept "mistmatch"
+      _          -> throwError $ TypeExcept "mismatch"
 
   Block body ret -> do
     mapM_ typecheck body
