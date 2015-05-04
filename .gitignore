@@ -2,6 +2,7 @@
 
 Lex.hs
 Parse.hs
+dist/
 
 # Executible:
 
