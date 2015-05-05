@@ -1,10 +1,7 @@
-2
 Type exception: "mismatch"
 [1,2,1]
 Type exception: "list is irregular"
 [[1],[1]]
-[[1],[1]]
-Type exception: "list is irregular"
 Type exception: "list is irregular"
 1
 1
@@ -12,7 +9,6 @@ Type exception: "If: bool-cond not bool"
 Type exception: "If: case mismatch"
 False
 Type exception: "Not: expected Bool"
--2
 Type exception: "Neg: expected Int"
 False
 Type exception: "mismatch"
