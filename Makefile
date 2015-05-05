@@ -7,6 +7,7 @@ all: $(EXE)
 .PHONY: config
 config:
 	cabal sandbox init
+	cabal install --only-dependencies
 
 .PHONY: test
 test: $(EXE)
