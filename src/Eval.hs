@@ -10,12 +10,10 @@ import Env
 
 eval :: Env -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
-  VInt i -> return $ VInt i
 
-  VBool b -> return $ VBool b
-
-  VPitch p -> return $ VPitch p
-
+  VInt i      -> return $ VInt i
+  VBool b     -> return $ VBool b
+  VPitch p    -> return $ VPitch p
   VDuration d -> return $ VDuration d
 
   VRest r -> return $ VRest r
@@ -24,7 +22,9 @@ eval env expr = case expr of
 
   VChord c -> return $ VChord c
 
-  VList xs -> liftM VList (mapM (eval env) xs)
+  VPart p -> liftM VPart (mapM (evalP env) p)
+
+  VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   If test tr fl -> do
     VBool b <- eval env test
@@ -55,6 +55,8 @@ eval env expr = case expr of
     b' <- eval env b
     matchI op a' b'
 
+  VList xs -> liftM VList (mapM (eval env) xs)
+
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
   Def name typ ex -> defineVar env name (typ, ex)
@@ -66,7 +68,22 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply name params body env args'
 
-  Empty    -> throwError $ Default "Error: eval called on Empty"
+  Empty -> error "Error: eval called on Empty"
+
+evalP :: Env -> Expr -> IOThrowsError Expr
+evalP _ expr = case expr of
+  VRest r  -> return $ VRest r
+
+  VNote n  -> return $ VNote n
+
+  VChord c -> return $ VChord c
+
+  _        -> throwError $ Default "Error: expected Note, Rest or Chord"
+
+evalM :: Env -> Expr -> IOThrowsError Expr
+evalM env expr = case expr of
+  VPart p -> liftM VPart (mapM (evalP env) p)
+  _        -> throwError $ Default "Error: expected Part"
 
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of

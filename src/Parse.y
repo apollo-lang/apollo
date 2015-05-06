@@ -1,7 +1,6 @@
 {
-module Parse
-( parse
-, parseRepl
+module Parse (
+  parse
 ) where
 import Control.Monad.Error (liftM, throwError)
 import Error
@@ -50,6 +49,7 @@ import Lex
     ']'         { TokenRBrack }
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
+    '|'         { TokenPipe }
 
 %nonassoc '=' '->'
 %left '||'
@@ -97,6 +97,7 @@ Expression  : NUM                           { VInt $1 }
               ',' Expression ')'            { construct (TData "Note") [$2, $4] }
             | '{' Expression
               ',' Expression '}'            { construct (TData "Chord") [$2, $4] }
+            | '|' Expressions '|'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
@@ -140,8 +141,4 @@ parseError []     = throwError . ParseErr $ "end of input"
 
 parse :: String -> ThrowsError [Expr]
 parse = program . scanTokens
-
--- TODO: implement single expr constraint at parse level
-parseRepl :: String -> ThrowsError Expr
-parseRepl = liftM head . parse
 }
