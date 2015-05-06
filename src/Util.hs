@@ -8,10 +8,13 @@ module Util
     , matchPitch
     , parseDuration
     , matchDuration
+    , makeAtom
+    , makeMusic
     ) where
 
 import Text.Regex.Posix
 import Expr
+-- import Error
 
 -- TODO: use Error monad instead of `error`
 
@@ -35,6 +38,22 @@ unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
 
+
+makeAtom :: Expr -> Atom 
+makeAtom (VNote  n)  = AtomNote  n
+makeAtom (VChord c)  = AtomChord c
+makeAtom (VRest  r)  = AtomRest  r
+makeAtom _           = error "Expected note, chord or rest"
+
+makePart :: Expr -> Part
+makePart (VPart p) = Part $ map makeAtom p
+makePart _         = error "bug: expected VPart"
+
+makeMusic :: Expr -> Music
+makeMusic (VMusic m) = Music $ map makePart m
+makeMusic _          = error "bug: expected VMusic"
+
+
 construct :: Type -> [Expr] -> Expr
 construct (TData "Pitch") [pitch]
     = VPitch $ Pitch $ unpackInt pitch
@@ -42,8 +61,10 @@ construct (TData "Note") [pitch, dur]
     = VNote $ Note (Pitch $ unpackInt pitch) (Duration $ unpackInt dur)
 construct (TData "Chord") [pitches, dur]
     = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
-construct (TData "Part") _ = error "Constructor for Part not implemented"
-construct (TData "Music") _ = error "Constructor for Music not implemented"
+construct (TData "Part") atoms 
+    = VPart atoms
+construct (TData "Music") parts 
+    = VMusic parts
 construct _ _ = error "Syntax error"
 
 pitchClass :: String -> Int
