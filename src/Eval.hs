@@ -12,12 +12,10 @@ import Midi
 
 eval :: Env -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
-  VInt i -> return $ VInt i
 
-  VBool b -> return $ VBool b
-
-  VPitch p -> return $ VPitch p
-
+  VInt i      -> return $ VInt i
+  VBool b     -> return $ VBool b
+  VPitch p    -> return $ VPitch p
   VDuration d -> return $ VDuration d
 
   VRest r -> return $ VRest r
@@ -61,6 +59,8 @@ eval env expr = case expr of
     b' <- eval env b
     matchI op a' b'
 
+  VList xs -> liftM VList (mapM (eval env) xs)
+
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
   Def name typ ex -> defineVar env name (typ, ex)
@@ -72,7 +72,7 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply name params body env args'
 
-  Empty    -> throwError $ Default "Error: eval called on Empty"
+  Empty -> error "Error: eval called on Empty"
 
 evalP :: Env -> Expr -> IOThrowsError Expr
 evalP _ expr = case expr of
