@@ -7,7 +7,8 @@ import Control.Monad.Error (throwError, liftIO)
 import Error
 import Expr
 import Env
--- import Util
+import Util
+import Midi
 
 eval :: Env -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
@@ -27,7 +28,9 @@ eval env expr = case expr of
 
   VPart p -> liftM VPart (mapM (evalP env) p)
 
-  VMusic m -> liftM VMusic (mapM (evalM env) m)
+  e@(VMusic m) -> do
+    -- return $ exportMusic (makeMusic e) 24 "file.mid"
+    liftM VMusic (mapM (evalM env) m)
 
   VList xs -> liftM VList (mapM (eval env) xs)
 

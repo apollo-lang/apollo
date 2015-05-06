@@ -9,6 +9,7 @@ module Util
     , parseDuration
     , matchDuration
     , makeAtom
+    , makeMusic
     ) where
 
 import Text.Regex.Posix
