@@ -83,6 +83,7 @@ tokens :-
     \]                              { \s -> TokenRBrack }
     \{                              { \s -> TokenLBrace }
     \}                              { \s -> TokenRBrace }
+    \|                              { \s -> TokenVertBar }
 
 {
 
@@ -120,6 +121,7 @@ data Token = TokenId String
            | TokenRBrack
            | TokenLBrace
            | TokenRBrace
+           | TokenVertBar
            | TokenEOL
            deriving (Eq,Show)
 
