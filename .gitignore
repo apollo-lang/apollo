@@ -23,5 +23,3 @@ core
 src/tmp/
 *.mid
 *.DS_Store
-.floo
-.flooignore
