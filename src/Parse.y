@@ -1,7 +1,6 @@
 {
-module Parse
-( parse
-, parseRepl
+module Parse (
+  parse
 ) where
 import Control.Monad.Error (liftM, throwError)
 import Error
@@ -140,8 +139,4 @@ parseError []     = throwError . ParseErr $ "end of input"
 
 parse :: String -> ThrowsError [Expr]
 parse = program . scanTokens
-
--- TODO: implement single expr constraint at parse level
-parseRepl :: String -> ThrowsError Expr
-parseRepl = liftM head . parse
 }
