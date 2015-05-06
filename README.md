@@ -1,16 +1,15 @@
 Apollo [![Build Status](https://travis-ci.org/apollo-lang/apollo.svg?branch=master)](https://travis-ci.org/apollo-lang/apollo)
 ======
 
-
 A programming language for algorithmic and musical composition.
 
 Contributors:
 
- * Benjamin Matthew Kogan (bmk2130@columbia.edu)
- * Javier Llaca (jl3960@columbia.edu)
- * Reza Nayebi (rn2324@columbia.edu)
- * Roberto Jose De Amorim (rja2139@columbia.edu)
- * Souren Sarkis Papazian (ssp2155@columbia.edu)
+ * [Benjamin Matthew Kogan](https://github.com/benkogan)
+ * [Javier Llaca](https://github.com/javierllaca)
+ * [Reza Nayebi](https://github.com/rezanayebi)
+ * [Roberto Jose De Amorim](https://github.com/rjamorim)
+ * [Souren Sarkis Papazian](https://github.com/SourenP)
 
 Getting Started
 ---------------
@@ -20,13 +19,15 @@ following series of commands will install all necessary dependencies, build
 the compiler, and run the integration test suite in that order:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ cabal install --only-dependencies
-$ cd src/
+$ make config
 $ make
 $ make test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The `make config` command is used to set up a [sandbox][] for project dependencies. It is not strictly necessary, but it is highly recommended.
+
 [haskell platform]: https://www.haskell.org/platform
+[sandbox]: https://www.haskell.org/cabal/users-guide/installing-packages.html#developing-with-sandboxes
 
 Usage
 -----
