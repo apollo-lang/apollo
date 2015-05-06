@@ -60,7 +60,10 @@ construct (TData "Note") [pitch, dur]
     = VNote $ Note (Pitch $ unpackInt pitch) (Duration $ unpackInt dur)
 construct (TData "Chord") [pitches, dur]
     = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
-construct (TData "Music") parts = VMusic parts
+construct (TData "Part") atoms 
+    = VPart atoms
+construct (TData "Music") parts 
+    = VMusic parts
 construct _ _ = error "Syntax error"
 
 pitchClass :: String -> Int
