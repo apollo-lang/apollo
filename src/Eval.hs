@@ -15,9 +15,16 @@ eval env expr = case expr of
   VBool b     -> return $ VBool b
   VPitch p    -> return $ VPitch p
   VDuration d -> return $ VDuration d
-  VRest r     -> return $ VRest r
-  VNote n     -> return $ VNote n
-  VChord c    -> return $ VChord c
+
+  VRest r -> return $ VRest r
+
+  VNote n -> return $ VNote n
+
+  VChord c -> return $ VChord c
+
+  VPart p -> liftM VPart (mapM (evalP env) p)
+
+  VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   If test tr fl -> do
     VBool b <- eval env test
@@ -62,6 +69,21 @@ eval env expr = case expr of
     apply name params body env args'
 
   Empty -> error "Error: eval called on Empty"
+
+evalP :: Env -> Expr -> IOThrowsError Expr
+evalP _ expr = case expr of
+  VRest r  -> return $ VRest r
+
+  VNote n  -> return $ VNote n
+
+  VChord c -> return $ VChord c
+
+  _        -> throwError $ Default "Error: expected Note, Rest or Chord"
+
+evalM :: Env -> Expr -> IOThrowsError Expr
+evalM env expr = case expr of
+  VPart p -> liftM VPart (mapM (evalP env) p)
+  _        -> throwError $ Default "Error: expected Part"
 
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of
