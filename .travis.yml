@@ -1,4 +1,4 @@
 language: haskell
 ghc: 7.8
-install: make config && cabal install --only-dependencies
+install: cabal install alex happy && make config
 script: make test
