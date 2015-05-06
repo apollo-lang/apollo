@@ -28,9 +28,7 @@ eval env expr = case expr of
 
   VPart p -> liftM VPart (mapM (evalP env) p)
 
-  e@(VMusic m) -> do
-    -- return $ exportMusic (makeMusic e) 24 "file.mid"
-    liftM VMusic (mapM (evalM env) m)
+  VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
