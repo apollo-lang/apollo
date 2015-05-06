@@ -50,7 +50,7 @@ import Lex
     ']'         { TokenRBrack }
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
-    '|'         { TokenVertBar }
+    '|'         { TokenPipe }
 
 %nonassoc '=' '->'
 %left '||'

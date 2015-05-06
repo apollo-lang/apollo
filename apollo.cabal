@@ -27,7 +27,7 @@ executable apollo
                      , Lex
                      , Parse
                      , Util
-                     , Main
+                     , Midi
 
   build-depends:       base          >=4.7  && <4.8
                      , regex-posix   >=0.95 && <0.96
@@ -35,7 +35,7 @@ executable apollo
                      , array         >=0.5  && <0.6
                      , transformers  >=0.3  && <0.4
                      , containers    >=0.5  && <0.6
-                     , HCodecs       >=0.2
+                     , HCodecs       >=0.5  && <0.6
 
   other-extensions:    CPP
   hs-source-dirs:      src
