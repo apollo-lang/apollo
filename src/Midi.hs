@@ -1,10 +1,10 @@
 module Midi where
 
 import Codec.Midi
-import Types
+import Expr
 
 musicToTrack :: Music -> [[(Ticks, Message)]]
-musicToTrack m = foldr (\x y -> x ++ y) [] $ map partToTrack (parts m)
+musicToTrack (Music m) = foldr (\x y -> x ++ y) [] $ map partToTrack m
 
 midiFromMusic :: Music -> Int -> Midi
 midiFromMusic m tempo = Midi 
@@ -21,24 +21,24 @@ exportMusic music tempo filename = export (midiFromMusic music tempo) filename
 
 -- returns lenght of longest atom
 longestAtom :: Part -> Int
-longestAtom p = maximum $ map sizeOfAtom (atoms p)
+longestAtom (Part p) = maximum $ map sizeOfAtom p
   where
-    sizeOfAtom (AtomChord (Chord a d)) = length a 
+    sizeOfAtom (AtomChord (Chord a _)) = length a 
     sizeOfAtom _ = 1
 
 -- Returns a [[Track]] of length l and takes care of rest padding if Atom is
 -- not of length l
 appendRests :: Int -> Atom -> [[(Ticks, Message)]]
-appendRests l (AtomNote n@(Note (Pitch p) d))
+appendRests l (AtomNote n@(Note (Pitch _) d))
     = noteToTrack n : (replicate (l - 1) (restToTrack (Rest d)))
-appendRests l (AtomRest r@(Rest d))
+appendRests l (AtomRest r@(Rest _))
     = restToTrack r : (replicate (l - 1) (restToTrack r))
 appendRests l (AtomChord c@(Chord a d))
     = chordToTrack c ++ (replicate (l - (length a)) (restToTrack (Rest d)))
 
 -- Takes a part and outputs [[Track]] with padding using partToTracKHelp
 partToTrack :: Part -> [[(Ticks, Message)]]
-partToTrack p = partToTrackHelp (replicate (longestAtom p) []) (atoms p)
+partToTrack p@(Part atoms) = partToTrackHelp (replicate (longestAtom p) []) atoms
 
 -- Appends all Atoms to a list of tracks with Rest padding
 partToTrackHelp :: [[(Ticks, Message)]] -> [Atom] -> [[(Ticks, Message)]]
