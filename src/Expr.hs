@@ -11,6 +11,9 @@ module Expr
     , Rest(..)
     , Note(..)
     , Chord(..)
+    , Part(..)
+    , Atom(..)
+    , Music(..)
     , showVal
     , typeOf
     ) where
@@ -34,6 +37,8 @@ data Expr
     | VRest Rest
     | VNote Note
     | VChord Chord
+    | VPart [Expr]
+    | VMusic [Expr]
     | VList [Expr]
     | Def Id Type Expr
     | Name Id
@@ -62,17 +67,27 @@ data Duration = Duration Int           deriving (Eq, Ord, Show)
 data Note     = Note Pitch Duration    deriving (Eq, Ord, Show)
 data Chord    = Chord [Pitch] Duration deriving (Eq, Ord, Show)
 data Rest     = Rest Duration          deriving (Eq, Ord, Show)
+data Atom     = AtomNote Note 
+              | AtomChord Chord
+              | AtomRest Rest          deriving (Eq, Ord, Show)
+data Part     = Part [Atom]            deriving (Eq, Ord, Show)
+data Music    = Music [Part]           deriving (Eq, Ord, Show)
+
+
+commaDelim :: [Expr] -> String
+commaDelim = init . concatMap ((++ ",") . showVal)
 
 showVal :: Expr -> String
 showVal (VInt  i)       = show i
 showVal (VBool b)       = show b
 showVal (VList l)       = "[" ++ commaDelim l  ++ "]"
-  where commaDelim = init . concatMap ((++ ",") . showVal)
 showVal (VDuration d)   = show d
 showVal (VPitch p)      = show p
 showVal (VRest r)       = show r
 showVal (VNote n)       = show n
 showVal (VChord c)      = show c
+showVal (VPart p)       = "Part | " ++ commaDelim p ++ " |"
+showVal (VMusic m)      = "Music [" ++ commaDelim m ++ "]"
 showVal (Empty)         = ""
 showVal otherVal        = show otherVal
 
@@ -84,6 +99,8 @@ typeOf VPitch{}    = "Pitch"
 typeOf VRest{}     = "Rest"
 typeOf VNote{}     = "Note"
 typeOf VChord{}    = "Chord"
+typeOf VPart{}     = "Part"
+typeOf VMusic{}    = "Music"
 typeOf VList{}     = "List"
 typeOf Block{}     = "Block"
 typeOf If{}        = "Conditional"
