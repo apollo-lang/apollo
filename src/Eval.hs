@@ -7,8 +7,6 @@ import Control.Monad.Error (throwError, liftIO)
 import Error
 import Expr
 import Env
-import Util
-import Midi
 
 eval :: Env -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
