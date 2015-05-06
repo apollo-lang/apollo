@@ -28,8 +28,6 @@ eval env expr = case expr of
 
   VMusic m -> liftM VMusic (mapM (evalM env) m)
 
-  VList xs -> liftM VList (mapM (eval env) xs)
-
   If test tr fl -> do
     VBool b <- eval env test
     if b
