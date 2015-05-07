@@ -96,7 +96,7 @@ Expression  : NUM                           { VInt $1 }
               ',' Expression ')'            { construct (TData "Atom") [$2, $4] }
             | '(' '_'
               ',' Expression ')'            { construct (TData "Rest") [$4] }
-            | '|' Expressions '|'           { VPart $2 }
+            | '{' Expressions '}'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
