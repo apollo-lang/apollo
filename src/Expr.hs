@@ -12,19 +12,47 @@ module Expr
     , Note(..)
     , Chord(..)
     , showVal
-    , typeOf
     ) where
 
 data Type
-  = TData String
-  | TList String
+  = TInt
+  | TBool
+  | TDuration
+  | TPitch
+  | TRest
+  | TNote
+  | TChord
+  | TList Type
+
+  | TEmpty String -- TODO: remove
+  | TError -- TODO: remove
+
+  | TData String
   | TFunc [Param] Type
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show Type where
+  show TInt      = "Integer"
+  show TBool     = "Boolean"
+  show TDuration = "Duration"
+  show TPitch    = "Pitch"
+  show TRest     = "Rest"
+  show TNote     = "Note"
+  show TChord    = "Chord"
+  show (TList t) = "[" ++ show t ++ "]"
+
+  show TEmpty{} = "shouldnt show for TEmpty"
+  show TError = "shouldnt show for TEmpty"
+
+  show TData{} = "TODO show for TData"
+  show TFunc{} = "TODO show for TFunc"
 
 data Param = Param Id Type
   deriving (Eq, Ord, Show)
 
 type Id = String
+
+-- TODO: note that FnBody stores untyped param names (just Ids)
 
 data Expr
     = VInt Int
@@ -40,6 +68,7 @@ data Expr
     | Block [Expr] Expr
     | If Expr Expr Expr
     | FnCall Id [Expr]
+    | FnBody [Id] Expr
     | Neg Expr
     | Not Expr
     | IntOp IOpr Expr Expr
@@ -49,13 +78,32 @@ data Expr
     deriving (Eq, Ord, Show)
 
 data IOpr = Add | Sub | Mul | Div | Mod
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show IOpr where
+  show Add = "+"
+  show Sub = "-"
+  show Mul = "*"
+  show Div = "/"
+  show Mod = "%"
 
 data BOpr = And | Or
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show BOpr where
+  show And = "&&"
+  show Or  = "||"
 
 data COpr = Eq | NEq | Le | Gr | LEq | GEq
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show COpr where
+  show Eq  = "=="
+  show NEq = "!="
+  show Le  = "<"
+  show Gr  = ">"
+  show LEq = "<="
+  show GEq = ">="
 
 data Pitch    = Pitch Int              deriving (Eq, Ord, Show)
 data Duration = Duration Int           deriving (Eq, Ord, Show)
@@ -75,25 +123,4 @@ showVal (VNote n)       = show n
 showVal (VChord c)      = show c
 showVal (Empty)         = ""
 showVal otherVal        = show otherVal
-
-typeOf :: Expr -> String
-typeOf VInt{}      = "Integer"
-typeOf VBool{}     = "Boolean"
-typeOf VDuration{} = "Duration"
-typeOf VPitch{}    = "Pitch"
-typeOf VRest{}     = "Rest"
-typeOf VNote{}     = "Note"
-typeOf VChord{}    = "Chord"
-typeOf VList{}     = "List"
-typeOf Block{}     = "Block"
-typeOf If{}        = "Conditional"
-typeOf Def{}       = error "Error: typeOf called on Def"
-typeOf Name{}      = error "Error: typeOf called on Name"
-typeOf FnCall{}    = error "Error: typeOf called on FnCall"
-typeOf Neg{}       = error "Error: typeOf called on Neg"
-typeOf Not{}       = error "Error: typeOf called on Not"
-typeOf IntOp{}     = error "Error: typeOf called on IntOp"
-typeOf BoolOp{}    = error "Error: typeOf called on BoolOp"
-typeOf CompOp{}    = error "Error: typeOf called on CompOp"
-typeOf Empty       = error "Error: typeOf called on Empty"
 

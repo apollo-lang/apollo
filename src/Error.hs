@@ -11,12 +11,15 @@ import Expr
 type ThrowsError = Either ApolloError
 
 data ApolloError
-  = TypeMismatch String String Expr
+  = TypeMismatch String Type Type
+  | TypeDMismatch Type Type
+  | TypeUMismatch String Type
   | TypeExcept String
   | UnboundVar String String
   | ArgMismatch String Integer [Expr]
   | RedefVar String
   | ParseErr String
+  | DivByZero
   | Default String
 
 instance Error ApolloError where
@@ -24,14 +27,20 @@ instance Error ApolloError where
   strMsg = Default
 
 instance Show ApolloError where
-  show (TypeMismatch  fn expected found) = "Invalid type: for " ++ fn ++ " expected " ++ expected ++ ", found " ++ typeOf found ++ " (" ++ showVal found ++ ")"
-  show (TypeExcept                  msg) = "Type exception: " ++ show msg
+  show (TypeMismatch  op a b) = "Type error: " ++ show a ++ " and " ++ show b ++ " are wrong operand types for `" ++ op ++ "`"
+  show (TypeUMismatch op a) = "Type error: " ++ show a ++ " is wrong operand type for unary `" ++ op ++ "`"
+  show (TypeDMismatch a b) = "Type error: definition of " ++ show a ++ ", but assigned to " ++ show b
+
+  show (TypeExcept                  msg) = "Type error: " ++ show msg
   show (UnboundVar           action var) = action ++ " an unbound variable: " ++ var
   show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelimit found ++ ")"
-    where commaDelimit = init . concatMap ((++ ",") . showVal)
   show (RedefVar                    var) = "Multiple declaration: redefining variable " ++ var
   show (ParseErr                    val) = "Parse error: unexpected " ++ val
+  show (DivByZero) = "Zero-division error: division or modulo by zero"
   show (Default                     msg) = msg
+
+commaDelimit :: [Expr] -> String
+commaDelimit = init . concatMap ((++ ",") . showVal)
 
 trapError :: (MonadError e m, Show e) => m String -> m String
 trapError action = catchError action (return . show)

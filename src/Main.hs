@@ -27,20 +27,21 @@ interpret :: IO ()
 interpret = do
   src <- getContents
   env <- nullEnv
-  results <- runIOThrows $ toAst src >>= execAst env
+  typeEnv <- nullEnv
+  results <- runIOThrows $ toAst typeEnv src >>= execAst env
   put results
 
-toAst :: String -> IOThrowsError [Expr]
-toAst src = liftThrows (parse src >>= \ast -> mapM_ typecheck ast >> return ast)
+toAst :: Env Type -> String -> IOThrowsError [Expr]
+toAst env src = liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> return ast
 
-execAst :: Env -> [Expr] -> IOThrowsError String
+execAst :: Env Expr -> [Expr] -> IOThrowsError String
 execAst env ast = liftM (unlines . map showVal . filter notEmpty) (exec env ast)
     where
       notEmpty :: Expr -> Bool
       notEmpty Empty = False
       notEmpty _     = True
 
-      exec :: Env -> [Expr] -> IOThrowsError [Expr]
+      exec :: Env Expr -> [Expr] -> IOThrowsError [Expr]
       exec _   []         = return []
       exec envr (e:exprs) = do
         x <- eval envr e
@@ -49,6 +50,7 @@ execAst env ast = liftM (unlines . map showVal . filter notEmpty) (exec env ast)
 
 put :: String -> IO ()
 put r
+  | r == ""          = putStr r
   | '\n' `notElem` r = putStrLn r
   | otherwise        = putStr r
 
@@ -62,7 +64,10 @@ putAst = getContents >>= \x -> putStrLn $ case parse x of
 -- Read-Evaluate-print Loop -------------------------------------------------
 
 runRepl :: IO ()
-runRepl = nullEnv >>= until_ (== "quit") (readPrompt "apollo> ") . interpretLine
+runRepl = do
+  env  <- nullEnv
+  tEnv <- nullEnv
+  until_ (== "quit") (readPrompt "apollo> ") (interpretLine env tEnv)
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
 until_ prdc prompt action = do
@@ -76,8 +81,9 @@ readPrompt prompt = flushStr prompt >> getLine
     flushStr :: String -> IO ()
     flushStr str = putStr str >> hFlush stdout
 
-interpretLine :: Env -> String -> IO ()
-interpretLine env src = runIOThrows (toAst src >>= astCheck >>= execAst env) >>= put
+interpretLine :: Env Expr -> Env Type -> String -> IO ()
+interpretLine env tEnv src =
+  runIOThrows (toAst tEnv src >>= astCheck >>= execAst env) >>= put
     where
       astCheck :: [Expr] -> IOThrowsError [Expr]
       astCheck ast = liftThrows $

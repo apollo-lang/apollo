@@ -16,13 +16,21 @@ import Expr
 -- TODO: use Error monad instead of `error`
 
 -- define: Coerce an Int to a Pitch or Duration datatype where appropriate
+-- define: For TFunc, store param names with body as FnBody type
 
 define :: Id -> Type -> Expr -> Expr
-define i (TData "Pitch") (VInt p)
-    = Def i (TData "Pitch") (VPitch $ Pitch $ p `mod` 128)
-define i (TData "Duration") (VInt d)
-    | d < 1 || d > 256 = error "Duration out of range [1, 256]"
-    | otherwise        = Def i (TData "Duration") (VDuration (Duration d))
+define i t@(TData "Pitch") (VInt p) =
+  Def i t (VPitch $ Pitch $ p `mod` 128)
+
+define i t@(TData "Duration") (VInt d)
+  | d < 1 || d > 256 = error "Duration out of range [1, 256]"
+  | otherwise        = Def i t (VDuration (Duration d))
+
+define i t@(TFunc params _) body =
+  Def i t (FnBody paramNames body)
+    where
+      paramNames = map (\(Param n _) -> n) params
+
 define i t e = Def i t e
 
 unpackInt :: Expr -> Int
