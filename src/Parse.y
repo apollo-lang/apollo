@@ -49,6 +49,7 @@ import Lex
     ']'         { TokenRBrack }
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
+    '|'         { TokenPipe }
 
 %nonassoc '=' '->'
 %left '||'
@@ -95,6 +96,7 @@ Expression  : NUM                           { VInt $1 }
               ',' Expression ')'            { construct (TData "Note") [$2, $4] }
             | '{' Expression
               ',' Expression '}'            { construct (TData "Chord") [$2, $4] }
+            | '|' Expressions '|'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
