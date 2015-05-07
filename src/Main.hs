@@ -18,6 +18,8 @@ main = getArgs >>= \args ->
        case args of
          ["--ast"]  -> putAst
          ["--repl"] -> runRepl
+         ["-h"]     -> runHelp
+         ["--help"] -> runHelp
          []         -> interpret
          _          -> putStrLn "Invalid arguments"
 
@@ -90,4 +92,16 @@ interpretLine env tEnv src =
         if length ast == 1
         then return ast
         else throwError $ Default "REPL received >1 expression"
+
+-- Help interface -----------------------------------------------------------
+
+runHelp :: IO()
+runHelp = do
+  putStrLn "Apollo: algorithmic music composition"
+  putStrLn "" 
+  putStrLn "Usage: apollo [options] < sourcefile.ap"
+  putStrLn "    --repl    Start Apollo interactive mode (Read-Evaluate-Print-Loop)"
+  putStrLn "    --ast     Print a program's abstract syntax tree"
+  putStrLn "    --help    This help message"
+  putStrLn "" 
 
