@@ -18,6 +18,7 @@ typecheck env expr = case expr of
   VRest{}     -> return TRest
   VChord{}    -> return TChord
   VNote{}     -> return TNote
+  VAtom{}     -> return TAtom
   
   VList xs -> do
     t <- mapM (typecheck env) xs
