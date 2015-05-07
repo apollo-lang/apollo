@@ -49,6 +49,7 @@ tokens :-
     "case"                          { \s -> TokenCase }
     "otherwise"                     { \s -> TokenOtherwise }
     "where"                         { \s -> TokenWhere }
+    "Music"                         { \s -> TokenMusic }
 
     -- Identifiers
     [a-z][$alpha $digit \']*        { \s -> TokenId s }
@@ -90,6 +91,7 @@ tokens :-
     \{                              { \s -> TokenLBrace }
     \}                              { \s -> TokenRBrace }
     \|                              { \s -> TokenPipe }
+    \_                              { \s -> TokenUScore }
 
 {
 
@@ -103,6 +105,7 @@ data Token = TokenId String
            | TokenCase
            | TokenOtherwise
            | TokenWhere
+           | TokenMusic
            | TokenPlus
            | TokenMinus
            | TokenMult
@@ -128,6 +131,7 @@ data Token = TokenId String
            | TokenLBrace
            | TokenRBrace
            | TokenPipe
+           | TokenUScore
            | TokenEOL
            deriving (Eq,Show)
 
