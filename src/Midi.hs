@@ -4,12 +4,12 @@ import Codec.Midi
 import Expr
 
 musicToTrack :: Music -> [[(Ticks, Message)]]
-musicToTrack (Music m) = foldr (\x y -> x ++ y) [] $ map partToTrack m
+musicToTrack (Music m) = concatMap partToTrack m
 
 midiFromMusic :: Music -> Int -> Midi
 midiFromMusic m tempo = Midi
     { fileType = MultiTrack
-    , timeDiv = (TicksPerBeat tempo)
+    , timeDiv = TicksPerBeat tempo
     , tracks = musicToTrack m }
 
 export :: Midi -> String -> IO ()
@@ -45,7 +45,7 @@ partToTrackHelp :: [[(Ticks, Message)]] -> [Atom] -> [[(Ticks, Message)]]
 partToTrackHelp container []
     = zipWith (++) container $ replicate (length container) [(0, TrackEnd)]
 partToTrackHelp container (x:xs)
-    = (partToTrackHelp (zipWith (++) container (appendRests (length container) x)) xs)
+    = partToTrackHelp (zipWith (++) container (appendRests (length container) x)) xs
 
 -- Turn Atom into list of Ticks and Messages
 atomToTrack :: Atom -> [[(Ticks, Message)]]
@@ -70,7 +70,7 @@ restToTrack (Rest (Duration d)) = ckvtToTrack 0 0 0 d
 -- Takes root, duration, pitch list and returns a midi track of the pitches in
 -- sequence for duration
 nSeqTrack :: [Note] -> [(Ticks, Message)]
-nSeqTrack ns = (foldr (\x y -> x ++ y) [] $ map noteToTrack ns)
+nSeqTrack = concatMap noteToTrack
 
 -- Takes Channel Pitch Velocity Ticks and outputs a Track with the note
 -- constructed from them

@@ -15,9 +15,16 @@ eval env expr = case expr of
   VBool b     -> return $ VBool b
   VPitch p    -> return $ VPitch p
   VDuration d -> return $ VDuration d
-  VRest r     -> return $ VRest r
-  VNote n     -> return $ VNote n
-  VChord c    -> return $ VChord c
+
+  VRest r -> return $ VRest r
+
+  VNote n -> return $ VNote n
+
+  VChord c -> return $ VChord c
+
+  VPart p -> liftM VPart (mapM (evalP env) p)
+
+  VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   VPart p -> liftM VPart (mapM (evalP env) p)
 
