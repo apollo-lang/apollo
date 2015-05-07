@@ -1,16 +1,17 @@
-Type exception: "mismatch"
+Type error: Integer and Boolean are wrong operand types for `+`
 [1,2,1]
-Type exception: "list is irregular"
+Type error: "list is irregular"
 [[1],[1]]
-Type exception: "list is irregular"
+Type error: "list is irregular"
 1
 1
-Type exception: "If: bool-cond not bool"
-Type exception: "If: case mismatch"
+Type error: "If: bool-cond not bool"
+Type error: "If: case mismatch"
 False
-Type exception: "Not: expected Bool"
-Type exception: "Neg: expected Int"
+Type error: Integer is wrong operand type for unary `!`
+Type error: Boolean is wrong operand type for unary `-`
 False
-Type exception: "mismatch"
+Type error: Boolean and Integer are wrong operand types for `||`
 True
 False
+Type error: definition of Integer, but assigned to Boolean

@@ -18,15 +18,15 @@ $commentable    = [. \n] # [\/ \*]
 tokens :-
 
     --^$eol\$?                      ;
-    --$eol                          { \s -> TokenEOL }     
+    --$eol                          { \s -> TokenEOL }
     $white+                         ;
 
     -- Single-line comments
     "--".*                          ;
 
     -- Multi-line comments
-    "{-" 
-    ("{"|"-"*$commentable)* 
+    "{-"
+    ("{"|"-"*$commentable)*
     "-"+ "}"                        ;
 
     -- Duration literal
@@ -49,12 +49,19 @@ tokens :-
     "case"                          { \s -> TokenCase }
     "otherwise"                     { \s -> TokenOtherwise }
     "where"                         { \s -> TokenWhere }
+    "Music"                         { \s -> TokenMusic }
 
     -- Identifiers
     [a-z][$alpha $digit \']*        { \s -> TokenId s }
 
     -- Type / Type Instance
-    [A-Z]$alpha*                    { \s -> TokenType s }
+    "Int"                           { \s -> TokenType TInt }
+    "Bool"                          { \s -> TokenType TBool }
+    "Duration"                      { \s -> TokenType TDuration }
+    "Pitch"                         { \s -> TokenType TPitch }
+    "Rest"                          { \s -> TokenType TRest }
+    "Note"                          { \s -> TokenType TNote }
+    "Chord"                         { \s -> TokenType TChord }
 
     -- Operators
     \+                              { \s -> TokenPlus }
@@ -91,13 +98,14 @@ tokens :-
 data Token = TokenId String
            | TokenNum Int
            | TokenBool Bool
-           | TokenType String
+           | TokenType Type
            | TokenDur String
            | TokenPitch String
            | TokenRest String
            | TokenCase
            | TokenOtherwise
            | TokenWhere
+           | TokenMusic
            | TokenPlus
            | TokenMinus
            | TokenMult
