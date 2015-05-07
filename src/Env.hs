@@ -1,13 +1,13 @@
-module Env
-    ( Env
-    , nullEnv
-    , IOThrowsError
-    , liftThrows
-    , runIOThrows
-    , getVar
-    , defineVar
-    , bindVars
-    ) where
+module Env (
+  Env
+, nullEnv
+, IOThrowsError
+, liftThrows
+, runIOThrows
+, getVar
+, defineVar
+, bindVars
+) where
 
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
 import Data.Maybe (isJust)
@@ -15,9 +15,9 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Error
 import Expr
 
-type Env = IORef [(String, IORef (Type, Expr))]
+type Env a = IORef [(String, IORef a)]
 
-nullEnv :: IO Env
+nullEnv :: IO (Env a)
 nullEnv = newIORef []
 
 type IOThrowsError = ErrorT ApolloError IO
@@ -29,25 +29,22 @@ liftThrows (Right val) = return val
 runIOThrows :: IOThrowsError String -> IO String
 runIOThrows action = liftM extractValue (runErrorT $ trapError action)
 
-isBound :: Env -> String -> IO Bool
-isBound envRef var = liftM (isJust . lookup var) (readIORef envRef)
-
-getVar :: Env -> String -> IOThrowsError (Type, Expr)
+getVar :: Env a -> Id -> IOThrowsError a
 getVar envRef var = do
   env <- liftIO $ readIORef envRef
   maybe (throwError $ UnboundVar "Getting" var)
         (liftIO . readIORef)
         (lookup var env)
 
-setVar :: Env -> String -> (Type, Expr) -> IOThrowsError Expr
+setVar :: Env a -> Id -> a -> IOThrowsError a
 setVar envRef var value = do
   env <- liftIO $ readIORef envRef
   maybe (throwError $ UnboundVar "Setting" var)
         (liftIO . flip writeIORef value)
         (lookup var env)
-  return Empty
+  return value -- see TODO on defineVar
 
-defineVar :: Env -> String -> (Type, Expr) -> IOThrowsError Expr
+defineVar :: Env a -> Id -> a -> IOThrowsError a
 defineVar envRef var value = do
      alreadyDefined <- liftIO $ isBound envRef var
      if alreadyDefined
@@ -56,9 +53,12 @@ defineVar envRef var value = do
              valueRef <- newIORef value
              env <- readIORef envRef
              writeIORef envRef ((var, valueRef) : env)
-             return Empty
+             return value -- TODO: could be bad; shouldnt return anything but then have to do weird stuff
+               where
+                 isBound :: Env a -> String -> IO Bool
+                 isBound env var = liftM (isJust . lookup var) (readIORef env)
 
-bindVars :: Env -> [(String, (Type, Expr))] -> IO Env
+bindVars :: Env Expr -> [(String, Expr)] -> IO (Env Expr)
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
      where extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
            addBinding (var, value) = do ref <- newIORef value

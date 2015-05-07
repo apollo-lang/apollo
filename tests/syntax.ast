@@ -1,1 +1,1 @@
-[If (Not (BoolOp And (VBool False) (VBool True))) (IntOp Add (VInt 3) (VInt 1)) (VInt 0)]
+[If (Not (BoolOp && (VBool False) (VBool True))) (IntOp + (VInt 3) (VInt 1)) (VInt 0)]

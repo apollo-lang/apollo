@@ -19,6 +19,7 @@ import Lex
     NUM         { TokenNum $$ }
     BOOL        { TokenBool $$ }
     TYPE        { TokenType $$ }
+    MUSIC       { TokenMusic }
     DUR         { TokenDur $$ }
     PITCH       { TokenPitch $$ }
     CASE        { TokenCase }
@@ -72,7 +73,7 @@ Definitions : Definition                    { [$1] }
 
 Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 
-Type        : TYPE                          { TData $1 }
+Type        : TYPE                          { $1 }
             | '[' TYPE ']'                  { TList $2 }
             | FnType                        { $1 }
 
@@ -91,7 +92,7 @@ Expression  : NUM                           { VInt $1 }
             | ID                            { Name $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
-            | TYPE '(' Expressions ')'      { construct (TData $1) $3 }
+            | MUSIC '(' Expressions ')'     { construct (TData "Music") $3 }
             | '(' Expression
               ',' Expression ')'            { construct (TData "Atom") [$2, $4] }
             | '(' '_'
