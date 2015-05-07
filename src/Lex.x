@@ -98,6 +98,7 @@ tokens :-
 data Token = TokenId String
            | TokenNum Int
            | TokenBool Bool
+           | TokenType Type
            | TokenDur String
            | TokenPitch String
            | TokenRest String

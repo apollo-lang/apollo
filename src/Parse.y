@@ -18,6 +18,7 @@ import Lex
     ID          { TokenId $$ }
     NUM         { TokenNum $$ }
     BOOL        { TokenBool $$ }
+    TYPE        { TokenType $$ }
     MUSIC       { TokenMusic }
     DUR         { TokenDur $$ }
     PITCH       { TokenPitch $$ }
@@ -91,7 +92,7 @@ Expression  : NUM                           { VInt $1 }
             | ID                            { Name $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
-            | MUSIC '(' Expressions ')'      { construct (TData $1) $3 }
+            | MUSIC '(' Expressions ')'     { construct (TData "Music") $3 }
             | '(' Expression
               ',' Expression ')'            { construct (TData "Atom") [$2, $4] }
             | '(' '_'
