@@ -121,7 +121,6 @@ data Atom     = AtomNote Note
 data Part     = Part [Atom]            deriving (Eq, Ord, Show)
 data Music    = Music [Part]           deriving (Eq, Ord, Show)
 
-
 commaDelim :: [Expr] -> String
 commaDelim = init . concatMap ((++ ",") . showVal)
 

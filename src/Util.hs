@@ -46,7 +46,6 @@ unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
 
-
 makeAtom :: Expr -> Atom
 makeAtom (VNote  n)  = AtomNote  n
 makeAtom (VChord c)  = AtomChord c
