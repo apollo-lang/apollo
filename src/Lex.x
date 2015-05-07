@@ -84,6 +84,7 @@ tokens :-
     \{                              { \s -> TokenLBrace }
     \}                              { \s -> TokenRBrace }
     \|                              { \s -> TokenPipe }
+    \_                              { \s -> TokenUScore }
 
 {
 
@@ -122,6 +123,7 @@ data Token = TokenId String
            | TokenLBrace
            | TokenRBrace
            | TokenPipe
+           | TokenUScore
            | TokenEOL
            deriving (Eq,Show)
 
