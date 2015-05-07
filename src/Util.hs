@@ -19,13 +19,21 @@ import Expr
 -- TODO: use Error monad instead of `error`
 
 -- define: Coerce an Int to a Pitch or Duration datatype where appropriate
+-- define: For TFunc, store param names with body as FnBody type
 
 define :: Id -> Type -> Expr -> Expr
-define i (TData "Pitch") (VInt p)
-    = Def i (TData "Pitch") (VPitch $ Pitch $ p `mod` 128)
-define i (TData "Duration") (VInt d)
-    | d < 1 || d > 256 = error "Duration out of range [1, 256]"
-    | otherwise        = Def i (TData "Duration") (VDuration (Duration d))
+define i t@(TData "Pitch") (VInt p) =
+  Def i t (VPitch $ Pitch $ p `mod` 128)
+
+define i t@(TData "Duration") (VInt d)
+  | d < 1 || d > 256 = error "Duration out of range [1, 256]"
+  | otherwise        = Def i t (VDuration (Duration d))
+
+define i t@(TFunc params _) body =
+  Def i t (FnBody paramNames body)
+    where
+      paramNames = map (\(Param n _) -> n) params
+
 define i t e = Def i t e
 
 unpackInt :: Expr -> Int
@@ -38,8 +46,7 @@ unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
 
-
-makeAtom :: Expr -> Atom 
+makeAtom :: Expr -> Atom
 makeAtom (VNote  n)  = AtomNote  n
 makeAtom (VChord c)  = AtomChord c
 makeAtom (VRest  r)  = AtomRest  r
@@ -68,9 +75,9 @@ construct (TData "Atom") [pitches, dur]
         _           -> error "Expected pitch(es)"
 construct (TData "Chord") [pitches, dur]
     = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
-construct (TData "Part") atoms 
+construct (TData "Part") atoms
     = VPart atoms
-construct (TData "Music") parts 
+construct (TData "Music") parts
     = VMusic parts
 construct _ _ = error "Syntax error"
 

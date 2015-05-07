@@ -2,81 +2,88 @@ module Check (
   typecheck
 ) where
 
-import Control.Monad.Error (Error(noMsg,strMsg), throwError)
-import qualified Data.Map as Map
+import Control.Monad.Error (throwError)
 
-import Expr hiding (Type, Pitch, Duration, Rest, Chord, Empty)
 import Error
+import Expr
+import Env
 
-data Type = Int | Bool | Pitch | Duration | Rest | Note | Chord | List Type | Empty
-  deriving (Eq, Show)
+typecheck :: Env Type -> Expr -> IOThrowsError Type
+typecheck env expr = case expr of
 
-typecheck :: Expr -> ThrowsError Type
-typecheck expr = case expr of
-
-  VInt{}      -> return Int
-  VBool{}     -> return Bool
-  VPitch{}    -> return Pitch
-  VDuration{} -> return Duration
-  VRest{}     -> return Rest
-  VChord{}    -> return Chord
+  VInt{}      -> return TInt
+  VBool{}     -> return TBool
+  VPitch{}    -> return TPitch
+  VDuration{} -> return TDuration
+  VRest{}     -> return TRest
+  VChord{}    -> return TChord
 
   VList xs -> do
-    t <- mapM typecheck xs
+    t <- mapM (typecheck env) xs
     if uniform t
-    then return $ List (head t)
+    then return $ TList (head t)
     else throwError $ TypeExcept "list is irregular"
 
   If test tr fl -> do
-    t <- typecheck test
+    t <- typecheck env test
     case t of
-      Bool -> do
-        t1 <- typecheck tr
-        t2 <- typecheck fl
+      TBool -> do
+        t1 <- typecheck env tr
+        t2 <- typecheck env fl
         if t1 == t2
         then return t1
         else throwError $ TypeExcept "If: case mismatch"
       _    -> throwError $ TypeExcept "If: bool-cond not bool"
 
   Not e -> do
-    t <- typecheck e
-    if t == Bool
-    then return Bool
-    else throwError $ TypeExcept "Not: expected Bool"
+    t <- typecheck env e
+    if t == TBool
+    then return TBool
+    else throwError (TypeUMismatch "!" t)
 
   Neg e -> do
-    t <- typecheck e
-    if t == Int
-    then return Int
-    else throwError $ TypeExcept "Neg: expected Int"
+    t <- typecheck env e
+    if t == TInt
+    then return TInt
+    else throwError (TypeUMismatch "-" t)
 
   BoolOp op a b -> do
-    ta <- typecheck a
-    tb <- typecheck b
+    ta <- typecheck env a
+    tb <- typecheck env b
     case (ta, tb) of
-      (Bool, Bool) -> return Bool
-      _            -> throwError $ TypeExcept "mismatch"
+      (TBool, TBool) -> return TBool
+      _              -> throwError (TypeMismatch (show op) ta tb)
 
   CompOp op a b -> do
-    ta <- typecheck a
-    tb <- typecheck b
+    ta <- typecheck env a
+    tb <- typecheck env b
     case (ta, tb) of
-      (Int, Int)   -> return Int
-      (Bool, Bool) -> return Bool
-      _            -> throwError $ TypeExcept "mismatch"
+      (TInt, TInt)   -> return TInt
+      (TBool, TBool) -> return TBool
+      _              -> throwError (TypeMismatch (show op) ta tb)
 
   IntOp op a b -> do
-    ta <- typecheck a
-    tb <- typecheck b
+    ta <- typecheck env a
+    tb <- typecheck env b
     case (ta, tb) of
-      (Int, Int) -> return Int
-      _          -> throwError $ TypeExcept "mismatch"
+      (TInt, TInt) -> return TInt
+      _            -> throwError (TypeMismatch (show op) ta tb)
 
   Block body ret -> do
-    mapM_ typecheck body
-    typecheck ret
+    mapM_ (typecheck env) body
+    typecheck env ret
 
-  other -> return Empty -- error $ "ERR: got: " ++ show other
+  Def name (TFunc p r) body -> return TError -- TODO
+
+  Def name t ex -> do
+    t' <- typecheck env ex
+    if t == t'
+    then defineVar env name t
+    else throwError (TypeDMismatch t t')
+
+  Name name -> getVar env name
+
+  other -> return (TEmpty (show other)) -- error $ "ERR: got: " ++ show other
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
