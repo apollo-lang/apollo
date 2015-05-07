@@ -21,7 +21,6 @@ import Lex
     TYPE        { TokenType $$ }
     DUR         { TokenDur $$ }
     PITCH       { TokenPitch $$ }
-    REST        { TokenRest $$ }
     CASE        { TokenCase }
     OTHERWISE   { TokenOtherwise }
     WHERE       { TokenWhere }
@@ -50,6 +49,7 @@ import Lex
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
     '|'         { TokenPipe }
+    '_'         { TokenUScore }
 
 %nonassoc '=' '->'
 %left '||'
@@ -91,13 +91,12 @@ Expression  : NUM                           { VInt $1 }
             | ID                            { Name $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
-            | REST                          { VRest $ Rest $ parseDuration $ tail $1 }
             | TYPE '(' Expressions ')'      { construct (TData $1) $3 }
             | '(' Expression
-              ',' Expression ')'            { construct (TData "Note") [$2, $4] }
-            | '{' Expression
-              ',' Expression '}'            { construct (TData "Chord") [$2, $4] }
-            | '|' Expressions '|'           { VPart $2 }
+              ',' Expression ')'            { construct (TData "Atom") [$2, $4] }
+            | '(' '_'
+              ',' Expression ')'            { construct (TData "Rest") [$4] }
+            | '{' Expressions '}'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
