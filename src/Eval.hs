@@ -2,7 +2,7 @@ module Eval
     ( eval
     ) where
 
-import Control.Monad (liftM)
+import Control.Monad (liftM, liftM2)
 import Control.Monad.Error (throwError, liftIO)
 import Error
 import Expr
@@ -21,6 +21,8 @@ eval env expr = case expr of
   VNote n -> return $ VNote n
 
   VChord c -> return $ VChord c
+
+  VAtom a b -> liftM2 VAtom (eval env a) (eval env b)
 
   VPart p -> liftM VPart (mapM (evalP env) p)
 
@@ -84,6 +86,8 @@ eval env expr = case expr of
     apply name params body env args'
 
   Empty -> error "Error: eval called on Empty"
+
+  Nil   -> return Nil
 
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
 evalP _ expr = case expr of

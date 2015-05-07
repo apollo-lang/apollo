@@ -94,9 +94,8 @@ Expression  : NUM                           { VInt $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | MUSIC '(' Expressions ')'     { construct (TData "Music") $3 }
             | '(' Expression
-              ',' Expression ')'            { construct (TData "Atom") [$2, $4] }
-            | '(' '_'
-              ',' Expression ')'            { construct (TData "Rest") [$4] }
+              ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
+            | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
             | '{' Expressions '}'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }

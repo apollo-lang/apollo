@@ -25,6 +25,7 @@ data Type
   | TRest
   | TNote
   | TChord
+  | TAtom
   | TList Type
 
   | TEmpty String -- TODO: remove
@@ -42,6 +43,7 @@ instance Show Type where
   show TRest     = "Rest"
   show TNote     = "Note"
   show TChord    = "Chord"
+  show TAtom     = "Atom"
   show (TList t) = "[" ++ show t ++ "]"
 
   show TEmpty{} = "shouldnt show for TEmpty"
@@ -65,6 +67,7 @@ data Expr
     | VRest Rest
     | VNote Note
     | VChord Chord
+    | VAtom Expr Expr
     | VPart [Expr]
     | VMusic [Expr]
     | VList [Expr]
@@ -79,7 +82,8 @@ data Expr
     | IntOp IOpr Expr Expr
     | BoolOp BOpr Expr Expr
     | CompOp COpr Expr Expr
-    | Empty
+    | Empty                     -- Value of definitions
+    | Nil                       -- Value of '_' token
     deriving (Eq, Ord, Show)
 
 data IOpr = Add | Sub | Mul | Div | Mod

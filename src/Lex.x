@@ -62,6 +62,7 @@ tokens :-
     "Rest"                          { \s -> TokenType TRest }
     "Note"                          { \s -> TokenType TNote }
     "Chord"                         { \s -> TokenType TChord }
+    "Atom"                          { \s -> TokenType TAtom }
 
     -- Operators
     \+                              { \s -> TokenPlus }
