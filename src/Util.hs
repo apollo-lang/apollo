@@ -59,6 +59,13 @@ construct (TData "Pitch") [pitch]
     = VPitch $ Pitch $ unpackInt pitch
 construct (TData "Note") [pitch, dur]
     = VNote $ Note (Pitch $ unpackInt pitch) (Duration $ unpackInt dur)
+construct (TData "Rest") [dur]
+    = VRest $ Rest (Duration $ unpackInt dur)
+construct (TData "Atom") [pitches, dur] 
+    = case pitches of 
+        (VList exprs) -> construct (TData "Chord") [pitches, dur]
+        (VPitch p)    -> construct (TData "Note" ) [pitches, dur]
+        _             -> error "Expected pitch(es)"
 construct (TData "Chord") [pitches, dur]
     = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
 construct (TData "Part") atoms 
