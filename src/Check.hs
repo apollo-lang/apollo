@@ -17,7 +17,8 @@ typecheck env expr = case expr of
   VDuration{} -> return TDuration
   VRest{}     -> return TRest
   VChord{}    -> return TChord
-
+  VNote{}     -> return TNote
+  
   VList xs -> do
     t <- mapM (typecheck env) xs
     if uniform t
