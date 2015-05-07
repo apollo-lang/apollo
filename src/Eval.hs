@@ -8,7 +8,7 @@ import Error
 import Expr
 import Env
 
-eval :: Env -> Expr -> IOThrowsError Expr
+eval :: Env Expr -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
 
   VInt i      -> return $ VInt i
@@ -46,18 +46,29 @@ eval env expr = case expr of
   IntOp op a b -> do
     a' <- eval env a
     b' <- eval env b
-    matchI op a' b'
+    if restricted op && isZero b'
+    then throwError DivByZero
+    else matchI op a' b'
+      where
+        restricted Div = True
+        restricted Mod = True
+        restricted _   = False
+        isZero (VInt x)                 = x == 0
+        isZero (VPitch (Pitch x))       = x == 0
+        isZero (VDuration (Duration x)) = x == 0
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
   Block body ret -> mapM_ (eval env) body >> eval env ret
 
-  Def name typ ex -> defineVar env name (typ, ex)
+  FnBody _ body -> eval env body
 
-  Name name -> getVar env name >>= eval env . snd
+  Def name _ ex -> defineVar env name ex >> return Empty
+
+  Name name -> getVar env name >>= eval env
 
   FnCall name args -> do
-    ((TFunc params _), body) <- getVar env name
+    FnBody params body <- getVar env name
     args' <- mapM (eval env) args
     apply name params body env args'
 
@@ -88,8 +99,8 @@ matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
 matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
   return . VDuration . Duration $ applyI op a b
 
-matchI op a b =
-  throwError $ TypeMismatch (show op) (typeOf a) (b)
+matchI op a b = error "TODO this should be taken care of in typechecking"
+  -- throwError $ TypeMismatch (show op) (typeOf a) (show b)
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
@@ -99,12 +110,9 @@ applyI op a b = case op of
   Div -> a `div` b
   Mod -> a `mod` b
 
-apply :: String -> [Param] -> Expr -> Env -> [Expr] -> IOThrowsError Expr
-apply name paramList body closure args =
-  if num params /= num args
-  then throwError $ ArgMismatch name (num params) args
-  else createEnv args >>= (flip eval) body
-    where num = toInteger . length
-          params = map (\(Param n _) -> n) paramList
-          createEnv = liftIO . bindVars closure . zip params . map (\a -> (TData "TODO", a))
+apply :: Id -> [Id] -> Expr -> Env Expr -> [Expr] -> IOThrowsError Expr
+apply name params body closure args =
+  createEnv args >>= (flip eval) body
+    where
+      createEnv = liftIO . bindVars closure . zip params
 
