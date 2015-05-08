@@ -25,6 +25,7 @@ import Lex
     CASE        { TokenCase }
     OTHERWISE   { TokenOtherwise }
     WHERE       { TokenWhere }
+    TEMPO       { TokenTempo }
     '+'         { TokenPlus }
     '-'         { TokenMinus }
     '*'         { TokenMult }
@@ -51,6 +52,7 @@ import Lex
     '}'         { TokenRBrace }
     '|'         { TokenPipe }
     '_'         { TokenUScore }
+    '#'         { TokenPound }
 
 %nonassoc '=' '->'
 %left '||'
@@ -72,6 +74,7 @@ Definitions : Definition                    { [$1] }
             | Definition Definitions        { $1:$2 }
 
 Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
+            | '#' TEMPO NUM                 { define "tempo" TInt (VInt $3) }
 
 Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
@@ -93,6 +96,7 @@ Expression  : NUM                           { VInt $1 }
             | ID                            { Name $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
+            | '#' TEMPO                     { Name "tempo" }
             | MUSIC '(' Expressions ')'     { construct (TData "Music") $3 }
             | '(' Expression
               ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
