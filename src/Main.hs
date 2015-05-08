@@ -38,8 +38,9 @@ interpret = do
   if checkMain then do
     m <- (runTypeExpr $ getVar env "main")  
     if checkTemp then do
-      a <- (runTypeExpr $ getVar env "#tempo")
-      (runTypeExpr $ eval env m) >>= exportMusic (makeInt a) "main.mid" . makeMusic
+      t <- (runTypeExpr $ getVar env "#tempo")
+      (VInt v) <- (runTypeExpr $ eval env t)
+      (runTypeExpr $ eval env m) >>= exportMusic v "main.mid" . makeMusic
     else
       (runTypeExpr $ eval env m) >>= exportMusic 120 "main.mid" . makeMusic
   else return ()
