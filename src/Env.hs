@@ -4,6 +4,7 @@ module Env (
 , IOThrowsError
 , liftThrows
 , runIOThrows
+, runTypeExpr
 , getVar
 , defineVar
 , bindVars
@@ -28,6 +29,11 @@ liftThrows (Right val) = return val
 
 runIOThrows :: IOThrowsError String -> IO String
 runIOThrows action = liftM extractValue (runErrorT $ trapError action)
+
+runTypeExpr :: IOThrowsError Expr -> IO Expr
+runTypeExpr typexpr = liftM extractValueM (runErrorT $ typexpr)
+                    where extractValueM (Right val) = val
+                          extractValueM (Left    _) = error "bug: extractValue called with Left" 
 
 getVar :: Env a -> Id -> IOThrowsError a
 getVar envRef var = do
