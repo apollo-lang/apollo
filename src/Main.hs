@@ -33,12 +33,16 @@ interpret = do
   env <- nullEnv
   typeEnv <- nullEnv
   results <- runIOThrows $ toAst typeEnv src >>= execAst env
-  check <- isBound env "main"
-  if check
-    then do
-      m <- (runTypeExpr $ getVar env "main") 
-      (runTypeExpr $ eval env m) >>= exportMusic 24 "main.mid" . makeMusic
-    else return ()
+  checkMain <- isBound env "main"
+  checkTemp <- isBound env "#tempo"
+  if checkMain then do
+    m <- (runTypeExpr $ getVar env "main")  
+    if checkTemp then do
+      a <- (runTypeExpr $ getVar env "#tempo")
+      (runTypeExpr $ eval env m) >>= exportMusic (makeInt a) "main.mid" . makeMusic
+    else
+      (runTypeExpr $ eval env m) >>= exportMusic 120 "main.mid" . makeMusic
+  else return ()
   put results
 
 toAst :: Env Type -> String -> IOThrowsError [Expr]
