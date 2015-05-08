@@ -8,8 +8,6 @@ module Util
     , matchPitch
     , parseDuration
     , matchDuration
-    , makeAtom
-    , makeMusic
     ) where
 
 import Text.Regex.Posix
@@ -46,10 +44,11 @@ unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
 
+
 makeAtom :: Expr -> Atom
-makeAtom (VNote  n)  = AtomNote  n
-makeAtom (VChord c)  = AtomChord c
-makeAtom (VRest  r)  = AtomRest  r
+makeAtom (VAtom (VPitch p) (VDuration d)) = AtomNote (Note p d)
+makeAtom (VAtom Nil (VDuration d)) = AtomRest (Rest d)
+makeAtom (VAtom pitches (VDuration d)) = AtomChord (Chord (map (\(VPitch p) -> p) $ unpackList pitches)  d)
 makeAtom _           = error "Expected note, chord or rest"
 
 makePart :: Expr -> Part
@@ -62,19 +61,6 @@ makeMusic _          = error "bug: expected VMusic"
 
 
 construct :: Type -> [Expr] -> Expr
-construct (TData "Pitch") [pitch]
-    = VPitch $ Pitch $ unpackInt pitch
-construct (TData "Note") [pitch, dur]
-    = VNote $ Note (Pitch $ unpackInt pitch) (Duration $ unpackInt dur)
-construct (TData "Rest") [dur]
-    = VRest $ Rest (Duration $ unpackInt dur)
-construct (TData "Atom") [pitches, dur] 
-    = case pitches of 
-        (VList _)   -> construct (TData "Chord") [pitches, dur]
-        (VPitch _)  -> construct (TData "Note" ) [pitches, dur]
-        _           -> error "Expected pitch(es)"
-construct (TData "Chord") [pitches, dur]
-    = VChord $ Chord (map (Pitch . unpackInt) $ unpackList pitches) (Duration $ unpackInt dur)
 construct (TData "Part") atoms
     = VPart atoms
 construct (TData "Music") parts

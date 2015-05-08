@@ -96,7 +96,7 @@ Expression  : NUM                           { VInt $1 }
             | '(' Expression
               ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
             | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
-            | '{' Expressions '}'           { VPart $2 }
+            | '|' Expressions '|'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | Conditional                   { $1 }
