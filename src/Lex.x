@@ -59,10 +59,8 @@ tokens :-
     "Bool"                          { \s -> TokenType TBool }
     "Duration"                      { \s -> TokenType TDuration }
     "Pitch"                         { \s -> TokenType TPitch }
-    "Rest"                          { \s -> TokenType TRest }
-    "Note"                          { \s -> TokenType TNote }
-    "Chord"                         { \s -> TokenType TChord }
     "Atom"                          { \s -> TokenType TAtom }
+    "Part"                          { \s -> TokenType TPart }
 
     -- Operators
     \+                              { \s -> TokenPlus }

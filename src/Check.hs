@@ -15,10 +15,9 @@ typecheck env expr = case expr of
   VBool{}     -> return TBool
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
-  VRest{}     -> return TRest
-  VChord{}    -> return TChord
-  VNote{}     -> return TNote
   VAtom{}     -> return TAtom
+  VPart{}     -> return TPart
+  VMusic{}    -> return TMusic
   
   VList xs -> do
     t <- mapM (typecheck env) xs

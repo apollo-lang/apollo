@@ -22,10 +22,9 @@ data Type
   | TBool
   | TDuration
   | TPitch
-  | TRest
-  | TNote
-  | TChord
   | TAtom
+  | TPart
+  | TMusic
   | TList Type
 
   | TEmpty String -- TODO: remove
@@ -40,10 +39,9 @@ instance Show Type where
   show TBool     = "Boolean"
   show TDuration = "Duration"
   show TPitch    = "Pitch"
-  show TRest     = "Rest"
-  show TNote     = "Note"
-  show TChord    = "Chord"
   show TAtom     = "Atom"
+  show TPart     = "Part"
+  show TMusic    = "Music"
   show (TList t) = "[" ++ show t ++ "]"
 
   show TEmpty{} = "shouldnt show for TEmpty"
@@ -64,9 +62,6 @@ data Expr
     | VBool Bool
     | VDuration Duration
     | VPitch Pitch
-    | VRest Rest
-    | VNote Note
-    | VChord Chord
     | VAtom Expr Expr
     | VPart [Expr]
     | VMusic [Expr]
@@ -134,9 +129,6 @@ showVal (VBool b)       = show b
 showVal (VList l)       = "[" ++ commaDelim l  ++ "]"
 showVal (VDuration d)   = show d
 showVal (VPitch p)      = show p
-showVal (VRest r)       = show r
-showVal (VNote n)       = show n
-showVal (VChord c)      = show c
 showVal (VPart p)       = "Part {" ++ commaDelim p ++ "}"
 showVal (VMusic m)      = "Music [" ++ commaDelim m ++ "]"
 showVal (Empty)         = ""

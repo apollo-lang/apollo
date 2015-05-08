@@ -16,17 +16,7 @@ eval env expr = case expr of
   VPitch p    -> return $ VPitch p
   VDuration d -> return $ VDuration d
 
-  VRest r -> return $ VRest r
-
-  VNote n -> return $ VNote n
-
-  VChord c -> return $ VChord c
-
   VAtom a b -> liftM2 VAtom (eval env a) (eval env b)
-
-  VPart p -> liftM VPart (mapM (evalP env) p)
-
-  VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   VPart p -> liftM VPart (mapM (evalP env) p)
 
@@ -89,12 +79,12 @@ eval env expr = case expr of
 
   Nil   -> return Nil
 
+
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
 evalP _ expr = case expr of
-  VRest r  -> return $ VRest r
-  VNote n  -> return $ VNote n
-  VChord c -> return $ VChord c
+  VAtom a b  -> return $ VAtom a b
   _        -> throwError $ Default "Error: expected Note, Rest or Chord"
+
 
 evalM :: Env Expr -> Expr -> IOThrowsError Expr
 evalM env expr = case expr of
