@@ -81,15 +81,17 @@ eval env expr = case expr of
 
 
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
-evalP _ expr = case expr of
+evalP env expr = case expr of
   VAtom a b  -> return $ VAtom a b
+  Name name -> getVar env name >>= evalP env
   _        -> throwError $ Default "Error: expected Note, Rest or Chord"
-
 
 evalM :: Env Expr -> Expr -> IOThrowsError Expr
 evalM env expr = case expr of
   VPart p -> liftM VPart (mapM (evalP env) p)
+  Name name -> getVar env name >>= evalM env
   _        -> throwError $ Default "Error: expected Part"
+
 
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of
