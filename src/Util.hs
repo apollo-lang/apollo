@@ -1,13 +1,7 @@
 module Util
     ( define
-    , construct
-    , pitchClass
-    , accidental
-    , pitchHeight
     , parsePitch
-    , matchPitch
     , parseDuration
-    , matchDuration
     , makeMusic
     ) where
 
@@ -17,40 +11,21 @@ import Expr
 
 -- TODO: use Error monad instead of `error`
 
--- define: Coerce an Int to a Pitch or Duration datatype where appropriate
 -- define: For TFunc, store param names with body as FnBody type
-
 define :: Id -> Type -> Expr -> Expr
-define i t@(TData "Pitch") (VInt p) =
-  Def i t (VPitch $ Pitch $ p `mod` 128)
-
-define i t@(TData "Duration") (VInt d)
-  | d < 1 || d > 256 = error "Duration out of range [1, 256]"
-  | otherwise        = Def i t (VDuration (Duration d))
-
-define i t@(TFunc params _) body =
-  Def i t (FnBody paramNames body)
-    where
-      paramNames = map (\(Param n _) -> n) params
-
+define i t@(TFunc params _) body = Def i t (FnBody paramNames body)
+  where paramNames = map (\(Param n _) -> n) params
 define i t e = Def i t e
-
-unpackInt :: Expr -> Int
-unpackInt (VInt i)                  = i
-unpackInt (VPitch (Pitch p))        = p
-unpackInt (VDuration (Duration d))  = d
-unpackInt _                         = error "Expected int, pitch, or duration"
 
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
 
-
 makeAtom :: Expr -> Atom
-makeAtom (VAtom (VPitch p) (VDuration d)) = AtomNote (Note p d)
-makeAtom (VAtom Nil (VDuration d)) = AtomRest (Rest d)
-makeAtom (VAtom pitches (VDuration d)) = AtomChord (Chord (map (\(VPitch p) -> p) $ unpackList pitches)  d)
-makeAtom _           = error "Expected note, chord or rest"
+makeAtom (VAtom (VPitch p) (VDuration d))   = AtomNote $ Note p d
+makeAtom (VAtom Nil (VDuration d))          = AtomRest $ Rest d
+makeAtom (VAtom pitches (VDuration d))      = AtomChord $ Chord (map (\(VPitch p) -> p) $ unpackList pitches) d
+makeAtom _                                  = error "Expected note, chord or rest"
 
 makePart :: Expr -> Part
 makePart (VPart p) = Part $ map makeAtom p
@@ -59,14 +34,6 @@ makePart _         = error "bug: expected VPart"
 makeMusic :: Expr -> Music
 makeMusic (VMusic m) = Music $ map makePart m
 makeMusic _          = error "bug: expected VMusic"
-
-
-construct :: Type -> [Expr] -> Expr
-construct (TData "Part") atoms
-    = VPart atoms
-construct (TData "Music") parts
-    = VMusic parts
-construct _ _ = error "Syntax error"
 
 pitchClass :: String -> Int
 pitchClass "C"  = 0

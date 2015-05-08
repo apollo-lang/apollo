@@ -18,40 +18,34 @@ module Expr
     ) where
 
 data Type
-  = TInt
-  | TBool
-  | TDuration
-  | TPitch
-  | TAtom
-  | TPart
-  | TMusic
-  | TList Type
-
-  | TEmpty String -- TODO: remove
-  | TError -- TODO: remove
-
-  | TData String
-  | TFunc [Param] Type
-  deriving (Eq, Ord)
+    = TInt
+    | TBool
+    | TDuration
+    | TPitch
+    | TAtom
+    | TPart
+    | TMusic
+    | TList Type
+    | TEmpty String   -- TODO: remove
+    | TError          -- TODO: remove
+    | TFunc [Param] Type
+    deriving (Eq, Ord)
 
 instance Show Type where
-  show TInt      = "Integer"
-  show TBool     = "Boolean"
-  show TDuration = "Duration"
-  show TPitch    = "Pitch"
-  show TAtom     = "Atom"
-  show TPart     = "Part"
-  show TMusic    = "Music"
-  show (TList t) = "[" ++ show t ++ "]"
-
-  show TEmpty{} = "shouldnt show for TEmpty"
-  show TError = "shouldnt show for TEmpty"
-
-  show TData{} = "TODO show for TData"
-  show TFunc{} = "TODO show for TFunc"
+    show TInt      = "Integer"
+    show TBool     = "Boolean"
+    show TDuration = "Duration"
+    show TPitch    = "Pitch"
+    show TAtom     = "Atom"
+    show TPart     = "Part"
+    show TMusic    = "Music"
+    show (TList t) = "[" ++ show t ++ "]"
+    show TEmpty{}  = "shouldnt show for TEmpty" -- TODO: remove
+    show TError    = "shouldnt show for TEmpty" -- TODO: remove
+    show TFunc{}   = "TODO show for TFunc"      -- TODO
 
 data Param = Param Id Type
-  deriving (Eq, Ord, Show)
+    deriving (Eq, Ord, Show)
 
 type Id = String
 
@@ -82,32 +76,32 @@ data Expr
     deriving (Eq, Ord, Show)
 
 data IOpr = Add | Sub | Mul | Div | Mod
-  deriving (Eq, Ord)
+    deriving (Eq, Ord)
 
 instance Show IOpr where
-  show Add = "+"
-  show Sub = "-"
-  show Mul = "*"
-  show Div = "/"
-  show Mod = "%"
+    show Add = "+"
+    show Sub = "-"
+    show Mul = "*"
+    show Div = "/"
+    show Mod = "%"
 
 data BOpr = And | Or
-  deriving (Eq, Ord)
+    deriving (Eq, Ord)
 
 instance Show BOpr where
-  show And = "&&"
-  show Or  = "||"
+    show And = "&&"
+    show Or  = "||"
 
 data COpr = Eq | NEq | Le | Gr | LEq | GEq
-  deriving (Eq, Ord)
+    deriving (Eq, Ord)
 
 instance Show COpr where
-  show Eq  = "=="
-  show NEq = "!="
-  show Le  = "<"
-  show Gr  = ">"
-  show LEq = "<="
-  show GEq = ">="
+    show Eq  = "=="
+    show NEq = "!="
+    show Le  = "<"
+    show Gr  = ">"
+    show LEq = "<="
+    show GEq = ">="
 
 data Pitch    = Pitch Int              deriving (Eq, Ord, Show)
 data Duration = Duration Int           deriving (Eq, Ord, Show)
@@ -124,13 +118,14 @@ commaDelim :: [Expr] -> String
 commaDelim = init . concatMap ((++ ",") . showVal)
 
 showVal :: Expr -> String
-showVal (VInt  i)       = show i
-showVal (VBool b)       = show b
-showVal (VList l)       = "[" ++ commaDelim l  ++ "]"
-showVal (VDuration d)   = show d
-showVal (VPitch p)      = show p
-showVal (VPart p)       = "Part {" ++ commaDelim p ++ "}"
-showVal (VMusic m)      = "Music [" ++ commaDelim m ++ "]"
-showVal (Empty)         = ""
-showVal otherVal        = show otherVal
+showVal (VInt  i)      = show i
+showVal (VBool b)      = show b
+showVal (VList l)      = "[" ++ commaDelim l  ++ "]"
+showVal (VDuration d)  = show d
+showVal (VPitch p)     = show p
+showVal (VAtom p d)    = "Atom (" ++ showVal p ++ ", " ++ showVal d ++ ")"
+showVal (VPart p)      = "Part {" ++ commaDelim p ++ "}"
+showVal (VMusic m)     = "Music [" ++ commaDelim m ++ "]"
+showVal (Empty)        = ""
+showVal otherVal       = show otherVal
 
