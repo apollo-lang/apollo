@@ -73,7 +73,7 @@ Definitions : Definition                    { [$1] }
             | Definition Definitions        { $1:$2 }
 
 Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
-            | TEMPO NUM                     { Def "#tempo" TInt $ VInt $2 }
+            | TEMPO Expression              { define "#tempo" TInt $2}
 
 Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
