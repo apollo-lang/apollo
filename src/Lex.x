@@ -39,7 +39,7 @@ tokens :-
     '\\[0-9]+\.?                    { \s -> TokenRest s }
 
     -- Integer Constants
-    $digit+                         { \s -> TokenNum (read s) }
+    \-?$digit+                      { \s -> TokenNum (read s) }
 
     -- Boolean Constants
     "True"                          { \s -> TokenBool (True) }
