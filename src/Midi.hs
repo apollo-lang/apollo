@@ -16,8 +16,8 @@ export :: Midi -> String -> IO ()
 export themidi filename = exportFile filename themidi
 
 -- best function
-exportMusic :: Music -> Int -> String -> IO ()
-exportMusic music tempo filename = export (midiFromMusic music tempo) filename
+exportMusic :: Int -> String -> Music -> IO ()
+exportMusic tempo filename music = export (midiFromMusic music tempo) filename
 
 -- returns lenght of longest atom
 longestAtom :: Part -> Int

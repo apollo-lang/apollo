@@ -8,6 +8,7 @@ module Env (
 , getVar
 , defineVar
 , bindVars
+, isBound
 ) where
 
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
@@ -50,6 +51,9 @@ setVar envRef var value = do
         (lookup var env)
   return value -- see TODO on defineVar
 
+isBound :: Env a -> String -> IO Bool
+isBound env var = liftM (isJust . lookup var) (readIORef env)
+
 defineVar :: Env a -> Id -> a -> IOThrowsError a
 defineVar envRef var value = do
      alreadyDefined <- liftIO $ isBound envRef var
@@ -60,9 +64,7 @@ defineVar envRef var value = do
              env <- readIORef envRef
              writeIORef envRef ((var, valueRef) : env)
              return value -- TODO: could be bad; shouldnt return anything but then have to do weird stuff
-               where
-                 isBound :: Env a -> String -> IO Bool
-                 isBound env var = liftM (isJust . lookup var) (readIORef env)
+                 
 
 bindVars :: Env Expr -> [(String, Expr)] -> IO (Env Expr)
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
