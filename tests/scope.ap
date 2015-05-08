@@ -1,3 +1,11 @@
 a: Int = 1
 f: (a: Int) -> Int = a
 f(2)
+
+b: Int = 1
+[{ b where b: Int = 10}, b]
+
+{ { a where a: Int = 1 } where a: Int = 2 }
+
+c: Int = 22
+{ c + d where d: Int = 20 }

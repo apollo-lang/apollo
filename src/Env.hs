@@ -34,7 +34,7 @@ runIOThrows action = liftM extractValue (runErrorT $ trapError action)
 runTypeExpr :: IOThrowsError Expr -> IO Expr
 runTypeExpr typexpr = liftM extractValueM (runErrorT $ typexpr)
                     where extractValueM (Right val) = val
-                          extractValueM (Left    _) = error "bug: extractValue called with Left" 
+                          extractValueM (Left    _) = error "bug: extractValue called with Left"
 
 getVar :: Env a -> Id -> IOThrowsError a
 getVar envRef var = do
@@ -64,7 +64,6 @@ defineVar envRef var value = do
              env <- readIORef envRef
              writeIORef envRef ((var, valueRef) : env)
              return value -- TODO: could be bad; shouldnt return anything but then have to do weird stuff
-                 
 
 bindVars :: Env Expr -> [(String, Expr)] -> IO (Env Expr)
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
