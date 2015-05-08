@@ -36,7 +36,7 @@ tokens :-
     [A-G](\#|b)?[0-9]               { \s -> TokenPitch s }
 
     -- Integer Constants
-    \-?$digit+                      { \s -> TokenNum (read s) }
+    $digit+                      { \s -> TokenNum (read s) }
 
     -- Boolean Constants
     "True"                          { \s -> TokenBool (True) }
