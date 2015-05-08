@@ -12,6 +12,8 @@ import Error
 import Expr
 import Eval
 import Env
+import Util
+import Midi
 
 main :: IO ()
 main = getArgs >>= \args ->
@@ -31,6 +33,8 @@ interpret = do
   env <- nullEnv
   typeEnv <- nullEnv
   results <- runIOThrows $ toAst typeEnv src >>= execAst env
+  -- m <- runTypeExpr $ getVar env "main"
+  -- exportMusic (makeMusic m) 24 "test.mid"
   put results
 
 toAst :: Env Type -> String -> IOThrowsError [Expr]

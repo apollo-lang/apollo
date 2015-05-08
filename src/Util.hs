@@ -8,6 +8,7 @@ module Util
     , matchPitch
     , parseDuration
     , matchDuration
+    , makeMusic
     ) where
 
 import Text.Regex.Posix
