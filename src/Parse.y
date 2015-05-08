@@ -76,6 +76,7 @@ Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 Type        : TYPE                          { $1 }
             | '[' TYPE ']'                  { TList $2 }
             | FnType                        { $1 }
+            | MUSIC                         { TMusic }
 
 FnType      : '(' Params ')' '->' Type      { TFunc $2 $5 }
 

@@ -61,7 +61,7 @@ tokens :-
     "Pitch"                         { \s -> TokenType TPitch }
     "Atom"                          { \s -> TokenType TAtom }
     "Part"                          { \s -> TokenType TPart }
-
+    
     -- Operators
     \+                              { \s -> TokenPlus }
     \-                              { \s -> TokenMinus }
