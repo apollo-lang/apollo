@@ -49,8 +49,10 @@ tokens :-
     "case"                          { \s -> TokenCase }
     "otherwise"                     { \s -> TokenOtherwise }
     "where"                         { \s -> TokenWhere }
-    "tempo"                         { \s -> TokenTempo }
     "Music"                         { \s -> TokenMusic }
+
+    -- Markers
+    "#tempo"                        { \s -> TokenTempo }
 
     -- Identifiers
     [a-z][$alpha $digit \']*        { \s -> TokenId s }
@@ -92,7 +94,6 @@ tokens :-
     \}                              { \s -> TokenRBrace }
     \|                              { \s -> TokenPipe }
     \_                              { \s -> TokenUScore }
-    \#                              { \s -> TokenPound }
 
 {
 
@@ -134,7 +135,6 @@ data Token = TokenId String
            | TokenRBrace
            | TokenPipe
            | TokenUScore
-           | TokenPound
            | TokenEOL
            deriving (Eq,Show)
 
