@@ -3,6 +3,7 @@ module Util
     , parsePitch
     , parseDuration
     , makeMusic
+    , makeInt
     ) where
 
 import Text.Regex.Posix
@@ -20,6 +21,10 @@ define i t e = Def i t e
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
+
+makeInt :: Expr -> Int
+makeInt (VInt i) = i
+makeInt _ = error "bug: expected VInt"
 
 makeAtom :: Expr -> Atom
 makeAtom (VAtom (VPitch p) (VDuration d))   = AtomNote $ Note p d
