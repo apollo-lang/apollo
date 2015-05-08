@@ -30,7 +30,6 @@ instance Show ApolloError where
   show (TypeMismatch  op a b) = "Type error: " ++ show a ++ " and " ++ show b ++ " are wrong operand types for `" ++ op ++ "`"
   show (TypeUMismatch op a) = "Type error: " ++ show a ++ " is wrong operand type for unary `" ++ op ++ "`"
   show (TypeDMismatch a b) = "Type error: definition of " ++ show a ++ ", but assigned to " ++ show b
-
   show (TypeExcept                  msg) = "Type error: " ++ show msg
   show (UnboundVar           action var) = action ++ " an unbound variable: " ++ var
   show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelimit found ++ ")"

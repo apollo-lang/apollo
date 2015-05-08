@@ -4,6 +4,7 @@ module Eval
 
 import Control.Monad (liftM, liftM2)
 import Control.Monad.Error (throwError, liftIO)
+import Data.IORef (newIORef, readIORef)
 import Error
 import Expr
 import Env
@@ -62,7 +63,12 @@ eval env expr = case expr of
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
-  Block body ret -> mapM_ (eval env) body >> eval env ret
+  Block body ret -> do
+    closure <- liftIO (foldr addBinding (readIORef env) body >>= newIORef)
+    eval closure ret
+      where
+        addBinding (Def name _ ex) envMap = liftM2 (:) (makeRef name ex) envMap
+        makeRef name ex = newIORef ex >>= \e -> return (name, e)
 
   FnBody _ body -> eval env body
 
@@ -73,7 +79,7 @@ eval env expr = case expr of
   FnCall name args -> do
     FnBody params body <- getVar env name
     args' <- mapM (eval env) args
-    apply name params body env args'
+    apply params body env args'
 
   Empty -> error "Error: eval called on Empty"
 
@@ -91,7 +97,6 @@ evalM env expr = case expr of
   VPart p -> liftM VPart (mapM (evalP env) p)
   Name name -> getVar env name >>= evalM env
   _        -> throwError $ Default "Error: expected Part"
-
 
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of
@@ -118,7 +123,7 @@ matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
 matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
   return . VDuration . Duration $ applyI op a b
 
-matchI op a b = error "TODO this should be taken care of in typechecking"
+matchI _ _ _ = error "TODO this should be taken care of in typechecking"
   -- throwError $ TypeMismatch (show op) (typeOf a) (show b)
 
 applyI :: IOpr -> Int -> Int -> Int
@@ -129,9 +134,9 @@ applyI op a b = case op of
   Div -> a `div` b
   Mod -> a `mod` b
 
-apply :: Id -> [Id] -> Expr -> Env Expr -> [Expr] -> IOThrowsError Expr
-apply name params body closure args =
-  createEnv args >>= (flip eval) body
+apply :: [Id] -> Expr -> Env Expr -> [Expr] -> IOThrowsError Expr
+apply params body closure args =
+  createEnv args >>= flip eval body
     where
       createEnv = liftIO . bindVars closure . zip params
 
