@@ -2,7 +2,8 @@ module Check (
   typecheck
 ) where
 
-import Control.Monad.Error (throwError)
+import Control.Monad.Error (throwError, liftIO)
+import Data.IORef (newIORef, readIORef)
 
 import Error
 import Expr
@@ -18,7 +19,7 @@ typecheck env expr = case expr of
   VAtom{}     -> return TAtom
   VPart{}     -> return TPart
   VMusic{}    -> return TMusic
-  
+
   VList xs -> do
     t <- mapM (typecheck env) xs
     if uniform t
@@ -71,8 +72,13 @@ typecheck env expr = case expr of
       _            -> throwError (TypeMismatch (show op) ta tb)
 
   Block body ret -> do
-    mapM_ (typecheck env) body
-    typecheck env ret
+    env' <- clone env
+    mapM_ (typecheck env') body
+    typecheck env' ret
+      where
+        clone e = liftIO (readIORef e >>= newIORef . removeNames)
+        removeNames = filter (\(n,_) -> n `notElem` names)
+        names = map (\(Def name _ _) -> name) body
 
   Def name (TFunc p r) body -> return TError -- TODO
 

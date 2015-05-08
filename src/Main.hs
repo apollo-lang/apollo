@@ -106,10 +106,10 @@ interpretLine env tEnv src =
 runHelp :: IO()
 runHelp = do
   putStrLn "Apollo: algorithmic music composition"
-  putStrLn "" 
+  putStrLn ""
   putStrLn "Usage: apollo [options] < sourcefile.ap"
   putStrLn "    --repl    Start Apollo interactive mode (Read-Evaluate-Print-Loop)"
   putStrLn "    --ast     Print a program's abstract syntax tree"
   putStrLn "    --help    This help message"
-  putStrLn "" 
+  putStrLn ""
 
