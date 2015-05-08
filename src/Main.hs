@@ -36,10 +36,8 @@ interpret = do
   check <- isBound env "main"
   if check
     then do
-      -- (runTypeExpr $ getVar env "main") >>= exportMusic 24 "main.mid" . makeMusic
       m <- (runTypeExpr $ getVar env "main") 
       (runTypeExpr $ eval env m) >>= exportMusic 24 "main.mid" . makeMusic
-      return ()
     else return ()
   put results
 
