@@ -35,11 +35,8 @@ tokens :-
     -- Pitch literal
     [A-G](\#|b)?[0-9]               { \s -> TokenPitch s }
 
-    -- Rest literal (single quote + duration literal)
-    '\\[0-9]+\.?                    { \s -> TokenRest s }
-
     -- Integer Constants
-    $digit+                         { \s -> TokenNum (read s) }
+    \-?$digit+                      { \s -> TokenNum (read s) }
 
     -- Boolean Constants
     "True"                          { \s -> TokenBool (True) }
@@ -103,7 +100,6 @@ data Token = TokenId String
            | TokenType Type
            | TokenDur String
            | TokenPitch String
-           | TokenRest String
            | TokenCase
            | TokenOtherwise
            | TokenWhere
