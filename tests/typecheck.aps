@@ -45,3 +45,19 @@ a: Music = \4
 a: Music = (A4, \4)
 a: Music = [1]
 a: Music = [[(A4,\4)]]
+
+#tempo 1
+#tempo True
+#tempo A4
+#tempo \4
+#tempo (A4, \4)
+#tempo [1]
+#tempo [[(A4,\4)]]
+
+a: [Int] = 1
+a: [Int] = True
+a: [Int] = A4
+a: [Int] = \4
+a: [Int] = (A4, \4)
+a: [Int] = [1]
+a: [Int] = [[(A4,\4)]]
