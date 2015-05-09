@@ -14,7 +14,6 @@ module Expr
     , Part(..)
     , Atom(..)
     , Music(..)
-    , showVal
     ) where
 
 data Type
@@ -28,28 +27,25 @@ data Type
     | TList Type
     | TEmpty String   -- TODO: remove
     | TError          -- TODO: remove
-    | TFunc [Param] Type
+    | TFunc [Type] Type
     deriving (Eq, Ord)
 
 instance Show Type where
-    show TInt      = "Integer"
-    show TBool     = "Boolean"
-    show TDuration = "Duration"
-    show TPitch    = "Pitch"
-    show TAtom     = "Atom"
-    show TPart     = "Part"
-    show TMusic    = "Music"
-    show (TList t) = "[" ++ show t ++ "]"
-    show TEmpty{}  = "shouldnt show for TEmpty" -- TODO: remove
-    show TError    = "shouldnt show for TEmpty" -- TODO: remove
-    show TFunc{}   = "TODO show for TFunc"      -- TODO
+    show TInt           = "Int"
+    show TBool          = "Bool"
+    show TDuration      = "Duration"
+    show TPitch         = "Pitch"
+    show TAtom          = "Atom"
+    show TPart          = "Part"
+    show TMusic         = "Music"
+    show (TList t)      = "[" ++ show t ++ "]"
+    show (TFunc p t)    = "(" ++ strdelim "," show p ++ ") -> " ++ show t
+    show _              = ""
 
 data Param = Param Id Type
     deriving (Eq, Ord, Show)
 
 type Id = String
-
--- TODO: note that FnBody stores untyped param names (just Ids)
 
 data Expr
     = VInt Int
@@ -60,12 +56,12 @@ data Expr
     | VPart [Expr]
     | VMusic [Expr]
     | VList [Expr]
-    | Def Id Type Expr
     | Name Id
+    | Def Id Type Expr
+    | VLam [Id] Expr            -- Lambdas / Functions
     | Block [Expr] Expr
     | If Expr Expr Expr
     | FnCall Id [Expr]
-    | FnBody [Id] Expr
     | Neg Expr
     | Not Expr
     | IntOp IOpr Expr Expr
@@ -73,7 +69,29 @@ data Expr
     | CompOp COpr Expr Expr
     | Empty                     -- Value of definitions
     | Nil                       -- Value of '_' token
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+instance Show Expr where
+    show (VInt  i)      = show i
+    show (VBool b)      = show b
+    show (VDuration d)  = "(" ++ show d ++ ")"
+    show (VPitch p)     = "(" ++ show p ++ ")"
+    show (VAtom p d)    = "(Atom " ++ show p ++ " " ++ show d ++ ")"
+    show (VPart p)      = "(Part " ++ strdelim " " show p ++ ")"
+    show (VMusic m)     = "(Music " ++ strdelim " " show m ++ ")"
+    show (VList l)      = "(List " ++ strdelim " " show l  ++ ")"
+    show (Name n)       = n
+    show (Def i _ e)    = "(Def " ++ i ++ " " ++ show e ++ ")"
+    show (VLam is e)    = "(Lambda " ++ strdelim " " id is ++ " " ++ show e ++ ")"
+    show (Block es e)   = "(Block " ++ strdelim " " show es ++ " " ++ show e ++ ")"
+    show (If e1 e2 e3)  = "(If " ++ show e1 ++ " " ++ show e2 ++ " " ++ show e3 ++ ")"
+    show (FnCall i e)   = "(" ++ i ++ " " ++ strdelim " " show e ++ ")"
+    show (Neg e)        = "(Neg " ++ show e ++ ")"
+    show (Not e)        = "(Not " ++ show e ++ ")"
+    show (IntOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show (BoolOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show (CompOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show _              = ""
 
 data IOpr = Add | Sub | Mul | Div | Mod
     deriving (Eq, Ord)
@@ -114,18 +132,6 @@ data Atom     = AtomNote Note
 data Part     = Part [Atom]            deriving (Eq, Ord, Show)
 data Music    = Music [Part]           deriving (Eq, Ord, Show)
 
-commaDelim :: [Expr] -> String
-commaDelim = init . concatMap ((++ ",") . showVal)
-
-showVal :: Expr -> String
-showVal (VInt  i)      = show i
-showVal (VBool b)      = show b
-showVal (VList l)      = "[" ++ commaDelim l  ++ "]"
-showVal (VDuration d)  = show d
-showVal (VPitch p)     = show p
-showVal (VAtom p d)    = "Atom (" ++ showVal p ++ ", " ++ showVal d ++ ")"
-showVal (VPart p)      = "Part {" ++ commaDelim p ++ "}"
-showVal (VMusic m)     = "Music [" ++ commaDelim m ++ "]"
-showVal (Empty)        = ""
-showVal otherVal       = show otherVal
+strdelim :: (Show a) => String -> (a -> String) -> [a] -> String
+strdelim = \s -> \f -> init . concatMap ((++ s) . f)
 
