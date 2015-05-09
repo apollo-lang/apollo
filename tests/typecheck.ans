@@ -52,6 +52,7 @@ Type error: definition of Integer, but assigned to Pitch
 Type error: definition of Integer, but assigned to Duration
 Type error: definition of Integer, but assigned to Atom
 Type error: definition of Integer, but assigned to [Integer]
+Type error: definition of Integer, but assigned to [[Atom]]
 
 Type error: definition of [Integer], but assigned to Integer
 Type error: definition of [Integer], but assigned to Boolean
