@@ -27,6 +27,7 @@ data Type
     | TPart
     | TMusic
     | TList Type
+    | TListEmpty
     | TEmpty String   -- TODO: remove
     | TError          -- TODO: remove
     | TFunc [Param] Type
@@ -41,6 +42,7 @@ instance Show Type where
     show TPart     = "Part"
     show TMusic    = "Music"
     show (TList t) = "[" ++ show t ++ "]"
+    show TListEmpty = "[]"
     show TEmpty{}  = "shouldnt show for TEmpty" -- TODO: remove
     show TError    = "shouldnt show for TEmpty" -- TODO: remove
     show TFunc{}   = "TODO show for TFunc"      -- TODO

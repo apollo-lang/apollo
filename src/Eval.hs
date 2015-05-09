@@ -57,8 +57,8 @@ eval env expr = case expr of
   Tail l -> do
     l' <- eval env l
     case l' of 
-      VList ll -> do
-        return (last ll)
+      VList (x:xs) -> do
+        return (VList xs)
       VPart p -> do
         return (last p)
       _       -> error "Error: expected Part or List" 
