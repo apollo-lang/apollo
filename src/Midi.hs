@@ -23,8 +23,8 @@ exportMusic :: Int -> String -> Music -> IO ()
 exportMusic tempo filename music = export (midiFromMusic music tempo) filename
 
 -- returns lenght of longest atom
-longestAtom :: Part -> Int
-longestAtom (Part p) = maximum $ map sizeOfAtom p
+longestAtom :: [Atom] -> Int
+longestAtom p = maximum $ map sizeOfAtom p
   where
     sizeOfAtom (AtomChord (Chord a _)) = length a
     sizeOfAtom _ = 1
@@ -40,8 +40,8 @@ appendRests l (AtomChord c@(Chord a d))
     = chordToTrack c ++ (replicate (l - (length a)) (restToTrack (Rest d)))
 
 -- Takes a part and outputs [[Track]] with padding using partToTracKHelp
-partToTrack :: Part -> [[(Ticks, Message)]]
-partToTrack p@(Part atoms) = partToTrackHelp (replicate (longestAtom p) []) atoms
+partToTrack :: [Atom] -> [[(Ticks, Message)]]
+partToTrack atoms = partToTrackHelp (replicate (longestAtom atoms) []) atoms
 
 -- Appends all Atoms to a list of tracks with Rest padding
 partToTrackHelp :: [[(Ticks, Message)]] -> [Atom] -> [[(Ticks, Message)]]

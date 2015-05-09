@@ -19,8 +19,6 @@ eval env expr = case expr of
 
   VAtom a b -> liftM2 VAtom (eval env a) (eval env b)
 
-  VPart p -> liftM VPart (mapM (evalP env) p)
-
   VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   If test tr fl -> do
@@ -30,12 +28,31 @@ eval env expr = case expr of
     else eval env fl
 
   Not e -> do
-    VBool b <- eval env e
-    return . VBool $ not b
+    e' <- eval env e
+    case e' of 
+      VBool b -> do
+        return . VBool $ not b
+      VList l -> do
+        return . VBool $ null l
+      _       -> error "Error: expected Bool, Part or List" 
 
   Neg e -> do
     VInt i <- eval env e
     return . VInt $ negate i
+
+  Head l -> do
+    l' <- eval env l
+    case l' of 
+      VList ll -> do
+        return (head ll)
+      _       -> error "Error: expected Part or List" 
+
+  Tail l -> do
+    l' <- eval env l
+    case l' of 
+      VList (x:xs) -> do
+        return (VList xs)
+      _       -> error "Error: expected Part or List" 
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -63,8 +80,11 @@ eval env expr = case expr of
 
   ArrOp op a l -> do
     a' <- eval env a
-    (VList l') <- eval env l
-    return . VList $ a' : l'
+    l' <- eval env l
+    case l' of 
+      VList ll -> do
+        return . VList $ a' : ll
+      _        -> error "Error: expected Part or List" 
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
@@ -99,7 +119,7 @@ evalP env expr = case expr of
 
 evalM :: Env Expr -> Expr -> IOThrowsError Expr
 evalM env expr = case expr of
-  VPart p -> liftM VPart (mapM (evalP env) p)
+  VList p -> liftM VList (mapM (evalP env) p)
   Name name -> getVar env name >>= evalM env
   _        -> throwError $ Default "Error: expected Part"
 
@@ -130,6 +150,7 @@ matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
 
 matchI _ _ _ = error "TODO this should be taken care of in typechecking"
   -- throwError $ TypeMismatch (show op) (typeOf a) (show b)
+
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
