@@ -6,6 +6,7 @@ module Expr
     , IOpr(..)
     , BOpr(..)
     , COpr(..)
+    , AOpr(..)
     , Pitch(..)
     , Duration(..)
     , Rest(..)
@@ -67,6 +68,7 @@ data Expr
     | IntOp IOpr Expr Expr
     | BoolOp BOpr Expr Expr
     | CompOp COpr Expr Expr
+    | ArrOp AOpr Expr Expr
     | Empty                     -- Value of definitions
     | Nil                       -- Value of '_' token
     deriving (Eq, Ord)
@@ -102,6 +104,12 @@ instance Show IOpr where
     show Mul = "*"
     show Div = "/"
     show Mod = "%"
+
+data AOpr = Cons
+    deriving (Eq, Ord)
+
+instance Show AOpr where
+    show Cons = "::"
 
 data BOpr = And | Or
     deriving (Eq, Ord)

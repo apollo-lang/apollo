@@ -1,17 +1,7 @@
-Type error: Integer and Boolean are wrong operand types for `+`
-[1,2,1]
-Type error: "list is irregular"
-[[1],[1]]
-Type error: "list is irregular"
-1
-1
-Type error: "If: bool-cond not bool"
-Type error: "If: case mismatch"
-False
-Type error: Integer is wrong operand type for unary `!`
-Type error: Boolean is wrong operand type for unary `-`
-False
-Type error: Boolean and Integer are wrong operand types for `||`
-True
-False
-Type error: definition of Integer, but assigned to Boolean
+Type error: definition of Integer, but assigned to Pitch
+Type error: definition of Boolean, but assigned to Pitch
+Type error: definition of Pitch, but assigned to Duration
+Type error: definition of Duration, but assigned to Pitch
+Type error: definition of Atom, but assigned to Pitch
+Type error: definition of Part, but assigned to Pitch
+Type error: definition of Music, but assigned to Pitch
