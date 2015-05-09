@@ -14,6 +14,7 @@ module Expr
     , Part(..)
     , Atom(..)
     , Music(..)
+    , showPP
     ) where
 
 data Type
@@ -39,7 +40,7 @@ instance Show Type where
     show TPart          = "Part"
     show TMusic         = "Music"
     show (TList t)      = "[" ++ show t ++ "]"
-    show (TFunc p t)    = "(" ++ strdelim "," show p ++ ") -> " ++ show t
+    show (TFunc p t)    = "(" ++ strDelim "," show p ++ ") -> " ++ show t
     show _              = ""
 
 data Param = Param Id Type
@@ -69,29 +70,32 @@ data Expr
     | CompOp COpr Expr Expr
     | Empty                     -- Value of definitions
     | Nil                       -- Value of '_' token
-    deriving (Eq, Ord)
+    deriving (Eq, Ord, Show)
 
-instance Show Expr where
-    show (VInt  i)      = show i
-    show (VBool b)      = show b
-    show (VDuration d)  = "(" ++ show d ++ ")"
-    show (VPitch p)     = "(" ++ show p ++ ")"
-    show (VAtom p d)    = "(Atom " ++ show p ++ " " ++ show d ++ ")"
-    show (VPart p)      = "(Part " ++ strdelim " " show p ++ ")"
-    show (VMusic m)     = "(Music " ++ strdelim " " show m ++ ")"
-    show (VList l)      = "(List " ++ strdelim " " show l  ++ ")"
-    show (Name n)       = n
-    show (Def i _ e)    = "(Def " ++ i ++ " " ++ show e ++ ")"
-    show (VLam is e)    = "(Lambda " ++ strdelim " " id is ++ " " ++ show e ++ ")"
-    show (Block es e)   = "(Block " ++ strdelim " " show es ++ " " ++ show e ++ ")"
-    show (If e1 e2 e3)  = "(If " ++ show e1 ++ " " ++ show e2 ++ " " ++ show e3 ++ ")"
-    show (FnCall i e)   = "(" ++ i ++ " " ++ strdelim " " show e ++ ")"
-    show (Neg e)        = "(Neg " ++ show e ++ ")"
-    show (Not e)        = "(Not " ++ show e ++ ")"
-    show (IntOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-    show (BoolOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-    show (CompOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-    show _              = ""
+-- | showPP is used for pretty-printing values after evaluation,
+-- whereas the derived Show for Expr is used to print the AST
+
+showPP :: Expr -> String
+showPP (VInt  i)      = show i
+showPP (VBool b)      = show b
+showPP (VDuration d)  = "(" ++ show d ++ ")"
+showPP (VPitch p)     = "(" ++ show p ++ ")"
+showPP (VAtom p d)    = "(Atom " ++ showPP p ++ " " ++ showPP d ++ ")"
+showPP (VPart p)      = "(Part " ++ strDelim " " showPP p ++ ")"
+showPP (VMusic m)     = "(Music " ++ strDelim " " showPP m ++ ")"
+showPP (VList l)      = "[" ++ commaDelim l  ++ "]"
+showPP (Name n)       = n
+showPP (Def i _ e)    = "(Def " ++ i ++ " " ++ showPP e ++ ")"
+showPP (VLam is e)    = "(Lambda " ++ strDelim " " id is ++ " " ++ showPP e ++ ")"
+showPP (Block es e)   = "(Block " ++ strDelim " " showPP es ++ " " ++ showPP e ++ ")"
+showPP (If e1 e2 e3)  = "(If " ++ showPP e1 ++ " " ++ showPP e2 ++ " " ++ showPP e3 ++ ")"
+showPP (FnCall i e)   = "(" ++ i ++ " " ++ strDelim " " showPP e ++ ")"
+showPP (Neg e)        = "(Neg " ++ showPP e ++ ")"
+showPP (Not e)        = "(Not " ++ showPP e ++ ")"
+showPP (IntOp o a b)  = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
+showPP (BoolOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
+showPP (CompOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
+showPP _              = ""
 
 data IOpr = Add | Sub | Mul | Div | Mod
     deriving (Eq, Ord)
@@ -132,6 +136,9 @@ data Atom     = AtomNote Note
 data Part     = Part [Atom]            deriving (Eq, Ord, Show)
 data Music    = Music [Part]           deriving (Eq, Ord, Show)
 
-strdelim :: (Show a) => String -> (a -> String) -> [a] -> String
-strdelim = \s -> \f -> init . concatMap ((++ s) . f)
+strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
+strDelim s f = init . concatMap ((++ s) . f)
+
+commaDelim :: [Expr] -> String
+commaDelim = init . concatMap ((++ ",") . showPP)
 

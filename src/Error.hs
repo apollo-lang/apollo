@@ -38,8 +38,8 @@ instance Show ApolloError where
   show (DivByZero) = "Zero-division error: division or modulo by zero"
   show (Default                     msg) = msg
 
-commaDelim :: (Show a) => [a] -> String
-commaDelim = init . concatMap ((++ ",") . show)
+commaDelim :: [Expr] -> String
+commaDelim = init . concatMap ((++ ",") . showPP)
 
 trapError :: (MonadError e m, Show e) => m String -> m String
 trapError action = catchError action (return . show)
