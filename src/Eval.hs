@@ -30,12 +30,25 @@ eval env expr = case expr of
     else eval env fl
 
   Not e -> do
-    VBool b <- eval env e
-    return . VBool $ not b
+    e' <- eval env e
+    case e' of 
+      (VBool b) -> do
+        return . VBool $ not b
+      (VList l) -> do
+        return . VBool $ null l
+      _         -> error "Error: expected Bool or List" 
 
   Neg e -> do
     VInt i <- eval env e
     return . VInt $ negate i
+
+  Head l -> do
+    VList l' <- eval env l
+    return (head l')
+
+  Tail l -> do
+    VList l' <- eval env l
+    return (last l')
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -63,7 +76,7 @@ eval env expr = case expr of
 
   ArrOp op a l -> do
     a' <- eval env a
-    (VList l') <- eval env l
+    VList l' <- eval env l
     return . VList $ a' : l'
 
   VList xs -> liftM VList (mapM (eval env) xs)

@@ -41,6 +41,8 @@ import Lex
     '||'        { TokenOr }
     '!'         { TokenNot }
     '::'        { TokenCons }
+    'h@'        { TokenHead }
+    't@'        { TokenTail }
     '='         { TokenDef }
     '->'        { TokenArrow }
     ':'         { TokenColon }
@@ -61,7 +63,7 @@ import Lex
 %right '::'
 %left '+' '-'
 %left '*' '/' '%'
-%right NEG '!'
+%right NEG '!' 'h@' 't@'
 
 %%
 
@@ -105,6 +107,7 @@ Expression  : NUM                           { VInt $1 }
             | '|' Expressions '|'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
+            | '[' ']'                       { VList [] }           
             | Conditional                   { $1 }
             | UnOp                          { $1 }
             | BinOp                         { $1 }
@@ -121,6 +124,8 @@ Conditional : CASE '(' Expression ')'
 
 UnOp        : '-' Expression  %prec NEG     { Neg $2 }
             | '!' Expression                { Not $2 }
+            | 'h@' Expression               { Head $2 }
+            | 't@' Expression               { Tail $2 }
 
 BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '-'  Expression    { IntOp  Sub $1 $3 }

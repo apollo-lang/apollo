@@ -78,6 +78,8 @@ tokens :-
     "||"                            { \s -> TokenOr }
     \!                              { \s -> TokenNot }
     "::"                            { \s -> TokenCons }
+    "h@"                            { \s -> TokenHead }
+    "t@"                            { \s -> TokenTail }
 
     -- Separators
     \=                              { \s -> TokenDef }
@@ -121,6 +123,8 @@ data Token = TokenId String
            | TokenOr
            | TokenNot
            | TokenCons
+           | TokenHead
+           | TokenTail
            | TokenDef
            | TokenArrow
            | TokenColon

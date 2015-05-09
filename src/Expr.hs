@@ -69,6 +69,8 @@ data Expr
     | FnBody [Id] Expr
     | Neg Expr
     | Not Expr
+    | Head Expr
+    | Tail Expr 
     | IntOp IOpr Expr Expr
     | BoolOp BOpr Expr Expr
     | CompOp COpr Expr Expr
@@ -123,7 +125,8 @@ data Part     = Part [Atom]            deriving (Eq, Ord, Show)
 data Music    = Music [Part]           deriving (Eq, Ord, Show)
 
 commaDelim :: [Expr] -> String
-commaDelim = init . concatMap ((++ ",") . showVal)
+commaDelim [] = ""
+commaDelim xs = init . concatMap ((++ ",") . showVal) $ xs
 
 showVal :: Expr -> String
 showVal (VInt  i)      = show i
