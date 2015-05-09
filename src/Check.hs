@@ -31,7 +31,7 @@ typecheck env expr = case expr of
     t <- mapM (typecheck env) xs
     if null t
       then return $ TListEmpty
-    else 
+    else
       if uniform t
       then return $ TList (head t)
       else throwError $ TypeExcept "list is irregular"
@@ -51,8 +51,8 @@ typecheck env expr = case expr of
     t <- typecheck env e
     if t == TBool
     then return TBool
-    else 
-      case t of 
+    else
+      case t of
         (TList _) -> return t
         _         -> throwError (TypeUMismatch "!" t)
 
@@ -61,17 +61,17 @@ typecheck env expr = case expr of
     if t == TInt
     then return TInt
     else throwError (TypeUMismatch "-" t)
-      
+
 
   Head l -> do
     tl <- typecheck env l
-    case tl of 
+    case tl of
       (TList t) -> return t
       _         -> throwError (TypeUMismatch "h@" tl)
 
   Tail l -> do
     tl <- typecheck env l
-    case tl of 
+    case tl of
       (TList _) -> return tl
       _         -> throwError (TypeUMismatch "t@" tl)
 
@@ -86,17 +86,14 @@ typecheck env expr = case expr of
     ta <- typecheck env a
     tb <- typecheck env b
     case (ta, tb) of
-      (TInt, TInt)   -> return TInt
+      (TInt, TInt)   -> return TBool
       (TBool, TBool) -> return TBool
-      (TList t, TList t') -> do
-        if t == t'
-        then
-          if op == Eq || op == NEq
-          then return $ TList t
-          else throwError (TypeMismatch (show op) ta tb)
+      (TList t, TList t') ->
+        if (t == t') && (op == Eq || op == NEq)
+        then return TBool
         else throwError (TypeMismatch (show op) ta tb)
-      (TList t, TListEmpty) -> return $ TList t
-      (TListEmpty, TList t) -> return $ TList t
+      (TList t, TListEmpty) -> return TBool
+      (TListEmpty, TList t) -> return TBool
       (TListEmpty, TListEmpty) -> return TListEmpty
       _              -> throwError (TypeMismatch (show op) ta tb)
 
@@ -108,18 +105,16 @@ typecheck env expr = case expr of
       _            -> throwError (TypeMismatch (show op) ta tb)
 
   ArrOp op a l -> do
-    ta <- typecheck env a 
+    ta <- typecheck env a
     tl <- typecheck env l
-    case tl of 
-      (TList t) -> do
+    case tl of
+      (TList t) ->
         if ta == t
         then return $ TList ta
         else throwError (TypeMismatch (show op) ta (TList t))
-      TListEmpty -> do
-        return $ TList ta
+      TListEmpty -> return (TList ta)
 
       _ -> throwError $ TypeExcept "Expected list"
-    
 
   Block body ret -> do
     env' <- clone env
