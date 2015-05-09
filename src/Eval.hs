@@ -70,14 +70,14 @@ eval env expr = case expr of
         addBinding (Def name _ ex) envMap = liftM2 (:) (makeRef name ex) envMap
         makeRef name ex = newIORef ex >>= \e -> return (name, e)
 
-  FnBody _ body -> eval env body
+  VLam _ body -> eval env body
 
   Def name _ ex -> defineVar env name ex >> return Empty
 
   Name name -> getVar env name >>= eval env
 
   FnCall name args -> do
-    FnBody params body <- getVar env name
+    VLam params body <- getVar env name
     args' <- mapM (eval env) args
     apply params body env args'
 

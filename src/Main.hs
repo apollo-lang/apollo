@@ -50,7 +50,7 @@ toAst :: Env Type -> String -> IOThrowsError [Expr]
 toAst env src = liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> return ast
 
 execAst :: Env Expr -> [Expr] -> IOThrowsError String
-execAst env ast = liftM (unlines . map showVal . filter notEmpty) (exec env ast)
+execAst env ast = liftM (unlines . map show . filter notEmpty) (exec env ast)
     where
       notEmpty :: Expr -> Bool
       notEmpty Empty = False

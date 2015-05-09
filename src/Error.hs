@@ -32,14 +32,14 @@ instance Show ApolloError where
   show (TypeDMismatch a b) = "Type error: definition of " ++ show a ++ ", but assigned to " ++ show b
   show (TypeExcept                  msg) = "Type error: " ++ show msg
   show (UnboundVar           action var) = action ++ " an unbound variable: " ++ var
-  show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelimit found ++ ")"
+  show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelim found ++ ")"
   show (RedefVar                    var) = "Multiple declaration: redefining variable " ++ var
   show (ParseErr                    val) = "Parse error: unexpected " ++ val
   show (DivByZero) = "Zero-division error: division or modulo by zero"
   show (Default                     msg) = msg
 
-commaDelimit :: [Expr] -> String
-commaDelimit = init . concatMap ((++ ",") . showVal)
+commaDelim :: (Show a) => [a] -> String
+commaDelim = init . concatMap ((++ ",") . show)
 
 trapError :: (MonadError e m, Show e) => m String -> m String
 trapError action = catchError action (return . show)
