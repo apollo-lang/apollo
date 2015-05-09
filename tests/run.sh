@@ -113,6 +113,7 @@ check() {
 
 
   if test $aps -eq 1; then
+    python double_backslash.py $test ${test}f
     local lineno=0
     while read line; do
       let lineno=lineno+1
@@ -128,7 +129,8 @@ check() {
       if test -n "$result"; then
         break
       fi
-    done < $test
+    done < ${test}f
+    rm ${test}f
   else
     if test "$ast" -eq 1; then
       local interp=$(evaluate $test --ast)
