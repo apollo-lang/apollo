@@ -3,14 +3,17 @@ module Midi where
 import Codec.Midi
 import Expr
 
-musicToTrack :: Music -> [[(Ticks, Message)]]
-musicToTrack (Music m) = concatMap partToTrack m
+musicToTrack :: Music -> Int -> [[(Ticks, Message)]]
+musicToTrack (Music m) tempo = map (addTM tempo) (concatMap partToTrack m)
+
+addTM :: Int -> [(Ticks, Message)] -> [(Ticks, Message)]
+addTM tempo tracks = [(0, TempoChange tempo)] ++ tracks
 
 midiFromMusic :: Music -> Int -> Midi
 midiFromMusic m tempo = Midi
     { fileType = MultiTrack
-    , timeDiv = TicksPerBeat tempo
-    , tracks = musicToTrack m }
+    , timeDiv = TicksPerBeat 16 -- depends on how we convert durations i think
+    , tracks = musicToTrack m $ quot 60000000 tempo}
 
 export :: Midi -> String -> IO ()
 export themidi filename = exportFile filename themidi
@@ -61,7 +64,7 @@ chordToTrack (Chord pitches (Duration d)) = chords
 
 -- Takes Note and outputs a Track with the note
 noteToTrack :: Note -> [(Ticks, Message)]
-noteToTrack (Note (Pitch p) (Duration d)) = ckvtToTrack 0 p 60 d
+noteToTrack (Note (Pitch p) (Duration d)) = ckvtToTrack 0 p 80 d
 
 -- Takes Rest and outputs a Track with the rest
 restToTrack :: Rest -> [(Ticks, Message)]
@@ -77,4 +80,3 @@ nSeqTrack = concatMap noteToTrack
 ckvtToTrack :: Channel -> Key -> Velocity -> Ticks -> [(Ticks, Message)]
 ckvtToTrack chan pitch vel dur
     = [(0, NoteOn chan pitch vel), (dur, NoteOff chan pitch vel)]
-
