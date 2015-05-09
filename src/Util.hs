@@ -28,7 +28,7 @@ makeAtom (VAtom pitches (VDuration d))      = AtomChord $ Chord (map (\(VPitch p
 makeAtom _                                  = error "Expected note, chord or rest"
 
 makeMusic :: Expr -> Music
-makeMusic (VMusic m) = Music $ map ((map makeAtom) . unpackList)  m
+makeMusic (VList m) = Music $ map ((map makeAtom) . unpackList)  m
 makeMusic _          = error "bug: expected VMusic"
 
 pitchClass :: String -> Int

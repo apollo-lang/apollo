@@ -53,7 +53,6 @@ import Lex
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
     '_'         { TokenUScore }
-    '|'         { TokenPipe }
 
 %nonassoc '=' '->'
 %left '||'
@@ -98,7 +97,6 @@ Expression  : NUM                           { VInt $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | TEMPO                         { Name "#tempo" }
-            | '|' Expressions '|'           { VMusic $2 }
             | '(' Expression
               ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
             | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
