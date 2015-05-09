@@ -4,6 +4,7 @@ module Parse (
 ) where
 import Control.Monad.Error (liftM, throwError)
 import Error
+import Type
 import Expr
 import Util
 import Lex

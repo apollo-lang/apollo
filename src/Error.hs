@@ -4,9 +4,9 @@ module Error
     , trapError
     , extractValue
     ) where
-
 import Control.Monad.Error (Error(noMsg,strMsg), MonadError, catchError)
-import Expr
+
+import Type
 
 type ThrowsError = Either ApolloError
 
@@ -16,7 +16,6 @@ data ApolloError
   | TypeUMismatch String Type
   | TypeExcept String
   | UnboundVar String String
-  | ArgMismatch String Integer [Expr]
   | RedefVar String
   | ParseErr String
   | DivByZero
@@ -32,14 +31,10 @@ instance Show ApolloError where
   show (TypeDMismatch a b) = "Type error: definition of " ++ show a ++ ", but assigned to " ++ show b
   show (TypeExcept                  msg) = "Type error: " ++ show msg
   show (UnboundVar           action var) = action ++ " an unbound variable: " ++ var
-  show (ArgMismatch name expected found) = "Argument mismatch: for function " ++ name ++ " expected " ++ show expected ++ " arguments; found (" ++ commaDelim found ++ ")"
   show (RedefVar                    var) = "Multiple declaration: redefining variable " ++ var
   show (ParseErr                    val) = "Parse error: unexpected " ++ val
   show (DivByZero) = "Zero-division error: division or modulo by zero"
   show (Default                     msg) = msg
-
-commaDelim :: [Expr] -> String
-commaDelim = init . concatMap ((++ ",") . showPP)
 
 trapError :: (MonadError e m, Show e) => m String -> m String
 trapError action = catchError action (return . show)

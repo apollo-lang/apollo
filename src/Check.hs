@@ -6,6 +6,7 @@ import Control.Monad.Error (throwError, liftIO)
 import Data.IORef (newIORef, readIORef)
 
 import Error
+import Type
 import Expr
 import Env
 
@@ -60,7 +61,7 @@ typecheck env expr = case expr of
     ta <- typecheck env a
     tb <- typecheck env b
     case (ta, tb) of
-      (TInt, TInt)   -> return TInt
+      (TInt, TInt)   -> return TBool
       (TBool, TBool) -> return TBool
       _              -> throwError (TypeMismatch (show op) ta tb)
 

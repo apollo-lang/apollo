@@ -14,7 +14,7 @@ foo: Int = {
 cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
     sideArea + circleArea
     where
-        sideArea: Int = b * h 
+        sideArea: Int = b * h
         circleArea: Int = {
             2 * pi * r * r
             where

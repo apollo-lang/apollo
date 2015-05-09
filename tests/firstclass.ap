@@ -1,0 +1,3 @@
+twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
+f: (n: Int) -> Int = n * n
+twice(f, 2)
