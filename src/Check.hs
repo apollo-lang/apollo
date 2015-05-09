@@ -71,6 +71,17 @@ typecheck env expr = case expr of
       (TInt, TInt) -> return TInt
       _            -> throwError (TypeMismatch (show op) ta tb)
 
+  ArrOp op a l -> do
+    ta <- typecheck env a 
+    tl <- typecheck env l
+    case tl of 
+      (TList t) -> do
+        if ta == t
+        then return $ TList ta
+        else throwError (TypeMismatch (show op) ta (TList t))
+      _ -> throwError $ TypeExcept "Expected list"
+    
+
   Block body ret -> do
     env' <- clone env
     mapM_ (typecheck env') body
