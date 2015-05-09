@@ -125,7 +125,7 @@ typecheck env expr = case expr of
 
   Def name t ex -> do
     t' <- typecheck env ex
-    if match t t'
+    if t == t'
     then defineVar env name t'
     else throwError (TypeDMismatch t t')
 
@@ -135,14 +135,6 @@ typecheck env expr = case expr of
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
-
-match :: Type -> Type -> Bool
-match a b | a == b    = True
-          | otherwise = case (a, b) of 
-                          -- (TListEmpty, TList _) -> True
-                          (TList _, TListEmpty) -> True
-                          -- (TListEmpty, TListEmpty) -> True
-                          _                     -> False
 
 
 
