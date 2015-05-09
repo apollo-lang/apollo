@@ -118,12 +118,6 @@ check() {
     return 0
   fi
 
-  if test ! -s "$answ"; then
-    yellow "$warn $name" "(answer file empty)"
-    return 0
-  fi
-
-
   if test $aps -eq 1; then
     # In .aps mode, each line is read and interpreted individually.
     local lineno=0
