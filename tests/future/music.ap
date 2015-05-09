@@ -1,9 +1,0 @@
-do: Pitch = C4
-mi: Pitch = E4
-q: Duration = \4
-note: Atom = (do, q)
-rest: Atom = (_, q)
-chord: Atom = ([do, mi], q)
-top: [Atom] = [note, note]
-bot: [Atom] = [rest, chord]
-song: Music = [top, bot]
