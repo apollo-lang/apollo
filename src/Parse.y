@@ -40,6 +40,7 @@ import Lex
     '&&'        { TokenAnd }
     '||'        { TokenOr }
     '!'         { TokenNot }
+    '::'        { TokenCons }
     '='         { TokenDef }
     '->'        { TokenArrow }
     ':'         { TokenColon }
@@ -57,6 +58,7 @@ import Lex
 %left '||'
 %left '&&'
 %left '==' '!=' '<' '>' '<=' '>='
+%right '::'
 %left '+' '-'
 %left '*' '/' '%'
 %right NEG '!'
@@ -141,6 +143,7 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '>=' Expression    { CompOp GEq $1 $3 }
             | Expression '&&' Expression    { BoolOp And $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
+            | Expression '::' Expression    { ArrOp Cons $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Expression

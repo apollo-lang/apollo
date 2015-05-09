@@ -61,6 +61,11 @@ eval env expr = case expr of
         isZero (VPitch (Pitch x))       = x == 0
         isZero (VDuration (Duration x)) = x == 0
 
+  ArrOp op a l -> do
+    a' <- eval env a
+    (VList l') <- eval env l
+    return . VList $ a' : l'
+
   VList xs -> liftM VList (mapM (eval env) xs)
 
   Block body ret -> do
