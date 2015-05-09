@@ -19,7 +19,6 @@ import Lex
     NUM         { TokenNum $$ }
     BOOL        { TokenBool $$ }
     TYPE        { TokenType $$ }
-    MUSIC       { TokenMusic }
     DUR         { TokenDur $$ }
     PITCH       { TokenPitch $$ }
     CASE        { TokenCase }
@@ -41,6 +40,8 @@ import Lex
     '||'        { TokenOr }
     '!'         { TokenNot }
     '::'        { TokenCons }
+    'h@'        { TokenHead }
+    't@'        { TokenTail }
     '='         { TokenDef }
     '->'        { TokenArrow }
     ':'         { TokenColon }
@@ -51,7 +52,6 @@ import Lex
     ']'         { TokenRBrack }
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
-    '|'         { TokenPipe }
     '_'         { TokenUScore }
 
 %nonassoc '=' '->'
@@ -61,7 +61,7 @@ import Lex
 %right '::'
 %left '+' '-'
 %left '*' '/' '%'
-%right NEG '!'
+%right NEG '!' 'h@' 't@'
 
 %%
 
@@ -80,7 +80,6 @@ Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
             | FnType                        { $1 }
-            | MUSIC                         { TMusic }
 
 FnType      : '(' Params ')' '->' Type      { TFunc $2 $5 }
 
@@ -98,13 +97,12 @@ Expression  : NUM                           { VInt $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | TEMPO                         { Name "#tempo" }
-            | MUSIC '(' Expressions ')'     { VMusic $3 }
             | '(' Expression
               ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
             | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
-            | '|' Expressions '|'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
+            | '[' ']'                       { VList [] }           
             | Conditional                   { $1 }
             | UnOp                          { $1 }
             | BinOp                         { $1 }
@@ -121,6 +119,8 @@ Conditional : CASE '(' Expression ')'
 
 UnOp        : '-' Expression  %prec NEG     { Neg $2 }
             | '!' Expression                { Not $2 }
+            | 'h@' Expression               { Head $2 }
+            | 't@' Expression               { Tail $2 }
 
 BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '-'  Expression    { IntOp  Sub $1 $3 }
