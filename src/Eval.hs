@@ -32,23 +32,36 @@ eval env expr = case expr of
   Not e -> do
     e' <- eval env e
     case e' of 
-      (VBool b) -> do
+      VBool b -> do
         return . VBool $ not b
-      (VList l) -> do
+      VList l -> do
         return . VBool $ null l
-      _         -> error "Error: expected Bool or List" 
+      VPart p -> do             -- This is pretty much useless since Parts can't be empty
+                                -- See TODO in Check.hs line 50
+        return . VBool $ null p
+      _       -> error "Error: expected Bool, Part or List" 
 
   Neg e -> do
     VInt i <- eval env e
     return . VInt $ negate i
 
   Head l -> do
-    VList l' <- eval env l
-    return (head l')
+    l' <- eval env l
+    case l' of 
+      VList ll -> do
+        return (head ll)
+      VPart p -> do
+        return (head p)
+      _       -> error "Error: expected Part or List" 
 
   Tail l -> do
-    VList l' <- eval env l
-    return (last l')
+    l' <- eval env l
+    case l' of 
+      VList ll -> do
+        return (last ll)
+      VPart p -> do
+        return (last p)
+      _       -> error "Error: expected Part or List" 
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -76,8 +89,13 @@ eval env expr = case expr of
 
   ArrOp op a l -> do
     a' <- eval env a
-    VList l' <- eval env l
-    return . VList $ a' : l'
+    l' <- eval env l
+    case l' of 
+      VList ll -> do
+        return . VList $ a' : ll
+      VPart p -> do
+        return . VPart $ a' : p
+      _        -> error "Error: expected Part or List" 
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
@@ -143,6 +161,7 @@ matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
 
 matchI _ _ _ = error "TODO this should be taken care of in typechecking"
   -- throwError $ TypeMismatch (show op) (typeOf a) (show b)
+
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
