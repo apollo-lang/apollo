@@ -17,8 +17,15 @@ typecheck env expr = case expr of
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
   VAtom{}     -> return TAtom
-  VPart{}     -> return TPart
-  VMusic{}    -> return TMusic
+
+  VMusic m    -> do
+    t <- mapM (typecheck env) m
+    if null t
+    then throwError $ TypeExcept "Music cannot be empty"
+    else
+      if uniform t && (head t) == (TList TAtom)
+      then return TMusic
+      else throwError $ TypeExcept "Music only takes lists of Atoms"
 
   VList xs -> do
     t <- mapM (typecheck env) xs
@@ -47,7 +54,7 @@ typecheck env expr = case expr of
     else 
       case t of 
         (TList _) -> return t
-        TPart     -> return t   --TODO: We can't have a Part || since this is OR
+        -- TPart     -> return t   --TODO: We can't have a Part || since this is OR
                                 --so ! is useless right now
         _         -> throwError (TypeUMismatch "!" t)
 
@@ -62,14 +69,14 @@ typecheck env expr = case expr of
     tl <- typecheck env l
     case tl of 
       (TList t) -> return t
-      TPart     -> return tl
+      -- TPart     -> return tl
       _         -> throwError (TypeUMismatch "h@" tl)
 
   Tail l -> do
     tl <- typecheck env l
     case tl of 
       (TList _) -> return tl
-      TPart     -> return tl
+      -- TPart     -> return tl
       _         -> throwError (TypeUMismatch "t@" tl)
 
   BoolOp op a b -> do
@@ -102,10 +109,6 @@ typecheck env expr = case expr of
         if ta == t
         then return $ TList ta
         else throwError (TypeMismatch (show op) ta (TList t))
-      TPart     -> do
-        if ta == TAtom
-        then return $ TPart
-        else throwError (TypeMismatch (show op) ta TPart)
       TListEmpty -> do
         return $ TList ta
 
