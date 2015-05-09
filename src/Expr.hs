@@ -1,52 +1,29 @@
-module Expr
-    ( Param(..)
-    , Id
-    , Type(..)
-    , Expr(..)
-    , IOpr(..)
-    , BOpr(..)
-    , COpr(..)
-    , Pitch(..)
-    , Duration(..)
-    , Rest(..)
-    , Note(..)
-    , Chord(..)
-    , Part(..)
-    , Atom(..)
-    , Music(..)
-    , showPP
-    ) where
+module Expr (
+  Id
+, Param(..)
+, Expr(..)
+, IOpr(..)
+, BOpr(..)
+, COpr(..)
+, Pitch(..)
+, Duration(..)
+, Rest(..)
+, Note(..)
+, Chord(..)
+, Part(..)
+, Atom(..)
+, Music(..)
+, showPP
+) where
 
-data Type
-    = TInt
-    | TBool
-    | TDuration
-    | TPitch
-    | TAtom
-    | TPart
-    | TMusic
-    | TList Type
-    | TEmpty String   -- TODO: remove
-    | TError          -- TODO: remove
-    | TFunc [Type] Type
-    deriving (Eq, Ord)
-
-instance Show Type where
-    show TInt           = "Int"
-    show TBool          = "Bool"
-    show TDuration      = "Duration"
-    show TPitch         = "Pitch"
-    show TAtom          = "Atom"
-    show TPart          = "Part"
-    show TMusic         = "Music"
-    show (TList t)      = "[" ++ show t ++ "]"
-    show (TFunc p t)    = "(" ++ strDelim "," show p ++ ") -> " ++ show t
-    show _              = ""
-
-data Param = Param Id Type
-    deriving (Eq, Ord, Show)
+import Type
+import Env
 
 type Id = String
+
+-- TODO: remove?
+data Param = Param Id Type
+  deriving (Eq, Ord, Show)
 
 data Expr
     = VInt Int
@@ -59,7 +36,8 @@ data Expr
     | VList [Expr]
     | Name Id
     | Def Id Type Expr
-    | VLam [Id] Expr            -- Lambdas / Functions
+    | VLam [Id] Expr                -- a function expression
+    | Function [Id] Expr (Env Expr) -- a function with its closure
     | Block [Expr] Expr
     | If Expr Expr Expr
     | FnCall Id [Expr]
@@ -95,7 +73,8 @@ showPP (Not e)        = "(Not " ++ showPP e ++ ")"
 showPP (IntOp o a b)  = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
 showPP (BoolOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
 showPP (CompOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
-showPP _              = ""
+showPP Nil            = "Nil"
+showPP _              = "<?>"
 
 data IOpr = Add | Sub | Mul | Div | Mod
     deriving (Eq, Ord)

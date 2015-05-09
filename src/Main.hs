@@ -9,6 +9,7 @@ import System.IO (hFlush, stdout)
 import Parse
 import Check
 import Error
+import Type
 import Expr
 import Eval
 import Env

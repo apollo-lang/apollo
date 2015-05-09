@@ -6,6 +6,7 @@ module Lex
     ) where
 
 import Expr
+import Type
 }
 
 %wrapper "basic"

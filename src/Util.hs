@@ -8,6 +8,7 @@ module Util
 
 import Text.Regex.Posix
 import Expr
+import Type
 -- import Error
 
 -- TODO: use Error monad instead of `error`

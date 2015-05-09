@@ -5,18 +5,26 @@ module Env (
 , liftThrows
 , runIOThrows
 , getVar
+, setVar
 , defineVar
 , bindVars
 , isBound
+, clone
 ) where
 
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
 import Data.Maybe (isJust)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Error
-import Expr
 
+type Id = String
 type Env a = IORef [(String, IORef a)]
+
+instance Show (IORef a) where
+  show _ = "<ioref>"
+
+instance Ord (IORef a) where
+  compare _ _ = EQ
 
 nullEnv :: IO (Env a)
 nullEnv = newIORef []
@@ -64,4 +72,6 @@ bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
      where extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
            addBinding (var, value) = do ref <- newIORef value
                                         return (var, ref)
+
+clone e = liftIO (readIORef e >>= newIORef)
 
