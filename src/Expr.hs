@@ -12,7 +12,6 @@ module Expr
     , Rest(..)
     , Note(..)
     , Chord(..)
-    , Part(..)
     , Atom(..)
     , Music(..)
     , showVal
@@ -24,9 +23,9 @@ data Type
     | TDuration
     | TPitch
     | TAtom
-    | TPart
     | TMusic
     | TList Type
+    | TListEmpty
     | TEmpty String   -- TODO: remove
     | TError          -- TODO: remove
     | TFunc [Param] Type
@@ -38,9 +37,10 @@ instance Show Type where
     show TDuration = "Duration"
     show TPitch    = "Pitch"
     show TAtom     = "Atom"
-    show TPart     = "Part"
+    -- show TPart     = "Part"
     show TMusic    = "Music"
     show (TList t) = "[" ++ show t ++ "]"
+    show TListEmpty = "[]"
     show TEmpty{}  = "shouldnt show for TEmpty" -- TODO: remove
     show TError    = "shouldnt show for TEmpty" -- TODO: remove
     show TFunc{}   = "TODO show for TFunc"      -- TODO
@@ -58,7 +58,6 @@ data Expr
     | VDuration Duration
     | VPitch Pitch
     | VAtom Expr Expr
-    | VPart [Expr]
     | VMusic [Expr]
     | VList [Expr]
     | Def Id Type Expr
@@ -69,6 +68,8 @@ data Expr
     | FnBody [Id] Expr
     | Neg Expr
     | Not Expr
+    | Head Expr
+    | Tail Expr 
     | IntOp IOpr Expr Expr
     | BoolOp BOpr Expr Expr
     | CompOp COpr Expr Expr
@@ -119,11 +120,11 @@ data Rest     = Rest Duration          deriving (Eq, Ord, Show)
 data Atom     = AtomNote Note
               | AtomChord Chord
               | AtomRest Rest          deriving (Eq, Ord, Show)
-data Part     = Part [Atom]            deriving (Eq, Ord, Show)
-data Music    = Music [Part]           deriving (Eq, Ord, Show)
+data Music    = Music [[Atom]]           deriving (Eq, Ord, Show)
 
 commaDelim :: [Expr] -> String
-commaDelim = init . concatMap ((++ ",") . showVal)
+commaDelim [] = ""
+commaDelim xs = init . concatMap ((++ ",") . showVal) $ xs
 
 showVal :: Expr -> String
 showVal (VInt  i)      = show i
@@ -132,7 +133,6 @@ showVal (VList l)      = "[" ++ commaDelim l  ++ "]"
 showVal (VDuration d)  = show d
 showVal (VPitch p)     = show p
 showVal (VAtom p d)    = "Atom (" ++ showVal p ++ ", " ++ showVal d ++ ")"
-showVal (VPart p)      = "Part {" ++ commaDelim p ++ "}"
 showVal (VMusic m)     = "Music [" ++ commaDelim m ++ "]"
 showVal (Empty)        = ""
 showVal otherVal       = show otherVal

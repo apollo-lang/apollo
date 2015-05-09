@@ -17,14 +17,24 @@ typecheck env expr = case expr of
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
   VAtom{}     -> return TAtom
-  VPart{}     -> return TPart
-  VMusic{}    -> return TMusic
+
+  VMusic m    -> do
+    t <- mapM (typecheck env) m
+    if null t
+    then throwError $ TypeExcept "Music cannot be empty"
+    else
+      if uniform t && (head t) == (TList TAtom)
+      then return TMusic
+      else throwError $ TypeExcept "Music only takes lists of Atoms"
 
   VList xs -> do
     t <- mapM (typecheck env) xs
-    if uniform t
-    then return $ TList (head t)
-    else throwError $ TypeExcept "list is irregular"
+    if null t
+      then return $ TListEmpty
+    else 
+      if uniform t
+      then return $ TList (head t)
+      else throwError $ TypeExcept "list is irregular"
 
   If test tr fl -> do
     t <- typecheck env test
@@ -41,13 +51,29 @@ typecheck env expr = case expr of
     t <- typecheck env e
     if t == TBool
     then return TBool
-    else throwError (TypeUMismatch "!" t)
+    else 
+      case t of 
+        (TList _) -> return t
+        _         -> throwError (TypeUMismatch "!" t)
 
   Neg e -> do
     t <- typecheck env e
     if t == TInt
     then return TInt
     else throwError (TypeUMismatch "-" t)
+      
+
+  Head l -> do
+    tl <- typecheck env l
+    case tl of 
+      (TList t) -> return t
+      _         -> throwError (TypeUMismatch "h@" tl)
+
+  Tail l -> do
+    tl <- typecheck env l
+    case tl of 
+      (TList _) -> return tl
+      _         -> throwError (TypeUMismatch "t@" tl)
 
   BoolOp op a b -> do
     ta <- typecheck env a
@@ -62,6 +88,16 @@ typecheck env expr = case expr of
     case (ta, tb) of
       (TInt, TInt)   -> return TInt
       (TBool, TBool) -> return TBool
+      (TList t, TList t') -> do
+        if t == t'
+        then
+          if op == Eq || op == NEq
+          then return $ TList t
+          else throwError (TypeMismatch (show op) ta tb)
+        else throwError (TypeMismatch (show op) ta tb)
+      (TList t, TListEmpty) -> return $ TList t
+      (TListEmpty, TList t) -> return $ TList t
+      (TListEmpty, TListEmpty) -> return TListEmpty
       _              -> throwError (TypeMismatch (show op) ta tb)
 
   IntOp op a b -> do
@@ -79,6 +115,9 @@ typecheck env expr = case expr of
         if ta == t
         then return $ TList ta
         else throwError (TypeMismatch (show op) ta (TList t))
+      TListEmpty -> do
+        return $ TList ta
+
       _ -> throwError $ TypeExcept "Expected list"
     
 
@@ -95,7 +134,7 @@ typecheck env expr = case expr of
 
   Def name t ex -> do
     t' <- typecheck env ex
-    if t == t'
+    if t == t' || t == TMusic && t' == (TList $ TList TAtom)
     then defineVar env name t
     else throwError (TypeDMismatch t t')
 
@@ -105,4 +144,6 @@ typecheck env expr = case expr of
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
+
+
 
