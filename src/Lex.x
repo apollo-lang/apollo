@@ -77,6 +77,7 @@ tokens :-
     "&&"                            { \s -> TokenAnd }
     "||"                            { \s -> TokenOr }
     \!                              { \s -> TokenNot }
+    "::"                            { \s -> TokenCons }
 
     -- Separators
     \=                              { \s -> TokenDef }
@@ -119,6 +120,7 @@ data Token = TokenId String
            | TokenAnd
            | TokenOr
            | TokenNot
+           | TokenCons
            | TokenDef
            | TokenArrow
            | TokenColon
