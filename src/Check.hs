@@ -22,9 +22,12 @@ typecheck env expr = case expr of
 
   VList xs -> do
     t <- mapM (typecheck env) xs
-    if uniform t
-    then return $ TList (head t)
-    else throwError $ TypeExcept "list is irregular"
+    if null t
+      then return $ TList TInt  -- TODO: FIX THIS, TInt is a placeholder
+    else 
+      if uniform t
+      then return $ TList (head t)
+      else throwError $ TypeExcept "list is irregular"
 
   If test tr fl -> do
     t <- typecheck env test
@@ -41,13 +44,29 @@ typecheck env expr = case expr of
     t <- typecheck env e
     if t == TBool
     then return TBool
-    else throwError (TypeUMismatch "!" t)
+    else 
+      case t of 
+        (TList _) -> return t
+        _         -> throwError (TypeUMismatch "!" t)
 
   Neg e -> do
     t <- typecheck env e
     if t == TInt
     then return TInt
     else throwError (TypeUMismatch "-" t)
+      
+
+  Head l -> do
+    tl <- typecheck env l
+    case tl of 
+      (TList _) -> return tl
+      _         -> throwError (TypeUMismatch "h@" tl)
+
+  Tail l -> do
+    tl <- typecheck env l
+    case tl of 
+      (TList _) -> return tl
+      _         -> throwError (TypeUMismatch "t@" tl)
 
   BoolOp op a b -> do
     ta <- typecheck env a
