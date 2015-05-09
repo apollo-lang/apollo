@@ -36,7 +36,7 @@ tokens :-
     [A-G](\#|b)?[0-9]               { \s -> TokenPitch s }
 
     -- Integer Constants
-    $digit+                      { \s -> TokenNum (read s) }
+    $digit+                         { \s -> TokenNum (read s) }
 
     -- Boolean Constants
     "True"                          { \s -> TokenBool (True) }
@@ -46,7 +46,7 @@ tokens :-
     "case"                          { \s -> TokenCase }
     "otherwise"                     { \s -> TokenOtherwise }
     "where"                         { \s -> TokenWhere }
-    "Music"                         { \s -> TokenMusic }
+    
 
     -- Markers
     "#tempo"                        { \s -> TokenTempo }
@@ -60,7 +60,7 @@ tokens :-
     "Duration"                      { \s -> TokenType TDuration }
     "Pitch"                         { \s -> TokenType TPitch }
     "Atom"                          { \s -> TokenType TAtom }
-    "Part"                          { \s -> TokenType TPart }
+    "Music"                         { \s -> TokenType TMusic }
     
     -- Operators
     \+                              { \s -> TokenPlus }
@@ -77,6 +77,7 @@ tokens :-
     "&&"                            { \s -> TokenAnd }
     "||"                            { \s -> TokenOr }
     \!                              { \s -> TokenNot }
+    \|                              { \s -> TokenPipe }
     "::"                            { \s -> TokenCons }
     "h@"                            { \s -> TokenHead }
     "t@"                            { \s -> TokenTail }
@@ -92,7 +93,6 @@ tokens :-
     \]                              { \s -> TokenRBrack }
     \{                              { \s -> TokenLBrace }
     \}                              { \s -> TokenRBrace }
-    \|                              { \s -> TokenPipe }
     \_                              { \s -> TokenUScore }
 
 {
@@ -107,7 +107,6 @@ data Token = TokenId String
            | TokenOtherwise
            | TokenWhere
            | TokenTempo
-           | TokenMusic
            | TokenPlus
            | TokenMinus
            | TokenMult
@@ -135,8 +134,8 @@ data Token = TokenId String
            | TokenRBrack
            | TokenLBrace
            | TokenRBrace
-           | TokenPipe
            | TokenUScore
+           | TokenPipe
            | TokenEOL
            deriving (Eq,Show)
 

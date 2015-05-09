@@ -19,7 +19,6 @@ import Lex
     NUM         { TokenNum $$ }
     BOOL        { TokenBool $$ }
     TYPE        { TokenType $$ }
-    MUSIC       { TokenMusic }
     DUR         { TokenDur $$ }
     PITCH       { TokenPitch $$ }
     CASE        { TokenCase }
@@ -53,8 +52,8 @@ import Lex
     ']'         { TokenRBrack }
     '{'         { TokenLBrace }
     '}'         { TokenRBrace }
-    '|'         { TokenPipe }
     '_'         { TokenUScore }
+    '|'         { TokenPipe }
 
 %nonassoc '=' '->'
 %left '||'
@@ -82,7 +81,6 @@ Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
 Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
             | FnType                        { $1 }
-            | MUSIC                         { TMusic }
 
 FnType      : '(' Params ')' '->' Type      { TFunc $2 $5 }
 
@@ -100,11 +98,10 @@ Expression  : NUM                           { VInt $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
             | TEMPO                         { Name "#tempo" }
-            | MUSIC '(' Expressions ')'     { VMusic $3 }
+            | '|' Expressions '|'           { VMusic $2 }
             | '(' Expression
               ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
             | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
-            | '|' Expressions '|'           { VPart $2 }
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
             | '[' ']'                       { VList [] }           

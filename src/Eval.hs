@@ -19,8 +19,6 @@ eval env expr = case expr of
 
   VAtom a b -> liftM2 VAtom (eval env a) (eval env b)
 
-  VPart p -> liftM VPart (mapM (evalP env) p)
-
   VMusic m -> liftM VMusic (mapM (evalM env) m)
 
   If test tr fl -> do
@@ -36,9 +34,6 @@ eval env expr = case expr of
         return . VBool $ not b
       VList l -> do
         return . VBool $ null l
-      VPart p -> do             -- This is pretty much useless since Parts can't be empty
-                                -- See TODO in Check.hs line 50
-        return . VBool $ null p
       _       -> error "Error: expected Bool, Part or List" 
 
   Neg e -> do
@@ -50,8 +45,6 @@ eval env expr = case expr of
     case l' of 
       VList ll -> do
         return (head ll)
-      VPart p -> do
-        return (head p)
       _       -> error "Error: expected Part or List" 
 
   Tail l -> do
@@ -59,8 +52,6 @@ eval env expr = case expr of
     case l' of 
       VList (x:xs) -> do
         return (VList xs)
-      VPart p -> do
-        return (last p)
       _       -> error "Error: expected Part or List" 
 
   BoolOp op a b -> do
@@ -93,8 +84,6 @@ eval env expr = case expr of
     case l' of 
       VList ll -> do
         return . VList $ a' : ll
-      VPart p -> do
-        return . VPart $ a' : p
       _        -> error "Error: expected Part or List" 
 
   VList xs -> liftM VList (mapM (eval env) xs)
@@ -130,7 +119,7 @@ evalP env expr = case expr of
 
 evalM :: Env Expr -> Expr -> IOThrowsError Expr
 evalM env expr = case expr of
-  VPart p -> liftM VPart (mapM (evalP env) p)
+  VList p -> liftM VList (mapM (evalP env) p)
   Name name -> getVar env name >>= evalM env
   _        -> throwError $ Default "Error: expected Part"
 
