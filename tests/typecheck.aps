@@ -1,7 +1,63 @@
+a: Int = 1
+a: Int = True
 a: Int = A4
-b: Bool = A4
-c: Pitch = \4
-d: Duration = A4
-e: Atom = A4
-f: Part = A4
-g: Music = A4
+a: Int = \4
+a: Int = (A4, \4)
+a: Int = [1]
+a: Int = [[(A4,\4)]]
+
+a: Bool = 1
+a: Bool = True
+a: Bool = A4
+a: Bool = \4
+a: Bool = (A4, \4)
+a: Bool = [1]
+a: Bool = [[(A4,\4)]]
+
+a: Pitch = 1
+a: Pitch = True
+a: Pitch = A4
+a: Pitch = \4
+a: Pitch = (A4, \4)
+a: Pitch = [1]
+a: Pitch = [[(A4,\4)]]
+
+a: Duration = 1
+a: Duration = True
+a: Duration = A4
+a: Duration = \4
+a: Duration = (A4, \4)
+a: Duration = [1]
+a: Duration = [[(A4,\4)]]
+
+a: Atom = 1
+a: Atom = True
+a: Atom = A4
+a: Atom = \4
+a: Atom = (A4, \4)
+a: Atom = [1]
+a: Atom = [[(A4,\4)]]
+
+a: Music = 1
+a: Music = True
+a: Music = A4
+a: Music = \4
+a: Music = (A4, \4)
+a: Music = [1]
+a: Music = [[(A4,\4)]]
+
+#tempo 1
+#tempo True
+#tempo A4
+#tempo \4
+#tempo (A4, \4)
+#tempo [1]
+#tempo [[(A4,\4)]]
+
+a: [Int] = 1
+a: [Int] = True
+a: [Int] = A4
+a: [Int] = \4
+a: [Int] = (A4, \4)
+a: [Int] = [1]
+a: [Int] = [[(A4,\4)]]
