@@ -54,8 +54,6 @@ typecheck env expr = case expr of
     else 
       case t of 
         (TList _) -> return t
-        -- TPart     -> return t   --TODO: We can't have a Part || since this is OR
-                                --so ! is useless right now
         _         -> throwError (TypeUMismatch "!" t)
 
   Neg e -> do
@@ -69,14 +67,12 @@ typecheck env expr = case expr of
     tl <- typecheck env l
     case tl of 
       (TList t) -> return t
-      -- TPart     -> return tl
       _         -> throwError (TypeUMismatch "h@" tl)
 
   Tail l -> do
     tl <- typecheck env l
     case tl of 
       (TList _) -> return tl
-      -- TPart     -> return tl
       _         -> throwError (TypeUMismatch "t@" tl)
 
   BoolOp op a b -> do
@@ -92,6 +88,16 @@ typecheck env expr = case expr of
     case (ta, tb) of
       (TInt, TInt)   -> return TInt
       (TBool, TBool) -> return TBool
+      (TList t, TList t') -> do
+        if t == t'
+        then
+          if op == Eq || op == NEq
+          then return $ TList t
+          else throwError (TypeMismatch (show op) ta tb)
+        else throwError (TypeMismatch (show op) ta tb)
+      (TList t, TListEmpty) -> return $ TList t
+      (TListEmpty, TList t) -> return $ TList t
+      (TListEmpty, TListEmpty) -> return TListEmpty
       _              -> throwError (TypeMismatch (show op) ta tb)
 
   IntOp op a b -> do
