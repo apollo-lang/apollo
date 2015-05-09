@@ -134,8 +134,8 @@ typecheck env expr = case expr of
 
   Def name t ex -> do
     t' <- typecheck env ex
-    if t == t'
-    then defineVar env name t'
+    if t == t' || t == TMusic && t' == (TList $ TList TAtom)
+    then defineVar env name t
     else throwError (TypeDMismatch t t')
 
   Name name -> getVar env name

@@ -77,7 +77,6 @@ tokens :-
     "&&"                            { \s -> TokenAnd }
     "||"                            { \s -> TokenOr }
     \!                              { \s -> TokenNot }
-    \|                              { \s -> TokenPipe }
     "::"                            { \s -> TokenCons }
     "h@"                            { \s -> TokenHead }
     "t@"                            { \s -> TokenTail }
@@ -135,7 +134,6 @@ data Token = TokenId String
            | TokenLBrace
            | TokenRBrace
            | TokenUScore
-           | TokenPipe
            | TokenEOL
            deriving (Eq,Show)
 
