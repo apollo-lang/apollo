@@ -23,7 +23,7 @@ typecheck env expr = case expr of
   VList xs -> do
     t <- mapM (typecheck env) xs
     if null t
-      then return $ TList TInt  -- TODO: FIX THIS, TInt is a placeholder
+      then return $ TListEmpty
     else 
       if uniform t
       then return $ TList (head t)
@@ -61,7 +61,7 @@ typecheck env expr = case expr of
   Head l -> do
     tl <- typecheck env l
     case tl of 
-      (TList _) -> return tl
+      (TList t) -> return t
       TPart     -> return tl
       _         -> throwError (TypeUMismatch "h@" tl)
 
@@ -106,6 +106,8 @@ typecheck env expr = case expr of
         if ta == TAtom
         then return $ TPart
         else throwError (TypeMismatch (show op) ta TPart)
+      TListEmpty -> do
+        return $ TList ta
 
       _ -> throwError $ TypeExcept "Expected list"
     
@@ -123,8 +125,8 @@ typecheck env expr = case expr of
 
   Def name t ex -> do
     t' <- typecheck env ex
-    if t == t'
-    then defineVar env name t
+    if match t t'
+    then defineVar env name t'
     else throwError (TypeDMismatch t t')
 
   Name name -> getVar env name
@@ -133,4 +135,14 @@ typecheck env expr = case expr of
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
+
+match :: Type -> Type -> Bool
+match a b | a == b    = True
+          | otherwise = case (a, b) of 
+                          -- (TListEmpty, TList _) -> True
+                          (TList _, TListEmpty) -> True
+                          -- (TListEmpty, TListEmpty) -> True
+                          _                     -> False
+
+
 
