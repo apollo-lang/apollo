@@ -177,6 +177,6 @@ Utilities for type and data construction in Apollo expressions
 #### Overall
 
  - Javier: fixed all build warnings.
- - Ben: set up continuous integration, wrote Makefile and created documentation
+ - Ben: set up continuous integration, wrote Makefile, created documentation
    build-process, and set up Cabal build-process, configuration file, and
    sandboxing.
