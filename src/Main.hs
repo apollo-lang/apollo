@@ -23,9 +23,11 @@ main = getArgs >>= \args ->
        case args of
          ["--ast"]  -> putAst
          ["--repl"] -> runRepl
-         ["-h"]     -> runHelp
-         ["--help"] -> runHelp
-         []         -> interpret
+         ["--help"] -> putHelp
+         ["-h"]     -> putHelp
+         ["-"]      -> getContents >>= interpret "main.mid"
+         [fname]    -> readFile fname >>= interpret "main.mid"
+         [fname, "-o", ofile] -> readFile fname >>= interpret ofile
          _          -> putStrLn "Invalid arguments"
 
 -- Parse and evaluate a program ---------------------------------------------
@@ -33,13 +35,12 @@ main = getArgs >>= \args ->
 loadPrelude :: Env Type -> Env Expr -> IO String
 loadPrelude typeEnv env = runIOThrows $ toAst typeEnv prelude >>= execAst env
 
-interpret :: IO ()
-interpret = do
-  src <- getContents
+interpret :: String -> String -> IO ()
+interpret ofile src = do
   env <- nullEnv
   typeEnv <- nullEnv
   _ <- loadPrelude typeEnv env
-  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
+  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env ofile >> return r-- ofile >> return r
   put results
 
 handleMain :: Env Expr -> String -> IOThrowsError ()
@@ -130,13 +131,15 @@ interpretLine env tEnv inp =
 
 -- Help interface -----------------------------------------------------------
 
-runHelp :: IO()
-runHelp = do
-  putStrLn "Apollo: algorithmic music composition"
+putHelp :: IO()
+putHelp = do
+  putStrLn "Apollo: a language for algorithmic music composition"
   putStrLn ""
-  putStrLn "Usage: apollo [options] < sourcefile.ap"
-  putStrLn "    --repl    Start Apollo interactive mode (Read-Evaluate-Print-Loop)"
-  putStrLn "    --ast     Print a program's abstract syntax tree"
-  putStrLn "    --help    This help message"
+  putStrLn "Usage: apollo [options] <source file> [-o <output>]"
   putStrLn ""
+  putStrLn "Options:"
+  putStrLn "       --repl      Start Read-Evaluate-Print-Loop"
+  putStrLn "       --ast       Print a program's abstract syntax tree"
+  putStrLn "    -h|--help      Print this message"
+  putStrLn "    -o <output>    Output midi to specified filename if source file present"
 

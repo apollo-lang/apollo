@@ -57,7 +57,7 @@ evalAPS() {
   # Stop execution exceeding 10 seconds to prevent infinite loops
   ulimit -t 10
 
-  echo "$1" | ../apollo $2 2> /dev/null
+  echo "$1" | ../apollo - $2 2> /dev/null
 
   if test $? -eq 1; then
     echo "<compilation error>"
@@ -148,7 +148,7 @@ check() {
     if test "$ast" -eq 1; then
       local interp=$(evaluate $test --ast)
     else
-      local interp=$(evaluate $test)
+      local interp=$(evaluate $test -)
     fi
 
     local answer=$(cat $answ)
