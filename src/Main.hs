@@ -6,6 +6,7 @@ import Control.Monad (liftM, unless, when)
 import Control.Monad.Error (throwError, liftIO, runErrorT)
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
+import Data.IORef (readIORef)
 import Parse
 import Check
 import Error
@@ -15,6 +16,7 @@ import Eval
 import Env
 import Util
 import Midi
+import Lib
 
 main :: IO ()
 main = getArgs >>= \args ->
@@ -33,7 +35,7 @@ interpret = do
   src <- getContents
   env <- nullEnv
   typeEnv <- nullEnv
-  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
+  results <- runIOThrows $ toAst typeEnv (prelude ++ src) >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
   put results
 
 handleMain :: Env Expr -> String -> IOThrowsError ()
@@ -91,6 +93,9 @@ runRepl :: IO ()
 runRepl = do
   env  <- nullEnv
   tEnv <- nullEnv
+
+  _ <- runIOThrows $ toAst tEnv prelude >>= execAst env
+
   until_ (== "quit") (readPrompt "apollo> ") (interpretLine env tEnv)
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
@@ -106,14 +111,21 @@ readPrompt prompt = flushStr prompt >> getLine
     flushStr str = putStr str >> hFlush stdout
 
 interpretLine :: Env Expr -> Env Type -> String -> IO ()
-interpretLine env tEnv src =
-  runIOThrows (toAst tEnv src >>= astCheck >>= execAst env) >>= put
+interpretLine env tEnv inp =
+  if inp == ":browse" -- TODO: strip whitespace
+  then getBindings >>= putStr . unlines
+  else runIOThrows (toAst tEnv inp >>= astCheck >>= execAst env) >>= put
     where
       astCheck :: [Expr] -> IOThrowsError [Expr]
       astCheck ast = liftThrows $
         if length ast == 1
         then return ast
         else throwError $ Default "REPL received >1 expression"
+      getBindings = do
+        e <- readIORef tEnv
+        mapM listing e
+      listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+      -- IO [(s, t)]
 
 -- Help interface -----------------------------------------------------------
 
