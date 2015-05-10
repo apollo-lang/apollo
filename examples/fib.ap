@@ -1,0 +1,23 @@
+#tempo 160
+
+fibonacci: (n: Int) -> Int = 
+    case (n <= 1) 1 
+    otherwise     fibonacci(n - 1) + fibonacci(n - 2)
+
+fibSeq: (n: Int) -> [Int] = mapII(fibonacci, sequence(0, n))
+
+mySeq: [Pitch] = mapII(\x: Int -> Int: x + 40, fibSeq(20))
+
+--mySeq: (n: Int) -> [Pitch] = mapII(\x: Int -> Int: x + 40, fibSeq(n))
+
+notesA: [Pitch] = replicateP(mySeq, 20)
+
+notesB: [Pitch] = reverseP(notesA)
+
+rhythm: [Duration] = uniform(\8, lenP(notesA))
+
+partA: [Atom] = zip(notesA, rhythm)
+
+partB: [Atom] = zip(notesB, rhythm)
+
+main: Music = [partA, partB]
