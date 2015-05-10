@@ -118,6 +118,7 @@ Expression  : Primitive                     { $1 }
             | BinOp                         { $1 }
             | '(' Expression ')'            { $2 }
             | ID                            { Name $1 }
+            | Macro                         { $1 }
 
 Primitive   : NUM                           { VInt $1 }
             | BOOL                          { VBool $1 }
@@ -165,7 +166,7 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
             | Expression '::' Expression    { ArrOp Cons $1 $3 }
 
-Macro       : NUM '?' NUM                   { random $1 $3 }
+Macro       : NUM '?' NUM                   { VInt $ random $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Expression
