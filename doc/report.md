@@ -262,8 +262,8 @@ Use singular when naming modules e.g. use `Data.Map` and
 `Data.ByteString.Internal` instead of `Data.Maps` and
 `Data.ByteString.Internals`.
 
-Misc
-----
+#### Misc
+
 
 ##### Point-free style #####
 
