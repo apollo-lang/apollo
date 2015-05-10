@@ -1,0 +1,7 @@
+-- | bound vars
+map(\x: Int -> Int: x * x, [1,2,3,4,5])
+
+-- | free & bound vars
+y: Int = 3
+map(\x: Int -> Int: x * y, [1,2,3,4,5])
+

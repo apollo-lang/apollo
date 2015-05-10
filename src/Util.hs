@@ -27,7 +27,7 @@ param i p t = Param i (TFunc (snd p') t)
     p' = unpackParams p
 
 lambda :: [Param] -> Type -> Expr -> Expr
-lambda p t e = VTLam (snd p') (fst p') t e
+lambda p t e = VTLam (snd p') t (fst p') e
   where
     p' = unpackParams p
 
@@ -51,11 +51,11 @@ toDuration _             = error "Expected VInt or VPitch"
 makeAtom :: Expr -> Atom
 makeAtom (VAtom Nil (VDuration d))          = AtomRest $ Rest (Duration d)
 makeAtom (VAtom p@(VPitch _) d@(VDuration _)) = AtomNote $ Note (toPitch p) (toDuration d)
-makeAtom (VAtom p@(VInt _) d@(VDuration _))   = AtomNote $ Note (toPitch p) (toDuration d)
-makeAtom (VAtom p@(VPitch _) d@(VInt _)) = AtomNote $ Note (toPitch p) (toDuration d)
-makeAtom (VAtom p@(VInt _) d@(VInt _))   = AtomNote $ Note (toPitch p) (toDuration d)
+-- makeAtom (VAtom p@(VInt _) d@(VDuration _))   = AtomNote $ Note (toPitch p) (toDuration d)
+-- makeAtom (VAtom p@(VPitch _) d@(VInt _)) = AtomNote $ Note (toPitch p) (toDuration d)
+-- makeAtom (VAtom p@(VInt _) d@(VInt _))   = AtomNote $ Note (toPitch p) (toDuration d)
 makeAtom (VAtom pitches d@(VDuration _))      = AtomChord $ Chord (map (\p -> (toPitch p)) $ unpackList pitches) (toDuration d)
-makeAtom (VAtom pitches d@(VInt _))      = AtomChord $ Chord (map (\p -> (toPitch p)) $ unpackList pitches) (toDuration d)
+-- makeAtom (VAtom pitches d@(VInt _))      = AtomChord $ Chord (map (\p -> (toPitch p)) $ unpackList pitches) (toDuration d)
 makeAtom _                                  = error "Expected note, chord or rest"
 
 makeMusic :: Expr -> Music
