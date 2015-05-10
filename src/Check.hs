@@ -111,8 +111,8 @@ typecheck env expr = case expr of
         if (t == t') && (op == Eq || op == NEq)
         then return TBool
         else throwError (TypeMismatch (show op) ta tb)
-      (TList t, TListEmpty) -> return TBool
-      (TListEmpty, TList t) -> return TBool
+      (TList _, TListEmpty) -> return TBool
+      (TListEmpty, TList _) -> return TBool
       (TListEmpty, TListEmpty) -> return TListEmpty
       _              -> throwError (TypeMismatch (show op) ta tb)
 
