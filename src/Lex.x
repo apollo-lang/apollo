@@ -12,22 +12,16 @@ import Expr
 
 $digit          = 0-9
 $alpha          = [a-zA-Z]
-$eol            = [\n]
-$commentable    = [. \n] # [\/ \*]
 
 tokens :-
 
-    --^$eol\$?                      ;
-    --$eol                          { \s -> TokenEOL }
     $white+                         ;
 
     -- Single-line comments
-    "--".*                          ;
+    "//".*                          ;
 
     -- Multi-line comments
-    "{-"
-    ("{"|"-"*$commentable)*
-    "-"+ "}"                        ;
+    \{\- ([^\-] | [\r\n] | (\-+ ([^ \- \}] | [\r\n])))* \-+ \} ;
 
     -- Duration literal
     \\[0-9]+\.?                     { \s -> TokenDur s }
@@ -78,6 +72,7 @@ tokens :-
     "||"                            { \s -> TokenOr }
     \!                              { \s -> TokenNot }
     "::"                            { \s -> TokenCons }
+    \\                              { \s -> TokenLambda }
 
     -- Separators
     \=                              { \s -> TokenDef }
@@ -121,6 +116,7 @@ data Token = TokenId String
            | TokenOr
            | TokenNot
            | TokenCons
+           | TokenLambda
            | TokenDef
            | TokenArrow
            | TokenColon
@@ -133,7 +129,6 @@ data Token = TokenId String
            | TokenRBrace
            | TokenPipe
            | TokenUScore
-           | TokenEOL
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens
