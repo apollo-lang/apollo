@@ -167,12 +167,9 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply is e env args'
 
-  Nil   -> return Nil
+  Nil -> return Nil
 
-  Empty -> error "Error: eval called on Empty"
-
-  _     -> error "Error: eval called on invalid expression"
-
+  other -> error $ "bug: `eval` called on " ++ show other
 
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
 evalP env expr = case expr of
@@ -222,7 +219,7 @@ matchI op (VDuration a) (VInt b) =
 matchI op (VInt a) (VDuration b) =
   return . VDuration $ applyI op a b
 
-matchI _ _ _ = error "TODO this should be taken care of in typechecking"
+matchI _ _ _ = error "bug: matchI called with invalid operand types"
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
