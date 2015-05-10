@@ -106,6 +106,8 @@ typecheck env expr = case expr of
     tb <- typecheck env b
     case (ta, tb) of
       (TInt, TInt)   -> return TBool
+      (TPitch, TPitch)   -> return TBool
+      (TDuration, TDuration)   -> return TBool
       (TBool, TBool) -> return TBool
       (TList t, TList t') ->
         if (t == t') && (op == Eq || op == NEq)
