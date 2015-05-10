@@ -29,10 +29,19 @@ eval env expr = case expr of
 
   Not e -> do
     e' <- eval env e
+<<<<<<< HEAD
     case e' of 
       VBool b -> return . VBool $ not b
       VList l -> return . VBool $ null l
       _       -> error "Error: expected Bool, Part or List" 
+=======
+    case e' of
+      VBool b -> do
+        return . VBool $ not b
+      VList l -> do
+        return . VBool $ null l
+      _       -> error "Error: expected Bool, Part or List"
+>>>>>>> master
 
   Neg e -> do
     VInt i <- eval env e
@@ -40,6 +49,7 @@ eval env expr = case expr of
 
   Head l -> do
     l' <- eval env l
+<<<<<<< HEAD
     case l' of 
       VList ll -> return (head ll)
       _       -> error "Error: expected Part or List" 
@@ -49,6 +59,19 @@ eval env expr = case expr of
     case l' of 
       VList (x:xs) -> return (VList xs)
       _       -> error "Error: expected Part or List" 
+=======
+    case l' of
+      VList ll -> do
+        return (head ll)
+      _       -> error "Error: expected Part or List"
+
+  Tail l -> do
+    l' <- eval env l
+    case l' of
+      VList (x:xs) -> do
+        return (VList xs)
+      _       -> error "Error: expected Part or List"
+>>>>>>> master
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -77,9 +100,11 @@ eval env expr = case expr of
   ArrOp op a l -> do
     a' <- eval env a
     l' <- eval env l
-    case l' of 
-      VList ll -> return . VList $ a' : ll
-      _        -> error "Error: expected Part or List" 
+    case l' of
+      VList ll -> do
+        return . VList $ a' : ll
+      _        -> error "Error: expected Part or List"
+
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
@@ -185,5 +210,5 @@ apply :: [Id] -> Expr -> Env Expr -> [Expr] -> IOThrowsError Expr
 apply params body closure args =
   createEnv args >>= flip eval body
     where
-      createEnv = liftIO . bindVars closure . zip params
+      createEnv = bindVars closure . zip params
 
