@@ -1,7 +1,7 @@
 Translator architecture
 -----------------------
 
-**Souren Papazian**
+**Ben Kogan**
 
 ![](./img/block.png)
 
