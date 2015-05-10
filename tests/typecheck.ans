@@ -1,7 +1,61 @@
-Type error: definition of Integer, but assigned to Pitch
-Type error: definition of Boolean, but assigned to Pitch
+
+Type error: definition of Int, but assigned to Bool
+Type error: definition of Int, but assigned to Pitch
+Type error: definition of Int, but assigned to Duration
+Type error: definition of Int, but assigned to Atom
+Type error: definition of Int, but assigned to [Int]
+Type error: definition of Int, but assigned to [[Atom]]
+
+Type error: definition of Bool, but assigned to Int
+
+Type error: definition of Bool, but assigned to Pitch
+Type error: definition of Bool, but assigned to Duration
+Type error: definition of Bool, but assigned to Atom
+Type error: definition of Bool, but assigned to [Int]
+Type error: definition of Bool, but assigned to [[Atom]]
+
+Type error: definition of Pitch, but assigned to Int
+Type error: definition of Pitch, but assigned to Bool
+
 Type error: definition of Pitch, but assigned to Duration
+Type error: definition of Pitch, but assigned to Atom
+Type error: definition of Pitch, but assigned to [Int]
+Type error: definition of Pitch, but assigned to [[Atom]]
+
+Type error: definition of Duration, but assigned to Int
+Type error: definition of Duration, but assigned to Bool
 Type error: definition of Duration, but assigned to Pitch
+
+Type error: definition of Duration, but assigned to Atom
+Type error: definition of Duration, but assigned to [Int]
+Type error: definition of Duration, but assigned to [[Atom]]
+
+Type error: definition of Atom, but assigned to Int
+Type error: definition of Atom, but assigned to Bool
 Type error: definition of Atom, but assigned to Pitch
-Type error: definition of Part, but assigned to Pitch
+Type error: definition of Atom, but assigned to Duration
+
+Type error: definition of Atom, but assigned to [Int]
+Type error: definition of Atom, but assigned to [[Atom]]
+
+Type error: definition of Music, but assigned to Int
+Type error: definition of Music, but assigned to Bool
 Type error: definition of Music, but assigned to Pitch
+Type error: definition of Music, but assigned to Duration
+Type error: definition of Music, but assigned to Atom
+Type error: definition of Music, but assigned to [Int]
+
+
+
+Type error: definition of Int, but assigned to Bool
+Type error: definition of Int, but assigned to Pitch
+Type error: definition of Int, but assigned to Duration
+Type error: definition of Int, but assigned to Atom
+Type error: definition of Int, but assigned to [Int]
+Type error: definition of Int, but assigned to [[Atom]]
+
+Type error: definition of [Int], but assigned to Int
+Type error: definition of [Int], but assigned to Bool
+Type error: definition of [Int], but assigned to Pitch
+Type error: definition of [Int], but assigned to Duration
+Type error: definition of [Int], but assigned to Atom

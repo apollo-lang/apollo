@@ -1,3 +1,3 @@
 Getting an unbound variable: a
-Type error: definition of Integer, but assigned to Pitch
+Type error: definition of Int, but assigned to Pitch
 Multiple declaration: redefining variable a
