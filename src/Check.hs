@@ -246,4 +246,4 @@ pitchOrInt (x:xs) = (x == TPitch || x == TInt) && (pitchOrInt xs)
 
 durOrInt :: [Type] -> Bool
 durOrInt [] = True
-durOrInt (x:xs) = (x == TDuration || x == TInt) && (pitchOrInt xs)
+durOrInt (x:xs) = (x == TDuration || x == TInt) && (durOrInt xs)

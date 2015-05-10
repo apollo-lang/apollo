@@ -91,7 +91,17 @@ eval env expr = case expr of
       _        -> error "Error: expected Part or List"
 
 
-  VList xs -> liftM VList (mapM (eval env) xs)
+  VList xs -> do
+    xs' <- mapM (eval env) xs
+    if vpichtOrvint xs' 0
+    then liftM VList (mapM ((eval env) . toVPitch) xs')
+    else 
+      if vdurOrvint xs' 0
+      then liftM VList (mapM ((eval env) . toVDuration) xs')
+      else liftM VList (mapM (eval env) xs')
+
+
+-- liftM VList (mapM (eval env) xs)
 
   Block body ret -> do
     env' <- clone' env
@@ -243,5 +253,19 @@ toVDuration _          = error "Expected VInt or VPitch"
 toNneg :: Int -> Int
 toNneg n | n >= 0    = n
          | otherwise = 0
+
+vpichtOrvint :: [Expr] -> Int -> Bool
+vpichtOrvint [] 0 = False
+vpichtOrvint [] _ = True
+vpichtOrvint ((VPitch _):xs) n = vpichtOrvint xs (n+1)
+vpichtOrvint ((VInt _):xs)   n = vpichtOrvint xs n
+vpichtOrvint _ _      = False
+
+vdurOrvint :: [Expr] -> Int -> Bool
+vdurOrvint [] 0 = False
+vdurOrvint [] _ = True
+vdurOrvint ((VDuration _):xs) n = vdurOrvint xs (n+1)
+vdurOrvint ((VInt _):xs)      n = vdurOrvint xs n 
+vdurOrvint _ _ = False
 
 
