@@ -55,6 +55,10 @@ prelude = unlines
 
   , "  reverseP: (xs: [Pitch]) -> [Pitch] = case (!xs) [] otherwise lastP(xs) :: reverseP(initP(xs))"
 
-  , "  intercalate: (a: [Int], b: [Int]) -> [Int] = case (!a || !b) [] otherwise concatI([h@a, h@b], intercalate(t@a, t@b))"
+  , "  intercalateI: (a: [Int], b: [Int]) -> [Int] = case (!a || !b) [] otherwise concatI([h@a, h@b], intercalateI(t@a, t@b))"
+
+  , "  intercalateP: (a: [Pitch], b: [Pitch]) -> [Pitch] = case (!a || !b) [] otherwise concatP([h@a, h@b], intercalateP(t@a, t@b))"
+
+  , "  concatMapI: (xs: [Int], f: (Int) -> Int, c: Int) -> [Int] = case (c <= 0) xs otherwise concatI(xs, concatMapI(mapII(f, xs), f, c-1))"
 
   ]
