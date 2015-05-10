@@ -30,7 +30,7 @@ Let's look at a very basic program in Apollo, namely one that creates a MIDI fil
 main: Music = [[(C5, \4 )]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type Music that contains what will eventually be written to our MIDI file. The Music is in fact just a list of lists of Atoms. An Atom, in turn, is simply a note, a chord or a rest (here a single note `( C5, \4 )`), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
+Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type `Music` that contains what will eventually be written to our MIDI file. `Music` is in fact just a list of lists of `Atom`s. An `Atom`, in turn, is simply a note, a chord or a rest (here a single note `( C5, \4 )`), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
 
 You can put this source code in a file, say hello.ap. Assuming that you are in a UNIX environment, you would enter the following command:
 
@@ -176,7 +176,7 @@ sol: Pitch = G4              -- c in the fourth octave
 mib: Pitch = Eb4             -- e flat in the fourth octave
 
 short: Duration = \4          -- a quarter note
-long: Duration = \1            -- a whole note
+long: Duration = \1           -- a whole note
 
 n1: Atom = (sol, short)
 n2: Atom = (mib, long)
