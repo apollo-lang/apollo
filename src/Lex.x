@@ -13,22 +13,16 @@ import Type
 
 $digit          = 0-9
 $alpha          = [a-zA-Z]
-$eol            = [\n]
-$commentable    = [. \n] # [\/ \*]
 
 tokens :-
 
-    --^$eol\$?                      ;
-    --$eol                          { \s -> TokenEOL }
     $white+                         ;
 
     -- Single-line comments
     "--".*                          ;
 
     -- Multi-line comments
-    "{-"
-    ("{"|"-"*$commentable)*
-    "-"+ "}"                        ;
+    \{\- ([^\-] | [\r\n] | (\-+ ([^ \- \}] | [\r\n])))* \-+ \} ;
 
     -- Duration literal
     \\[0-9]+\.?                     { \s -> TokenDur s }
@@ -79,6 +73,7 @@ tokens :-
     "||"                            { \s -> TokenOr }
     \!                              { \s -> TokenNot }
     "::"                            { \s -> TokenCons }
+    \\                              { \s -> TokenLambda }
     "h@"                            { \s -> TokenHead }
     "t@"                            { \s -> TokenTail }
 
@@ -122,6 +117,7 @@ data Token = TokenId String
            | TokenOr
            | TokenNot
            | TokenCons
+           | TokenLambda
            | TokenHead
            | TokenTail
            | TokenDef
@@ -135,7 +131,6 @@ data Token = TokenId String
            | TokenLBrace
            | TokenRBrace
            | TokenUScore
-           | TokenEOL
            deriving (Eq,Show)
 
 scanTokens = alexScanTokens

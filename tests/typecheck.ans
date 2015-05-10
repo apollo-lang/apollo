@@ -14,7 +14,7 @@ Type error: definition of Bool, but assigned to Atom
 Type error: definition of Bool, but assigned to [Int]
 Type error: definition of Bool, but assigned to [[Atom]]
 
-Type error: definition of Pitch, but assigned to Int
+
 Type error: definition of Pitch, but assigned to Bool
 
 Type error: definition of Pitch, but assigned to Duration

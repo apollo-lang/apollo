@@ -22,7 +22,7 @@ a: Pitch = (A4, \4)
 a: Pitch = [1]
 a: Pitch = [[(A4,\4)]]
 
-a: Duration = 1
+
 a: Duration = True
 a: Duration = A4
 a: Duration = \4
