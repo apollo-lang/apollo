@@ -37,7 +37,6 @@ executable apollo
                      , transformers   >=0.3  && <0.4
                      , containers     >=0.5  && <0.6
                      , HCodecs        >=0.5  && <0.6
-                     , raw-strings-qq >=1.0  && <1.1
 
   other-extensions:    CPP
   hs-source-dirs:      src

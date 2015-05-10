@@ -30,12 +30,16 @@ main = getArgs >>= \args ->
 
 -- Parse and evaluate a program ---------------------------------------------
 
+loadPrelude :: Env Type -> Env Expr -> IO String
+loadPrelude typeEnv env = runIOThrows $ toAst typeEnv prelude >>= execAst env
+
 interpret :: IO ()
 interpret = do
   src <- getContents
   env <- nullEnv
   typeEnv <- nullEnv
-  results <- runIOThrows $ toAst typeEnv (prelude ++ src) >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
+  _ <- loadPrelude typeEnv env
+  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
   put results
 
 handleMain :: Env Expr -> String -> IOThrowsError ()
@@ -93,9 +97,7 @@ runRepl :: IO ()
 runRepl = do
   env  <- nullEnv
   tEnv <- nullEnv
-
-  _ <- runIOThrows $ toAst tEnv prelude >>= execAst env
-
+  _ <- loadPrelude tEnv env
   until_ (== "quit") (readPrompt "apollo> ") (interpretLine env tEnv)
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
@@ -125,7 +127,6 @@ interpretLine env tEnv inp =
         e <- readIORef tEnv
         mapM listing e
       listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
-      -- IO [(s, t)]
 
 -- Help interface -----------------------------------------------------------
 
