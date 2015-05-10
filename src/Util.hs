@@ -17,6 +17,7 @@ define i t@(TFunc params _) body = Def i t (FnBody paramNames body)
   where paramNames = map (\(Param n _) -> n) params
 define i t e = case (t, e) of 
     (TPitch, VInt n) -> Def i t (VPitch (n `mod` 128))
+    (TDuration, VInt n) -> Def i t (VDuration n)
     _                -> Def i t e 
 
 -- Def i t e
