@@ -1,11 +1,13 @@
 % Apollo Language Tutorial
 % **Team 8**
   **Tester & Validator:** Roberto Jose De Amorim (rja2139)
-  **Language & Tools Guru:** Benjamin Matthew Kogan (bmk2130)
-  **System Integrator:** Javier Llaca (jl3960)
+  **System Architect:** Benjamin Matthew Kogan (bmk2130)
+  **Language & Tools Guru:** Javier Llaca (jl3960)
   **Project Manager:** Reza Nayebi (rn2324)
-  **System Architect:** Souren Sarkis Papazian (ssp2155)
+  **System Integrator:** Souren Sarkis Papazian (ssp2155)
 % March 25, 2015
+
+\pagebreak
 
 ![](./img/lrm-logo.png)
 
@@ -303,7 +305,7 @@ This will begin the Apollo interpreter, thereby converting Apollo source code in
 To input source code into the Apollo compiler via stdin, use `-` as the only argument:
 
 ~~~
-$ echo "main: Music = [[ (C5, \4 ) ]]" | apollo
+$ echo "main: Music = [[ (C5, \4 ) ]]" | apollo -
 ~~~
 
 To specify a different name or location for the output MIDI file, use the `-o` flag:
