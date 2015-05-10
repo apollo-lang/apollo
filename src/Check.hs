@@ -111,8 +111,8 @@ typecheck env expr = case expr of
         if (t == t') && (op == Eq || op == NEq)
         then return TBool
         else throwError (TypeMismatch (show op) ta tb)
-      (TList t, TListEmpty) -> return TBool
-      (TListEmpty, TList t) -> return TBool
+      (TList _, TListEmpty) -> return TBool
+      (TListEmpty, TList _) -> return TBool
       (TListEmpty, TListEmpty) -> return TListEmpty
       _              -> throwError (TypeMismatch (show op) ta tb)
 
@@ -157,11 +157,11 @@ typecheck env expr = case expr of
       _ -> throwError $ TypeExcept ("Expected list; got " ++ show tl)
 
   Block body ret -> do
-    env' <- clone env
+    env' <- clone' env
     mapM_ (typecheck env') body
     typecheck env' ret
       where
-        clone e = liftIO (readIORef e >>= newIORef . removeNames)
+        clone' e = liftIO (readIORef e >>= newIORef . removeNames)
         removeNames = filter (\(n,_) -> n `notElem` names)
         names = map (\(Def name _ _) -> name) body
 
@@ -177,14 +177,15 @@ typecheck env expr = case expr of
       then return tr
       else throwError . Default $ "expected args: " ++ show tps ++ "; actual: " ++ show ta ++ " for " ++ name
    where
-     check e (param, arg) = if isTFunc param && isName arg
+     check _ (param, arg) = if isTFunc param && isName arg
                             then getVar env (getName arg)
                             else typecheck env arg
-     isTFunc TFunc{} = True
-     isTFunc _       = False
-     isName Name{} = True
-     isName _      = False
-     getName (Name a) = a
+     isTFunc TFunc{}    = True
+     isTFunc _          = False
+     isName Name{}      = True
+     isName _           = False
+     getName (Name a)   = a
+     getName _          = ""
 
   -- TODO: check param count on call; this is currently done, but should we add another `if` to make it more explicit?
 

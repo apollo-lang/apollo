@@ -48,7 +48,7 @@ eval env expr = case expr of
   Tail l -> do
     l' <- eval env l
     case l' of 
-      VList (x:xs) -> return (VList xs)
+      VList (_:xs) -> return (VList xs)
       _       -> error "Error: expected Part or List" 
 
   BoolOp op a b -> do
@@ -74,8 +74,9 @@ eval env expr = case expr of
         isZero (VInt x)      = x == 0
         isZero (VPitch x)    = x == 0
         isZero (VDuration x) = x == 0
+        isZero _             = False
 
-  ArrOp op a l -> do
+  ArrOp _ a l -> do
     a' <- eval env a
     l' <- eval env l
     case l' of
@@ -87,11 +88,11 @@ eval env expr = case expr of
   VList xs -> liftM VList (mapM (eval env) xs)
 
   Block body ret -> do
-    env' <- clone env
+    env' <- clone' env
     mapM_ (eval env') body
     eval env' ret
       where
-        clone e = liftIO (readIORef e >>= newIORef . removeNames)
+        clone' e = liftIO (readIORef e >>= newIORef . removeNames)
         removeNames = filter (\(n,_) -> n `notElem` names)
         names = map (\(Def name _ _) -> name) body
 
@@ -103,11 +104,10 @@ eval env expr = case expr of
   -- For recursion, binding names must be initialized
   -- before they are stored.
 
-  Def name _ ex@(VLam p b) -> do
-    val <- eval env ex
-    defineVar env name Empty
+  Def name _ (VLam p b) -> do
+    _ <- defineVar env name Empty
     env' <- clone env
-    setVar env' name (Function p b env')
+    _ <- setVar env' name (Function p b env')
     return Empty
 
   Def name _ ex -> eval env ex >>= defineVar env name >> return Empty
@@ -119,13 +119,15 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply p b closure args'
 
-  FnCall (VTLam ts is t e) args -> do
+  FnCall (VTLam _ is _ e) args -> do
     args' <- mapM (eval env) args
     apply is e env args'
 
   Empty -> error "Error: eval called on Empty"
 
   Nil   -> return Nil
+
+  _     -> error "Error: eval called on invalid expression"
 
 
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
