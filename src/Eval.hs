@@ -15,10 +15,16 @@ eval env expr = case expr of
 
   VInt i      -> return $ VInt i
   VBool b     -> return $ VBool b
-  VPitch p    -> return $ VPitch p
+  VPitch p    -> return $ VPitch (p `mod` 128)
   VDuration d -> return $ VDuration d
 
-  VAtom a b -> liftM2 VAtom (eval env a) (eval env b)
+  VAtom a b -> do
+    a' <- eval env a
+    b' <- eval env b
+    case (a', b') of 
+      (Nil, d)             -> return $ VAtom Nil (toVDuration d)
+      ((VList pitches), d) -> return $ VAtom (VList (map (\p -> (toVPitch p)) pitches)) (toVDuration d)
+      _                    -> return $ VAtom (toVPitch a') (toVDuration b')
 
   VMusic m -> liftM VMusic (mapM (evalM env) m)
 
@@ -107,6 +113,12 @@ eval env expr = case expr of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
         _ -> return Empty
+
+  Def name TDuration ex -> do
+    val <- eval env ex
+    case val of
+        (VInt i) -> (defineVar env name $ VDuration (toNneg i)) >> return Empty
+        (VDuration p) -> (defineVar env name $ VDuration (toNneg p)) >> return Empty
 
   -- For recursion, binding names must be initialized
   -- before they are stored. (below)
@@ -203,4 +215,19 @@ apply params body closure args =
   createEnv args >>= flip eval body
     where
       createEnv = bindVars closure . zip params
+
+toVPitch :: Expr -> Expr
+toVPitch (VPitch p) = VPitch $ p `mod` 128 
+toVPitch (VInt i)   = VPitch $ i `mod` 128 
+toVPitch _          = error "Expected VInt or VPitch"
+
+toVDuration :: Expr -> Expr
+toVDuration (VDuration d) = VDuration d
+toVDuration (VInt i)   = VDuration i 
+toVDuration _          = error "Expected VInt or VPitch"
+
+toNneg :: Int -> Int
+toNneg n | n >= 0    = n
+         | otherwise = 0
+
 
