@@ -25,18 +25,18 @@ Hello World (Compile and Run your first program)
 Let's look at a very basic program in Apollo, namely one that creates a MIDI file containing a single note.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = Music([Part([Note(`c5, \4 )])])
+main: Music = [[(C5, \4 )]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type Music that contains what will eventually be written to our MIDI file. The Music type has a constructor that takes a list of Parts. A Part, in turn, is simply a list of notes, here a single note (`` `c5, \4 ``), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
+Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type Music that contains what will eventually be written to our MIDI file. The Music is in fact just a list of lists of Atoms. An Atom, in turn, is simply a note, a chord or a rest (here a single note (`` C5, \4 ``)), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
 
-You can put this source code in a file, say hello.ao. Assuming that you are in a UNIX environment, you would enter the following command:
+You can put this source code in a file, say hello.ap. Assuming that you are in a UNIX environment, you would enter the following command:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ apollo ./hello.ao
+$ apollo hello.ap
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-to get the file `out.mid`, the MIDI file containing your music. Now you can play this MIDI file, use it to control your MIDI-compatible instruments or anything else that crosses your mind!
+to get the file `main.mid`, the MIDI file containing your music. Now you can play this MIDI file, use it to control your MIDI-compatible instruments or anything else that crosses your mind!
 
 Data Types
 ----------
@@ -74,13 +74,13 @@ A `Pitch` describes the frequency of a note. It can constructed using a pitch li
 Initializing a pitch with a pitch literal:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sol: Pitch = `g4   -- c in the fourth octave
-mib: Pitch = `eb4  -- e flat in the fourth octave
+sol: Pitch = G4   -- c in the fourth octave
+mib: Pitch = Eb4  -- e flat in the fourth octave
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A pitch literal is: a backtick, followed by a single character indicating the note, followed by an optional `#` or `b` character indicating the accidental, followed by a number indicating the octave.
 
-Alternatively, we can define the note using an integer that indicates its offset from the first (0th) note i.e. *c* in the zero octave (`` `c0 ``):
+Alternatively, we can define the note using an integer that indicates its offset from the first (0th) note i.e. *c* in the zero octave (`` C0 ``):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sol: Pitch = 55
@@ -101,7 +101,7 @@ Here is a table of integer to pitch mapping:
 | 7  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
 | 8  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
 | 9  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-| 10 | 120 | 121   | 122 | 123   | 124 | 125 |       |     |       |     |       |     |
+| 10 | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
 But a pitch can't be heard without a duration, so we need to define what a duration is. We will then combine the pitch and duration to construct a note.
 
@@ -114,92 +114,69 @@ long:  Duration = 64  -- a whole note   (multiple notation)
 
 Now we're ready to construct our first note!
 
-An Atom is something that can be played. So let's put our note into an Atom. To do this we make a tuple consisting of a `Pitch` and a `Duration`:
+An Atom is something that can be played. So let's put our note into an Atom. To do this we make a tuple consisting of a `Pitch` (or `Pitch`es) and a `Duration`:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-n1: Atom = Note(sol, short)
-n2: Atom = Note(mi, long)
+n1: Atom = (sol, short)
+n2: Atom = (mi, long)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We could've alternatively done:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-n1: Atom = Note(`g4, \4)
-n2: Atom = Note(`eb4, 64)
+n1: Atom = (G4, \4)
+n2: Atom = (Eb4, 64)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Or if we wanted to construct our pitch using an integer:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-n1: Atom = Note(55, \4)
-n2: Atom = Note(51, 64)
+n1: Atom = (55, \4)
+n2: Atom = (51, 64)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's make a MIDI out of our note!
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = Music([Part(n1)])
+main: Music = [[n1]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We will explain what `Music` and `Part` are soon. For now, let us talk about `Chord`s.
+We will explain what `Music` and `Part` are soon. For now, let us talk about `Atom`s.
 
-If we want to play both our notes simultaneously, we can construct a `Chord`. A `Chord` consists of a list of pitches and a single duration.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-c1: Atom = Chord([n1, n2], long)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Since a `Chord` is an `Atom`, we can output our chord in the same way we output our `Note`:
+If we want to play both our notes simultaneously, we can construct a chord `Atom`. A chord `Atom` consists of a list of pitches and a single duration.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = Music([Part(c1)])
+c1: Atom = ([n1, n2], long)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are a couple of more helpful data structures, as follows.
 
-A `Rhythm` is a list of `Durations`.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+main: Music = [[c1]]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's make a `Rhythm` with three `short`s and one `long` using the `Duration`s we defined above:
+You've probably realized by now that an `Atom` is either a note, a chord, or a rest.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sssl: Rhythm = Rhythm([short, short, short, long])
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We could have also done this by putting the duration literals directly into the list of rhythm:
+Now that we know how to make `Atoms`, we can put several `Atoms` in sequence to make a melody as a `[Atom]`.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sssl: Rhythm = Rhythm([\4,\4,\4,1])
+p: [Atom] = [n1, n1, n1, n2]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A `Rest` is simply a `Duration`, denoting the length of a pause:
+And finally, we can use a list of `[Atom]`s to make `Music`!
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-r: Atom = Rest(short)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You've probably realized by now that an `Atom` is either a `Note`, a `Chord`, or a `Rest`.
-
-Now that we know how to make `Atoms`, we can put several `Atoms` in sequence to make a melody. We call this list of `Atom`s a `Part`.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-p: Part = Part([n1, n1, n1, n2])
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-And finally, we can use a list of `Part`s to make `Music`!
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sol: Pitch = `g4              -- c in the fourth octave
-mib: Pitch = `eb4             -- e flat in the fourth octave
+sol: Pitch = G4              -- c in the fourth octave
+mib: Pitch = Eb4             -- e flat in the fourth octave
 
 short: Duration = \4          -- a quarter note
 long: Duration = 1            -- a whole note
 
-n1: Atom = Note(sol, short)
-n2: Atom = Note(mi, long)
+n1: Atom = (sol, short)
+n2: Atom = (mi, long)
 
-p1: Part = Part([n1,n1,n1,n2])
+p1: [Atom] = [n1,n1,n1,n2]
 
-main: Music = Music([p1])     -- Beethoven's Symphony No. 5
+main: Music = [p1]     -- Beethoven's Symphony No. 5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the example above we only have one part, but if we had two parts in the list, they would be played simultaneously.
@@ -207,22 +184,22 @@ In the example above we only have one part, but if we had two parts in the list,
 For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-do: Pitch = Pitch(`c4)
-re: Pitch = Pitch(`d4)
-mi: Pitch = Pitch(`e4)
-fa: Pitch = Pitch(`f4)
-sol: Pitch = Pitch(`g4)
+do: Pitch = C4
+re: Pitch = D4
+mi: Pitch = E4
+fa: Pitch = F4
+sol: Pitch = G4
 
-n1: Atom = Note(do, \4)
-n2: Atom = Note(re, \4)
-n3: Atom = Note(mi, \4)
+n1: Atom = (do, \4)
+n2: Atom = (re, \4)
+n3: Atom = (mi, \4)
 
-c1: Atom = Chord([do, mi, sol], 64)
+c1: Atom = ([do, mi, sol], 64)
 
-p1: Part = Part([n1, n2, n3])
-p2: Part = Part([c1])
+p1: [Atom] = [n1, n2, n3]
+p2: [Atom] = [c1]
 
-main: Music = Music([p1, p2])
+main: Music = [p1, p2]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Conditionals
@@ -273,7 +250,7 @@ Note that declarations cannot exist on their own; they require a definition.
 Functions in Apollo can be passed as parameters to other functions. Let's write a function that applies a function twice to an integer.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-twice: (f: (n: Int) -> Int, x: Int) = f(f(x))
+twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The twice function takes a function f and applies it twice to the argument `x`. Now we can use our two functions to declare a new function, `pow4`, which takes an integer `x` and returns `x^4`.
@@ -300,10 +277,10 @@ For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 mult2: (x: Int) -> Int = x * 2
-r: Rhythm = Rhythm(map(mult2, [\4,\8,\8]))
+r: [Duration] = mapII(mult2, [16,32,32])
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this example, the `mult2` function takes an integer and multiplies it by two. The map function then takes the `mult2` function and a list of durations and multiplies every duration by 2, effectively slowing down the rhythm by a half.
+In this example, the `mult2` function takes an integer and multiplies it by two. The mapII function then takes the `mult2` function and a list of integers and multiplies every integer by 2, effectively slowing down the rhythm by a half.
 
 Compiling and Running
 ---------------------
@@ -311,7 +288,7 @@ Compiling and Running
 To compile a valid Apollo source code file (for example, main.ao), simply run the Apollo compiler with the path to the source file as its first command line argument:
 
 ~~~
-$ apollo ./main.ao
+$ apollo main.ap
 ~~~
 
 *Note that the above assumed that the `apollo` executable is in the user’s `$PATH` environment variable*
@@ -321,13 +298,13 @@ This will begin the Apollo interpreter, thereby converting Apollo source code in
 To input source code into the Apollo compiler via stdin, use `-` as the only argument:
 
 ~~~
-$ echo “main: Music = Music(Note(`c5, \4 ))” | apollo -
+$ echo "main: Music = [[ (C5, \4 ) ]]" | apollo
 ~~~
 
-To specify a different name or location for the output MIDI file, use the `-o` or `--output=PATH` flag:
+To specify a different name or location for the output MIDI file, use the `-o` flag:
 
 ~~~
-$ apollo ./main.ao -o symphony.mid
+$ apollo main.ap -o symphony.mid
 ~~~
 
 To get more information on Apollo’s options, use the `--help` flag:
