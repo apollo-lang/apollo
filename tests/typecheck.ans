@@ -59,3 +59,5 @@ Type error: definition of [Int], but assigned to Bool
 Type error: definition of [Int], but assigned to Pitch
 Type error: definition of [Int], but assigned to Duration
 Type error: definition of [Int], but assigned to Atom
+
+Type error: definition of [Int], but assigned to [[Atom]]
