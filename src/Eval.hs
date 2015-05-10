@@ -123,7 +123,7 @@ eval env expr = case expr of
 
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
 evalP env expr = case expr of
-  VAtom a b  -> return $ VAtom a b
+  VAtom a b  -> eval env $ VAtom a b
   Name name -> getVar env name >>= evalP env
   _        -> throwError $ Default "Error: expected Note, Rest or Chord"
 
