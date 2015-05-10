@@ -12,7 +12,7 @@ import Type
 
 eval :: Env Expr -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
-  
+
   VInt i      -> return $ VInt i
   VBool b     -> return $ VBool b
   VPitch p    -> return $ VPitch (p `mod` 128)
@@ -36,10 +36,10 @@ eval env expr = case expr of
 
   Not e -> do
     e' <- eval env e
-    case e' of 
+    case e' of
       VBool b -> return . VBool $ not b
       VList l -> return . VBool $ null l
-      _       -> error "Error: expected Bool, Part or List" 
+      _       -> error "Error: expected Bool, Part or List"
 
 
   Neg e -> do
@@ -48,15 +48,15 @@ eval env expr = case expr of
 
   Head l -> do
     l' <- eval env l
-    case l' of 
+    case l' of
       VList ll -> return (head ll)
-      _       -> error "Error: expected Part or List" 
+      _       -> error "Error: expected Part or List"
 
   Tail l -> do
     l' <- eval env l
-    case l' of 
-      VList (x:xs) -> return (VList xs)
-      _       -> error "Error: expected Part or List" 
+    case l' of
+      VList (_:xs) -> return (VList xs)
+      _       -> error "Error: expected Part or List"
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -81,46 +81,46 @@ eval env expr = case expr of
         isZero (VInt x)      = x == 0
         isZero (VPitch x)    = x == 0
         isZero (VDuration x) = x == 0
+        isZero _             = False
 
-  ArrOp op a l -> do
+  ArrOp _ a l -> do
     a' <- eval env a
     l' <- eval env l
     case l' of
-      VList ll -> do
-        return . VList $ a' : ll
+      VList ll -> return . VList $ a' : ll
       _        -> error "Error: expected Part or List"
 
 
   VList xs -> liftM VList (mapM (eval env) xs)
 
   Block body ret -> do
-    env' <- clone env
+    env' <- clone' env
     mapM_ (eval env') body
     eval env' ret
       where
-        clone e = liftIO (readIORef e >>= newIORef . removeNames)
+        clone' e = liftIO (readIORef e >>= newIORef . removeNames)
         removeNames = filter (\(n,_) -> n `notElem` names)
         names = map (\(Def name _ _) -> name) body
 
   VLam params body -> clone env >>= \closure -> return (Function params body closure)
+  VTLam _ _ params body -> clone env >>= \closure -> return (Function params body closure)
 
   Function{} -> error "bug / TODO(?): eval called on Function"
 
-  -- HAHA RECURSION YOU SUCKA
-  -- For recursion, binding names must be initialized
-  -- before they are stored.
-  
   Def name TPitch ex -> do
     val <- eval env ex
-    case val of 
+    case val of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
 
+  -- For recursion, binding names must be initialized
+  -- before they are stored. (below)
+
   Def name _ ex@(VLam p b) -> do
-    val <- eval env ex
-    defineVar env name Empty
+    _ <- eval env ex
+    _ <- defineVar env name Empty
     env' <- clone env
-    setVar env' name (Function p b env')
+    _ <- setVar env' name (Function p b env')
     return Empty
 
   Def name _ ex -> eval env ex >>= defineVar env name >> return Empty
@@ -132,13 +132,15 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply p b closure args'
 
-  FnCall (VTLam ts is t e) args -> do
+  FnCall (VTLam _ _ is e) args -> do
     args' <- mapM (eval env) args
     apply is e env args'
 
   Empty -> error "Error: eval called on Empty"
 
   Nil   -> return Nil
+
+  _     -> error "Error: eval called on invalid expression"
 
 
 evalP :: Env Expr -> Expr -> IOThrowsError Expr

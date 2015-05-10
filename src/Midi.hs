@@ -9,7 +9,7 @@ musicToTrack :: Music -> Int -> [[(Ticks, Message)]]
 musicToTrack (Music m) tempo = map (addTM tempo) (concatMap partToTrack m)
 
 addTM :: Int -> [(Ticks, Message)] -> [(Ticks, Message)]
-addTM tempo tracks = [(0, TempoChange tempo)] ++ tracks
+addTM tempo tracks' = [(0, TempoChange tempo)] ++ tracks'
 
 midiFromMusic :: Music -> Int -> Midi
 midiFromMusic m tempo = Midi
@@ -52,12 +52,6 @@ partToTrackHelp container []
 partToTrackHelp container (x:xs)
     = partToTrackHelp (zipWith (++) container (appendRests (length container) x)) xs
 
--- Turn Atom into list of Ticks and Messages
-atomToTrack :: Atom -> [[(Ticks, Message)]]
-atomToTrack (AtomNote n) = [noteToTrack n]
-atomToTrack (AtomRest r) = [restToTrack r]
-atomToTrack (AtomChord c) = chordToTrack c
-
 -- Takes Chord and outputs a list of Tracks with its notes
 chordToTrack :: Chord -> [[(Ticks, Message)]]
 chordToTrack (Chord pitches (Duration d)) = chords
@@ -72,13 +66,9 @@ noteToTrack (Note (Pitch p) (Duration d)) = ckvtToTrack 0 p 80 d
 restToTrack :: Rest -> [(Ticks, Message)]
 restToTrack (Rest (Duration d)) = ckvtToTrack 0 0 0 d
 
--- Takes root, duration, pitch list and returns a midi track of the pitches in
--- sequence for duration
-nSeqTrack :: [Note] -> [(Ticks, Message)]
-nSeqTrack = concatMap noteToTrack
-
 -- Takes Channel Pitch Velocity Ticks and outputs a Track with the note
 -- constructed from them
 ckvtToTrack :: Channel -> Key -> Velocity -> Ticks -> [(Ticks, Message)]
 ckvtToTrack chan pitch vel dur
     = [(0, NoteOn chan pitch vel), (dur, NoteOff chan pitch vel)]
+
