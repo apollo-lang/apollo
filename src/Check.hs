@@ -22,7 +22,7 @@ typecheck env expr = case expr of
     ta <- typecheck env a
     tb <- typecheck env b
     if (ta == TNil || ta == TInt || ta == TPitch || ta == TList TPitch || ta == TList TInt )
-      && (tb == TInt || tb == TDuration || tb == TList TDuration || tb == TList TInt)
+      && (tb == TInt || tb == TDuration)
     then return TAtom
     else throwError $ TypeExcept "Atom must contain Pitch and Duration"
 
