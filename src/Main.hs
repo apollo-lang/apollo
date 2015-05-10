@@ -50,17 +50,17 @@ interpret ofile src = do
     where
       interp t e = toAst t src >>=
                    execAst e >>= \r ->
-                   handleMain e ofile >>
+                   handleExport e ofile "main" >>
                    return r
 
-handleMain :: Env Expr -> String -> IOThrowsError ()
-handleMain env filename = do
-  mainExists <- liftIO (isBound env "main")
+handleExport :: Env Expr -> String -> String -> IOThrowsError ()
+handleExport env filename mainName = do
+  mainExists <- liftIO (isBound env mainName)
   tempo <- getTempo env
   liftIO $ when mainExists (export tempo)
     where
       export tempo = getMain >>= \m -> exportMusic tempo filename (makeMusic m)
-      getMain = runUnchecked (getVar env "main")
+      getMain = runUnchecked (getVar env mainName)
       runUnchecked action = liftM extractValue (runErrorT action)
 
 getTempo :: Env Expr -> IOThrowsError Int
@@ -78,14 +78,14 @@ toAst env src = liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> 
 
 execAst :: Env Expr -> [Expr] -> IOThrowsError String
 execAst env ast = liftM (unlines . map showPP . filter notEmpty) (exec env ast)
-    where
-      notEmpty Empty = False
-      notEmpty _     = True
-      exec _   []         = return []
-      exec envr (e:exprs) = do
-        x <- eval envr e
-        y <- exec envr exprs
-        return (x:y)
+  where
+    notEmpty Empty = False
+    notEmpty _     = True
+    exec _   []         = return []
+    exec envr (e:exprs) = do
+      x <- eval envr e
+      y <- exec envr exprs
+      return (x:y)
 
 put :: String -> IO ()
 put r | r == ""          = putStr r
@@ -120,18 +120,19 @@ readPrompt prompt = flushStr prompt >> getLine
     flushStr str = putStr str >> hFlush stdout
 
 interpretLine :: Env Expr -> Env Type -> String -> IO ()
-interpretLine env tEnv inp =
-  if inp == ":browse"
-  then getBindings >>= putStr . unlines
-  else runIOThrows (toAst tEnv inp >>= astCheck >>= execAst env) >>= put
-    where
-      astCheck ast = liftThrows $ if length ast == 1
-                                  then return ast
-                                  else throwError $ Default "REPL received >1 expression"
-      getBindings = do
-        e <- readIORef tEnv
-        mapM listing e
-      listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+interpretLine env tEnv inp = case inp of
+  ":browse" -> getBindings >>= putStr . unlines
+  (':':'e':'x':'p':'o':'r':'t':' ':name) -> runUnchecked (handleExport env "_repl.mid" name)
+  src -> runIOThrows (toAst tEnv src >>= astCheck >>= execAst env) >>= put
+ where
+  astCheck ast = liftThrows $ if length ast == 1
+                              then return ast
+                              else throwError $ Default "REPL received >1 expression"
+  getBindings = do
+    e <- readIORef tEnv
+    mapM listing e
+  listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+  runUnchecked action = liftM extractValue (runErrorT action)
 
 -- Help interface -----------------------------------------------------------
 
