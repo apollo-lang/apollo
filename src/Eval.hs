@@ -1,6 +1,11 @@
-module Eval
-    ( eval
-    ) where
+
+--------------------------------------------------------------------------
+-- Eval: module for evaluating an Apollo expression
+--------------------------------------------------------------------------
+
+module Eval (
+  eval
+) where
 
 import Control.Monad (liftM)
 import Control.Monad.Error (throwError, liftIO)
@@ -21,10 +26,10 @@ eval env expr = case expr of
   VAtom a b -> do
     a' <- eval env a
     b' <- eval env b
-    case (a', b') of 
-      (Nil, d)             -> return $ VAtom Nil (toVDuration d)
-      ((VList pitches), d) -> return $ VAtom (VList (map (\p -> (toVPitch p)) pitches)) (toVDuration d)
-      _                    -> return $ VAtom (toVPitch a') (toVDuration b')
+    case (a', b') of
+      (Nil, d)           -> return $ VAtom Nil (toVDuration d)
+      (VList pitches, d) -> return $ VAtom (VList (map toVPitch pitches)) (toVDuration d)
+      _                  -> return $ VAtom (toVPitch a') (toVDuration b')
 
   VMusic m -> liftM VMusic (mapM (evalM env) m)
 
@@ -41,7 +46,6 @@ eval env expr = case expr of
       VList l -> return . VBool $ null l
       _       -> error "Error: expected Bool, Part or List"
 
-
   Neg e -> do
     VInt i <- eval env e
     return . VInt $ negate i
@@ -50,13 +54,13 @@ eval env expr = case expr of
     l' <- eval env l
     case l' of
       VList ll -> return (head ll)
-      _       -> error "Error: expected Part or List"
+      _        -> error "Error: expected Part or List"
 
   Tail l -> do
     l' <- eval env l
     case l' of
       VList (_:xs) -> return (VList xs)
-      _       -> error "Error: expected Part or List"
+      _            -> error "Error: expected Part or List"
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -90,18 +94,14 @@ eval env expr = case expr of
       VList ll -> return . VList $ a' : ll
       _        -> error "Error: expected Part or List"
 
-
   VList xs -> do
     xs' <- mapM (eval env) xs
-    if vpichtOrvint xs' 0
-    then liftM VList (mapM ((eval env) . toVPitch) xs')
-    else 
-      if vdurOrvint xs' 0
-      then liftM VList (mapM ((eval env) . toVDuration) xs')
+    if pitchOrInt xs' 0
+    then liftM VList (mapM (eval env . toVPitch) xs')
+    else
+      if durOrInt xs' 0
+      then liftM VList (mapM (eval env . toVDuration) xs')
       else liftM VList (mapM (eval env) xs')
-
-
--- liftM VList (mapM (eval env) xs)
 
   Block body ret -> do
     env' <- clone' env
@@ -112,37 +112,37 @@ eval env expr = case expr of
         removeNames = filter (\(n,_) -> n `notElem` names)
         names = map (\(Def name _ _) -> name) body
 
-  VLam params body -> clone env >>= \closure -> return (Function params body closure)
-  VTLam _ _ params body -> clone env >>= \closure -> return (Function params body closure)
+  VLam params body -> clone env >>= \closure ->
+                      return (Function params body closure)
 
-  Function{} -> error "bug / TODO(?): eval called on Function"
+  VTLam _ _ params body -> clone env >>= \closure ->
+                           return (Function params body closure)
 
   Def name TPitch ex -> do
     val <- eval env ex
     case val of
-        (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
-        (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
-        _ -> return Empty
+      VInt i   -> defineVar env name (VPitch (i `mod` 128)) >> return Empty
+      VPitch p -> defineVar env name (VPitch (p `mod` 128)) >> return Empty
+      _        -> return Empty
 
-  
   Def name (TList TPitch) ex -> do
     val <- eval env ex
     case val of
-        (VList xs) -> (defineVar env name $ VList (map toVPitch xs)) >> return Empty
-        _          -> error "Error: expected List"
+      VList xs -> defineVar env name (VList (map toVPitch xs)) >> return Empty
+      _        -> error "Error: expected List"
 
   Def name (TList TDuration) ex -> do
     val <- eval env ex
     case val of
-        (VList xs) -> (defineVar env name $ VList (map toVDuration xs)) >> return Empty
-        _          -> error "Error: expected List"
-  
+        VList xs -> defineVar env name (VList (map toVDuration xs)) >> return Empty
+        _        -> error "Error: expected List"
+
   Def name TDuration ex -> do
     val <- eval env ex
     case val of
-        (VInt i) -> (defineVar env name $ VDuration (toNneg i)) >> return Empty
-        (VDuration p) -> (defineVar env name $ VDuration (toNneg p)) >> return Empty
-        _ -> return Empty
+      VInt i      -> defineVar env name (VDuration (nonneg i)) >> return Empty
+      VDuration p -> defineVar env name (VDuration (nonneg p)) >> return Empty
+      _           -> return Empty
 
   -- For recursion, binding names must be initialized
   -- before they are stored. (below)
@@ -167,9 +167,9 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply is e env args'
 
-  Empty -> error "Error: eval called on Empty"
-
   Nil   -> return Nil
+
+  Empty -> error "Error: eval called on Empty"
 
   _     -> error "Error: eval called on invalid expression"
 
@@ -177,14 +177,14 @@ eval env expr = case expr of
 evalP :: Env Expr -> Expr -> IOThrowsError Expr
 evalP env expr = case expr of
   VAtom a b  -> eval env $ VAtom a b
-  Name name -> getVar env name >>= evalP env
-  _        -> throwError $ Default "Error: expected Note, Rest or Chord"
+  Name name  -> getVar env name >>= evalP env
+  _          -> throwError $ Default "Error: expected Note, Rest or Chord"
 
 evalM :: Env Expr -> Expr -> IOThrowsError Expr
 evalM env expr = case expr of
-  VList p -> liftM VList (mapM (evalP env) p)
+  VList p   -> liftM VList (mapM (evalP env) p)
   Name name -> getVar env name >>= evalM env
-  _        -> throwError $ Default "Error: expected Part"
+  _         -> throwError $ Default "Error: expected Part"
 
 applyB :: BOpr -> Bool -> Bool -> Bool
 applyB op a b = case op of
@@ -223,8 +223,6 @@ matchI op (VInt a) (VDuration b) =
   return . VDuration $ applyI op a b
 
 matchI _ _ _ = error "TODO this should be taken care of in typechecking"
-  -- throwError $ TypeMismatch (show op) (typeOf a) (show b)
-
 
 applyI :: IOpr -> Int -> Int -> Int
 applyI op a b = case op of
@@ -241,31 +239,30 @@ apply params body closure args =
       createEnv = bindVars closure . zip params
 
 toVPitch :: Expr -> Expr
-toVPitch (VPitch p) = VPitch $ p `mod` 128 
-toVPitch (VInt i)   = VPitch $ i `mod` 128 
+toVPitch (VPitch p) = VPitch $ p `mod` 128
+toVPitch (VInt i)   = VPitch $ i `mod` 128
 toVPitch _          = error "Expected VInt or VPitch"
 
 toVDuration :: Expr -> Expr
 toVDuration (VDuration d) = VDuration d
-toVDuration (VInt i)   = VDuration i 
-toVDuration _          = error "Expected VInt or VPitch"
+toVDuration (VInt i)      = VDuration i
+toVDuration _             = error "Expected VInt or VPitch"
 
-toNneg :: Int -> Int
-toNneg n | n >= 0    = n
+nonneg :: Int -> Int
+nonneg n | n >= 0    = n
          | otherwise = 0
 
-vpichtOrvint :: [Expr] -> Int -> Bool
-vpichtOrvint [] 0 = False
-vpichtOrvint [] _ = True
-vpichtOrvint ((VPitch _):xs) n = vpichtOrvint xs (n+1)
-vpichtOrvint ((VInt _):xs)   n = vpichtOrvint xs n
-vpichtOrvint _ _      = False
+pitchOrInt :: [Expr] -> Int -> Bool
+pitchOrInt [] 0            = False
+pitchOrInt [] _            = True
+pitchOrInt (VPitch _:xs) n = pitchOrInt xs (n + 1)
+pitchOrInt (VInt _:xs)   n = pitchOrInt xs n
+pitchOrInt _ _             = False
 
-vdurOrvint :: [Expr] -> Int -> Bool
-vdurOrvint [] 0 = False
-vdurOrvint [] _ = True
-vdurOrvint ((VDuration _):xs) n = vdurOrvint xs (n+1)
-vdurOrvint ((VInt _):xs)      n = vdurOrvint xs n 
-vdurOrvint _ _ = False
-
+durOrInt :: [Expr] -> Int -> Bool
+durOrInt [] 0               = False
+durOrInt [] _               = True
+durOrInt (VDuration _:xs) n = durOrInt xs (n + 1)
+durOrInt (VInt _:xs) n      = durOrInt xs n
+durOrInt _ _                = False
 
