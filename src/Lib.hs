@@ -26,6 +26,12 @@ prelude = unlines
 
   , "  length: (xs: [Int]) -> Int = case (!xs) 0 otherwise 1 + length(t@xs)"
 
+  , "  zip: (a: [Pitch], b: [Duration]) -> [Atom] = case (!a || !b) [] otherwise (h@a, h@b) :: zip(t@a, t@b)"
+
+  , "  replicate: (xs: [Int], n: Int) -> [Int] = case (n == 0) [] otherwise concat(xs, replicate(xs, n - 1))"
+
+  , "  uniform: (d: Duration, n: Int) -> [Duration] = case (n == 0) [] otherwise d :: uniform(d, n - 1)"
+
   , "  last: (xs: [Int]) -> Int = case (length(xs) == 1) h@xs otherwise last(t@xs)"
 
   , "  init: (xs: [Int]) -> [Int] = case (length(xs) == 1) [] otherwise h@xs :: init(t@xs)"
