@@ -1,2 +1,6 @@
 fib: (n: Int) -> Int = case (n <= 1) n otherwise fib(n - 1) + fib(n - 2)
 fib(10)
+
+factorial: (n: Int) -> Int = 
+    case (n == 0) 1 otherwise n * factorial(n - 1)
+factorial(6)
