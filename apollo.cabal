@@ -28,6 +28,7 @@ executable apollo
                      , Parse
                      , Util
                      , Midi
+                     , Type
 
   build-depends:       base          >=4.6  && <4.8
                      , regex-posix   >=0.95 && <0.96
