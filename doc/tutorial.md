@@ -78,7 +78,7 @@ sol: Pitch = G4   -- c in the fourth octave
 mib: Pitch = Eb4  -- e flat in the fourth octave
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A pitch literal is: a backtick, followed by a single character indicating the note, followed by an optional `#` or `b` character indicating the accidental, followed by a number indicating the octave.
+A pitch literal is: a single capitalized character indicating the note, followed by an optional `#` or `b` character indicating the accidental, followed by a number indicating the octave.
 
 Alternatively, we can define the note using an integer that indicates its offset from the first (0th) note i.e. *c* in the zero octave (`` C0 ``):
 
@@ -114,7 +114,7 @@ long:  Duration = 64  -- a whole note   (multiple notation)
 
 Now we're ready to construct our first note!
 
-An Atom is something that can be played. So let's put our note into an Atom. To do this we make a tuple consisting of a `Pitch` (or `Pitch`es) and a `Duration`:
+An Atom is something that can be played. So let's put our note into an Atom. To do this we make a tuple consisting of a `Pitch` (or `Pitch`es or `_` indicating silence) and a `Duration`:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 n1: Atom = (sol, short)
@@ -141,7 +141,7 @@ Let's make a MIDI out of our note!
 main: Music = [[n1]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We will explain what `Music` and `Part` are soon. For now, let us talk about `Atom`s.
+We will explain what `Music` is soon. For now, let us talk about `Atom`s.
 
 If we want to play both our notes simultaneously, we can construct a chord `Atom`. A chord `Atom` consists of a list of pitches and a single duration.
 
@@ -149,12 +149,17 @@ If we want to play both our notes simultaneously, we can construct a chord `Atom
 c1: Atom = ([n1, n2], long)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+We can now play this chord:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 main: Music = [[c1]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You've probably realized by now that an `Atom` is either a note, a chord, or a rest.
+You've probably realized by now that an `Atom` is either a note or a chord, but it can also be a rest.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+r1: Atom = (_, long)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we know how to make `Atoms`, we can put several `Atoms` in sequence to make a melody as a `[Atom]`.
 
@@ -169,10 +174,10 @@ sol: Pitch = G4              -- c in the fourth octave
 mib: Pitch = Eb4             -- e flat in the fourth octave
 
 short: Duration = \4          -- a quarter note
-long: Duration = 1            -- a whole note
+long: Duration = \1            -- a whole note
 
 n1: Atom = (sol, short)
-n2: Atom = (mi, long)
+n2: Atom = (mib, long)
 
 p1: [Atom] = [n1,n1,n1,n2]
 
