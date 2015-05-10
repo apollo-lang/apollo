@@ -1,4 +1,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
+-------------------------------------------------------------------------------
+-- Env: module for representing an environment in a mutable symbol-table
+-------------------------------------------------------------------------------
+
 module Env (
   Env
 , nullEnv
@@ -15,11 +20,12 @@ module Env (
 
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
 import Control.Monad.IO.Class (MonadIO)
-import Data.Maybe (isJust)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import Data.Maybe (isJust)
 import Error
 
 type Id = String
+
 type Env a = IORef [(String, IORef a)]
 
 instance Show (IORef a) where
@@ -34,11 +40,11 @@ nullEnv = newIORef []
 type IOThrowsError = ErrorT ApolloError IO
 
 liftThrows :: ThrowsError a -> IOThrowsError a
-liftThrows (Left err) = throwError err
+liftThrows (Left err)  = throwError err
 liftThrows (Right val) = return val
 
 runIOThrows :: IOThrowsError String -> IO String
-runIOThrows action = liftM extractValue (runErrorT $ trapError action)
+runIOThrows action = liftM extractValue (runErrorT (trapError action))
 
 getVar :: Env a -> Id -> IOThrowsError a
 getVar envRef var = do
@@ -47,18 +53,18 @@ getVar envRef var = do
         (liftIO . readIORef)
         (lookup var env)
 
-setVar :: Env a -> Id -> a -> IOThrowsError a
+setVar :: Env a -> Id -> a -> IOThrowsError ()
 setVar envRef var value = do
   env <- liftIO $ readIORef envRef
   maybe (throwError $ UnboundVar "Setting" var)
         (liftIO . flip writeIORef value)
         (lookup var env)
-  return value -- see TODO on defineVar
+  return ()
 
 isBound :: Env a -> String -> IO Bool
 isBound env var = liftM (isJust . lookup var) (readIORef env)
 
-defineVar :: Env a -> Id -> a -> IOThrowsError a
+defineVar :: Env a -> Id -> a -> IOThrowsError ()
 defineVar envRef var value = do
      alreadyDefined <- liftIO $ isBound envRef var
      if alreadyDefined
@@ -67,13 +73,14 @@ defineVar envRef var value = do
              valueRef <- newIORef value
              env <- readIORef envRef
              writeIORef envRef ((var, valueRef) : env)
-             return value -- TODO: could be bad; shouldnt return anything but then have to do weird stuff
+             return ()
 
 bindVars :: Env a -> [(String, a)] -> IOThrowsError (Env a)
-bindVars envRef bindings = liftIO (readIORef envRef >>= extendEnv bindings >>= newIORef)
-     where extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
-           addBinding (var, value) = do ref <- newIORef value
-                                        return (var, ref)
+bindVars envRef bindings =
+  liftIO (readIORef envRef >>= extendEnv bindings >>= newIORef)
+    where
+      extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
+      addBinding (var, value) = liftM ((,) var) (newIORef value)
 
 clone :: MonadIO m => IORef a -> m (IORef a)
 clone e = liftIO (readIORef e >>= newIORef)

@@ -1,9 +1,10 @@
 {
 {-# OPTIONS_GHC -w #-}
-module Lex
-    ( Token(..)
-    , scanTokens
-    ) where
+
+module Lex (
+  Token(..)
+  , scanTokens
+) where
 
 import Expr
 import Type
@@ -41,7 +42,7 @@ tokens :-
     "case"                          { \s -> TokenCase }
     "otherwise"                     { \s -> TokenOtherwise }
     "where"                         { \s -> TokenWhere }
-    
+
 
     -- Markers
     "#tempo"                        { \s -> TokenTempo }
@@ -56,7 +57,7 @@ tokens :-
     "Pitch"                         { \s -> TokenType TPitch }
     "Atom"                          { \s -> TokenType TAtom }
     "Music"                         { \s -> TokenType TMusic }
-    
+
     -- Operators
     \+                              { \s -> TokenPlus }
     \-                              { \s -> TokenMinus }
