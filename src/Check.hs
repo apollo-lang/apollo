@@ -223,7 +223,7 @@ typecheck env expr = case expr of
 
   Nil -> return TNil
 
-  other -> return (TErrVerbose (show other))
+  other -> error $ "bug: `typecheck` received" ++ show other
 
 
 uniform :: Eq a => [a] -> Bool
