@@ -17,7 +17,14 @@ typecheck env expr = case expr of
   VBool{}     -> return TBool
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
-  VAtom{}     -> return TAtom
+  
+  VAtom a b     -> do
+    ta <- typecheck env a
+    tb <- typecheck env b
+    if (ta == TNil || ta == TInt || ta == TPitch || ta == TList TPitch || ta == TList TInt ) 
+      && (tb == TInt || tb == TDuration || tb == TList TDuration || tb == TList TInt)
+    then return TAtom
+    else throwError $ TypeExcept "Atom must contain Pitch and Duration"
 
   VMusic m    -> do
     t <- mapM (typecheck env) m
@@ -114,6 +121,27 @@ typecheck env expr = case expr of
     tb <- typecheck env b
     case (ta, tb) of
       (TInt, TInt) -> return TInt
+      (TPitch, TInt) -> 
+        if op == Add || op == Sub
+        then return TPitch
+        else throwError (TypeMismatch (show op) ta tb)
+      (TInt, TPitch) ->
+        if op == Add
+        then return TPitch
+        else throwError (TypeMismatch (show op) ta tb)
+      (TInt, TDuration) ->
+        if op == Mul || op == Div
+        then return TDuration
+        else throwError (TypeMismatch (show op) ta tb)
+      (TDuration, TInt) ->
+        if op == Mul || op == Div
+        then return TDuration
+        else throwError (TypeMismatch (show op) ta tb)
+      (TDuration, TDuration) ->
+        if op == Add || op == Sub
+        then return TDuration
+        else throwError (TypeMismatch (show op) ta tb)
+
       _            -> throwError (TypeMismatch (show op) ta tb)
 
   ArrOp op a l -> do
@@ -170,7 +198,7 @@ typecheck env expr = case expr of
 
   Def name t ex -> do
     t' <- typecheck env ex
-    if t == t' || t == TMusic && t' == (TList $ TList TAtom)
+    if t == t' || t == TMusic && t' == (TList $ TList TAtom) || match t t'
     then defineVar env name t
     else throwError (TypeDMismatch t t')
 
@@ -179,8 +207,18 @@ typecheck env expr = case expr of
       getType (TFunc _ returnType) = returnType
       getType other                = other
 
+  Nil       -> return TNil
+
   other -> return (TErrVerbose (show other)) -- error $ "ERR: got: " ++ show other
+
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
+
+
+match :: Type -> Type -> Bool
+match a b = case (a, b) of 
+        (TPitch, TInt)    -> True
+        (TDuration, TInt) -> True
+        _                 -> False
 

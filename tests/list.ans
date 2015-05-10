@@ -1,2 +1,9 @@
-[2,2,2]
-[1,3,4,5]
+Type error: [] is wrong operand type for unary `t@`
+Type error: [] is wrong operand type for unary `h@`
+Type error: "list is irregular"
+Type error: "list is irregular"
+Type error: "list is irregular"
+[1]
+[[2],[3]]
+True
+False

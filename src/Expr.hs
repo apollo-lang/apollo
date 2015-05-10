@@ -28,8 +28,8 @@ data Param = Param Id Type
 data Expr
     = VInt Int
     | VBool Bool
-    | VDuration Duration
-    | VPitch Pitch
+    | VDuration Int
+    | VPitch Int
     | VAtom Expr Expr
     | VMusic [Expr]
     | VList [Expr]
