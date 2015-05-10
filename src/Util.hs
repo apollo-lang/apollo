@@ -1,5 +1,6 @@
 module Util
     ( def
+    , define
     , param
     , parsePitch
     , parseDuration
@@ -13,25 +14,47 @@ import Type
 
 -- TODO: use Error monad instead of `error`
 
+
+-- define: For TFunc, store param names with body as FnBody type
+define :: Id -> Type -> Expr -> Expr
+define i t e = case (t, e) of 
+    (TPitch, VInt n) -> Def i t (VPitch (n `mod` 128))
+    (TDuration, VInt n) -> Def i t (VDuration n)
+    _                   -> Def i t e
+
 def :: Id -> ([Param], Type) -> Expr -> Expr
-def id (params, retType) body = Def id (TFunc (snd params') retType) (VLam (fst params') body)
+def iden (params, retType) body = Def iden (TFunc (snd params') retType) (VLam (fst params') body)
   where params' = unzip $ unpackParam params
 
 param :: Id -> ([Param], Type) -> Param
-param id (params, t) = Param id (TFunc (snd params') t)
+param iden (params, t) = Param iden (TFunc (snd params') t)
   where params' = unzip $ unpackParam params
 
 unpackParam :: [Param] -> [(Id, Type)]
 unpackParam = map (\(Param i t) -> (i, t))
+
+toPitch :: Expr -> Pitch
+toPitch (VPitch p) = Pitch p
+toPitch (VInt i)   = Pitch $ i `mod` 128 
+toPitch _          = error "Expected VInt or VPitch"
+
+toDuration :: Expr -> Duration
+toDuration (VDuration p) = Duration p
+toDuration (VInt i)      = Duration i
+toDuration _             = error "Expected VInt or VPitch"
 
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
 unpackList _ = error "Expected expression list"
 
 makeAtom :: Expr -> Atom
-makeAtom (VAtom (VPitch p) (VDuration d))   = AtomNote $ Note p d
-makeAtom (VAtom Nil (VDuration d))          = AtomRest $ Rest d
-makeAtom (VAtom pitches (VDuration d))      = AtomChord $ Chord (map (\(VPitch p) -> p) $ unpackList pitches) d
+makeAtom (VAtom Nil (VDuration d))          = AtomRest $ Rest (Duration d)
+makeAtom (VAtom p@(VPitch _) d@(VDuration _)) = AtomNote $ Note (toPitch p) (toDuration d)
+makeAtom (VAtom p@(VInt _) d@(VDuration _))   = AtomNote $ Note (toPitch p) (toDuration d)
+makeAtom (VAtom p@(VPitch _) d@(VInt _)) = AtomNote $ Note (toPitch p) (toDuration d)
+makeAtom (VAtom p@(VInt _) d@(VInt _))   = AtomNote $ Note (toPitch p) (toDuration d)
+makeAtom (VAtom pitches d@(VDuration _))      = AtomChord $ Chord (map (\p -> (toPitch p)) $ unpackList pitches) (toDuration d)
+makeAtom (VAtom pitches d@(VInt _))      = AtomChord $ Chord (map (\p -> (toPitch p)) $ unpackList pitches) (toDuration d)
 makeAtom _                                  = error "Expected note, chord or rest"
 
 makeMusic :: Expr -> Music
@@ -56,12 +79,12 @@ accidental _    = 0
 pitchHeight :: Int -> Int -> Int -> Int
 pitchHeight pc acc octave = (pc + acc) + 12 * (octave + 1)
 
-parsePitch :: String -> Pitch
+parsePitch :: String -> Int
 parsePitch s = case matchPitch s of
     [] -> error "Invalid pitch (no match)"
     ms -> case head ms of
         [_, pc, acc, octave] ->
-            Pitch $ pitchHeight
+                pitchHeight
                 (pitchClass pc)
                 (accidental acc)
                 (read octave :: Int)
@@ -70,13 +93,13 @@ parsePitch s = case matchPitch s of
 matchPitch :: String -> [[String]]
 matchPitch s = s =~ "([A-G])(b|#)?([0-9])"
 
-parseDuration :: String -> Duration
+parseDuration :: String -> Int
 parseDuration s = case matchDuration s of
     [] -> error "Invalid duration (no match)"
     ms -> case head ms of
         [_, dur, dot] -> case dot of
-            "." -> Duration $ 64 `div` (read dur :: Int) * 3 `div` 2
-            _   -> Duration $ 64 `div` (read dur :: Int)
+            "." -> 64 `div` (read dur :: Int) * 3 `div` 2
+            _   -> 64 `div` (read dur :: Int)
         _ -> error "Invalid duration (invalid match)"
 
 matchDuration :: String -> [[String]]
