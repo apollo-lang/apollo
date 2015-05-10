@@ -17,11 +17,11 @@ prelude = unlines
 
   , "  mapIB: (f: (Int) -> Bool, a: [Int]) -> [Bool] = case (!a) [] otherwise f(h@a) :: mapIB(f, t@a)"
 
-  , "  lenI: (xs: [Int]) -> Int = case(xs == []) 0 otherwise 1 + lenI(t@xs)"
+  , "  lengthI: (xs: [Int]) -> Int = case(xs == []) 0 otherwise 1 + lengthI(t@xs)"
 
-  , "  lenB: (xs: [Bool]) -> Int = case(xs == []) 0 otherwise 1 + lenB(t@xs)"
+  , "  lengthB: (xs: [Bool]) -> Int = case(xs == []) 0 otherwise 1 + lengthB(t@xs)"
 
-  , "  lenP: (xs: [Pitch]) -> Int = case(xs == []) 0 otherwise 1 + lenP(t@xs)"
+  , "  lengthP: (xs: [Pitch]) -> Int = case(xs == []) 0 otherwise 1 + lengthP(t@xs)"
 
   , "  concatI: (x1: [Int], x2: [Int]) -> [Int] = case (!x1) x2 otherwise (h@x1 :: concatI(t@x1, x2))"
 
@@ -43,13 +43,13 @@ prelude = unlines
 
   , "  uniform: (d: Duration, n: Int) -> [Duration] = case (n == 0) [] otherwise d :: uniform(d, n - 1)"
 
-  , "  lastI: (xs: [Int]) -> Int = case (lenI(xs) == 1) h@xs otherwise lastI(t@xs)"
+  , "  lastI: (xs: [Int]) -> Int = case (lengthI(xs) == 1) h@xs otherwise lastI(t@xs)"
 
-  , "  lastP: (xs: [Pitch]) -> Pitch = case (lenP(xs) == 1) h@xs otherwise lastP(t@xs)"
+  , "  lastP: (xs: [Pitch]) -> Pitch = case (lengthP(xs) == 1) h@xs otherwise lastP(t@xs)"
 
-  , "  initI: (xs: [Int]) -> [Int] = case (lenI(xs) == 1) [] otherwise h@xs :: initI(t@xs)"
+  , "  initI: (xs: [Int]) -> [Int] = case (lengthI(xs) == 1) [] otherwise h@xs :: initI(t@xs)"
 
-  , "  initP: (xs: [Pitch]) -> [Pitch] = case (lenP(xs) == 1) [] otherwise h@xs :: initP(t@xs)"
+  , "  initP: (xs: [Pitch]) -> [Pitch] = case (lengthP(xs) == 1) [] otherwise h@xs :: initP(t@xs)"
 
   , "  reverseI: (xs: [Int]) -> [Int] = case (!xs) [] otherwise lastI(xs) :: reverseI(initI(xs))"
 
