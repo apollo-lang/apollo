@@ -106,6 +106,7 @@ eval env expr = case expr of
     case val of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
+        _ -> return Empty
 
   -- For recursion, binding names must be initialized
   -- before they are stored. (below)
