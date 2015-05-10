@@ -113,6 +113,19 @@ eval env expr = case expr of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
 
+  
+  Def name (TList TPitch) ex -> do
+    val <- eval env ex
+    case val of
+        (VList xs) -> (defineVar env name $ VList (map toVPitch xs)) >> return Empty
+        _          -> error "Error: expected List"
+
+  Def name (TList TDuration) ex -> do
+    val <- eval env ex
+    case val of
+        (VList xs) -> (defineVar env name $ VList (map toVDuration xs)) >> return Empty
+        _          -> error "Error: expected List"
+  
   Def name TDuration ex -> do
     val <- eval env ex
     case val of
