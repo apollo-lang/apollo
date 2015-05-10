@@ -55,5 +55,6 @@ prelude = unlines
 
   , "  reverseP: (xs: [Pitch]) -> [Pitch] = case (!xs) [] otherwise lastP(xs) :: reverseP(initP(xs))"
 
-  ]
+  , "  intercalate: (a: [Int], b: [Int]) -> [Int] = case (!a || !b) [] otherwise concatI([h@a, h@b], intercalate(t@a, t@b))"
 
+  ]
