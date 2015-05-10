@@ -1,5 +1,7 @@
 module Util
-    ( define
+    ( def
+    , define
+    , param
     , parsePitch
     , parseDuration
     , makeMusic
@@ -7,20 +9,30 @@ module Util
 
 import Text.Regex.Posix
 import Expr
+import Type
 -- import Error
 
 -- TODO: use Error monad instead of `error`
 
+
 -- define: For TFunc, store param names with body as FnBody type
 define :: Id -> Type -> Expr -> Expr
-define i t@(TFunc params _) body = Def i t (FnBody paramNames body)
-  where paramNames = map (\(Param n _) -> n) params
 define i t e = case (t, e) of 
     (TPitch, VInt n) -> Def i t (VPitch (n `mod` 128))
     (TDuration, VInt n) -> Def i t (VDuration n)
     _                -> Def i t e 
 
--- Def i t e
+def :: Id -> ([Param], Type) -> Expr -> Expr
+def iden (params, retType) body = Def iden (TFunc (snd params') retType) (VLam (fst params') body)
+  where params' = unzip $ unpackParam params
+
+param :: Id -> ([Param], Type) -> Param
+param iden (params, t) = Param iden (TFunc (snd params') t)
+  where params' = unzip $ unpackParam params
+
+unpackParam :: [Param] -> [(Id, Type)]
+unpackParam = map (\(Param i t) -> (i, t))
+
 
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs

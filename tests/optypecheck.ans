@@ -1,4 +1,4 @@
-Type error: Integer and Boolean are wrong operand types for `+`
+Type error: Int and Bool are wrong operand types for `+`
 [1,2,1]
 Type error: "list is irregular"
 [[1],[1]]
@@ -8,10 +8,10 @@ Type error: "list is irregular"
 Type error: "If: bool-cond not bool"
 Type error: "If: case mismatch"
 False
-Type error: Integer is wrong operand type for unary `!`
-Type error: Boolean is wrong operand type for unary `-`
+Type error: Int is wrong operand type for unary `!`
+Type error: Bool is wrong operand type for unary `-`
 False
-Type error: Boolean and Integer are wrong operand types for `||`
+Type error: Bool and Int are wrong operand types for `||`
 True
 False
-Type error: definition of Integer, but assigned to Boolean
+Type error: definition of Int, but assigned to Bool
