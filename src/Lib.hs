@@ -1,5 +1,6 @@
 module Lib where
 
+prelude :: String
 prelude = unlines
   [ "map: (f: (Int) -> Int, a: [Int]) -> [Int] = case (!a) [] otherwise f(h@a) :: map(f, t@a)"
   , "len: (xs: [Int]) -> Int = case(xs == []) 0 otherwise 1 + len(t@xs)"
