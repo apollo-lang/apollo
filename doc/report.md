@@ -26,21 +26,18 @@ As said above, we used both local unit tests and continuous integration tests on
 
 ### Style guide
 
-Apollo Style Guide
-===================
-
 When something isn't covered by this guide you should stay consistent with the
 code in the other modules. Fork of https://github.com/tibbe/haskell-style-guide
 
-Formatting
-----------
+#### Formatting
 
-### Line Length
+
+##### Line Length
 
 Maximum line length is *90 characters*. Occasional exceptions are okay for
 readability (see Error.hs) --- use your judgement.
 
-### Indentation
+##### Indentation
 
 Tabs are illegal. Use spaces for indenting. Indent your code blocks with *2
 spaces*. Indent the `where` keyword two spaces from the parent block and write
@@ -62,7 +59,7 @@ filter p (x:xs)
   | otherwise = filter p xs
 ```
 
-### Blank Lines
+##### Blank Lines
 
 One blank line between top-level definitions. No blank lines between type
 signatures and function definitions. Add one blank line between
@@ -70,14 +67,14 @@ functions in a type class instance declaration, cases of a `case` statement, or
 pattern-matched function cases if the functions bodies are large and. Use your
 judgement.
 
-### Whitespace
+##### Whitespace
 
 Surround binary operators with a single space on either side. Use
 your better judgement for the insertion of spaces around arithmetic
 operators but always be consistent about whitespace on either side of
 a binary operator. Don't insert a space after a lambda.
 
-### Data Declarations
+##### Data Declarations
 
 Align the constructors in a data type definition. Example:
 
@@ -104,7 +101,7 @@ data Person = Person
   } deriving (Eq, Show)
 ```
 
-### List Declarations
+##### List Declarations
 
 Align the elements in the list. Example:
 
@@ -126,11 +123,11 @@ directions = [ North
              ]
 ```
 
-### Pragmas
+##### Pragmas
 
 Put pragmas in the first line of their source file.
 
-### Hanging Lambdas
+##### Hanging Lambdas
 
 You may or may not indent the code following a "hanging" lambda. Use
 your judgement. Some examples:
@@ -147,7 +144,7 @@ foo = alloca 10 $ \a ->
       cFunction a b
 ```
 
-### Export Lists
+##### Export Lists
 
 Format export lists as follows:
 
@@ -160,7 +157,7 @@ module Data.Set (
 ) where
 ```
 
-### If-then-else clauses
+##### If-then-else clauses
 
 Generally, guards and pattern matches should be preferred over if-then-else
 clauses, where possible. Short cases should usually be put on a single line
@@ -178,7 +175,7 @@ foo2 = bar $ \qux -> if predicate qux
                      else someOtherCode
 ```
 
-### Case expressions
+##### Case expressions
 
 The alternatives in a case expression can be indented using either of
 the two following styles:
@@ -199,8 +196,8 @@ foobar = case something of
 
 Align the `->` arrows when it helps readability.
 
-Imports
--------
+#### Imports
+
 
 Imports should be grouped in the following order:
 
@@ -214,15 +211,15 @@ Always use explicit import lists or `qualified` imports for standard and third
 party libraries but not for local libraries. This makes the code more robust
 against changes in these libraries. Exception: The Prelude.
 
-Comments
---------
+#### Comments
 
-### Punctuation
+
+##### Punctuation
 
 Write proper sentences; start with a capital letter and use proper
 punctuation.
 
-### Top-Level Definitions
+##### Top-Level Definitions
 
 Every top-level definitions should have a type-signature, but comments are not
 strictly necessary. A brief comment may be added if deemed necessary:
@@ -233,7 +230,7 @@ clone :: MonadIO m => IORef a -> m (IORef a)
 clone e = liftIO (readIORef e >>= newIORef)
 ```
 
-### End-of-Line Comments
+##### End-of-Line Comments
 
 Separate end-of-line comments from the code using 2 spaces. Align
 comments for data type definitions. Some examples:
@@ -249,8 +246,8 @@ foo n = salt * 32 + 9
     salt = 453645243 -- Magic hash salt.
 ```
 
-Naming
-------
+#### Naming
+
 
 Use camel case (e.g. `functionName`) when naming functions and upper
 camel case (e.g. `DataType`) when naming data types.
@@ -259,7 +256,7 @@ For readability reasons, don't capitalize all letters when using an
 abbreviation. For example, write `HttpServer` instead of
 `HTTPServer`. Exception: Two letter abbreviations, e.g. `IO`.
 
-### Modules
+##### Modules
 
 Use singular when naming modules e.g. use `Data.Map` and
 `Data.ByteString.Internal` instead of `Data.Maps` and
@@ -268,7 +265,7 @@ Use singular when naming modules e.g. use `Data.Map` and
 Misc
 ----
 
-### Point-free style ###
+##### Point-free style #####
 
 Avoid over-using point-free style. For example, this is hard to read:
 
@@ -277,12 +274,12 @@ Avoid over-using point-free style. For example, this is hard to read:
 f = (g .) . h
 ```
 
-### Warnings ###
+##### Warnings #####
 
 Code should be compilable with `-Wall -Werror`. There should be no
 warnings.
 
-### Errors ###
+##### Errors #####
 
 If a total function is not possible, it is often a good idea to add a final
 case matching errors. Use the `error` function here (and only here), and add a
