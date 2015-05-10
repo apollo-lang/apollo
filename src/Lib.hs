@@ -14,7 +14,11 @@ prelude = unlines
 
   , "  lenB: (xs: [Bool]) -> Int = case(xs == []) 0 otherwise 1 + lenB(t@xs)"
 
-  , "  concat: (x1: [Int], x2: [Int]) -> [Int] = case(!x1) x2 otherwise (h@x1 :: concat(t@x1, x2))"
+  , "  lenP: (xs: [Pitch]) -> Int = case(xs == []) 0 otherwise 1 + lenP(t@xs)"
+
+  , "  concatI: (x1: [Int], x2: [Int]) -> [Int] = case (!x1) x2 otherwise (h@x1 :: concatI(t@x1, x2))"
+
+  , "  concatP: (x1: [Pitch], x2: [Pitch]) -> [Pitch] = case (!x1) x2 otherwise (h@x1 :: concatP(t@x1, x2))"
 
   , "  filterI: (f: (Int) -> Bool, a: [Int]) -> [Int] = case (!a) [] otherwise { case (f(h@a)) h@a :: filterI(f, t@a) otherwise filterI(f, t@a) }"
 
@@ -22,21 +26,27 @@ prelude = unlines
 
   , "  sumI: (xs: [Int]) -> Int = foldrII(\\x: Int, y: Int -> Int: x + y, 0, xs)"
 
-  , "  sequence: (start: Int, end: Int) -> [Int] = case (start >= end - 1) [end] otherwise start :: sequence(start + 1, end)"
-
-  , "  length: (xs: [Int]) -> Int = case (!xs) 0 otherwise 1 + length(t@xs)"
+  , "  sequence: (start: Int, end: Int) -> [Int] = case (start >= end) [] otherwise start :: sequence(start + 1, end)"
 
   , "  zip: (a: [Pitch], b: [Duration]) -> [Atom] = case (!a || !b) [] otherwise (h@a, h@b) :: zip(t@a, t@b)"
 
-  , "  replicate: (xs: [Int], n: Int) -> [Int] = case (n == 0) [] otherwise concat(xs, replicate(xs, n - 1))"
+  , "  replicateI: (xs: [Int], n: Int) -> [Int] = case (n == 0) [] otherwise concatI(xs, replicateI(xs, n - 1))"
+
+  , "  replicateP: (xs: [Pitch], n: Int) -> [Pitch] = case (n == 0) [] otherwise concatP(xs, replicateP(xs, n - 1))"
 
   , "  uniform: (d: Duration, n: Int) -> [Duration] = case (n == 0) [] otherwise d :: uniform(d, n - 1)"
 
-  , "  last: (xs: [Int]) -> Int = case (length(xs) == 1) h@xs otherwise last(t@xs)"
+  , "  lastI: (xs: [Int]) -> Int = case (lenI(xs) == 1) h@xs otherwise lastI(t@xs)"
 
-  , "  init: (xs: [Int]) -> [Int] = case (length(xs) == 1) [] otherwise h@xs :: init(t@xs)"
+  , "  lastP: (xs: [Pitch]) -> Pitch = case (lenP(xs) == 1) h@xs otherwise lastP(t@xs)"
 
-  , "  reverse: (xs: [Int]) -> [Int] = case (!xs) [] otherwise last(xs) :: reverse(init(xs))"
+  , "  initI: (xs: [Int]) -> [Int] = case (lenI(xs) == 1) [] otherwise h@xs :: initI(t@xs)"
+
+  , "  initP: (xs: [Pitch]) -> [Pitch] = case (lenP(xs) == 1) [] otherwise h@xs :: initP(t@xs)"
+
+  , "  reverseI: (xs: [Int]) -> [Int] = case (!xs) [] otherwise lastI(xs) :: reverseI(initI(xs))"
+
+  , "  reverseP: (xs: [Pitch]) -> [Pitch] = case (!xs) [] otherwise lastP(xs) :: reverseP(initP(xs))"
 
   ]
   -- TODO: foldl
