@@ -113,6 +113,12 @@ eval env expr = case expr of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
 
+  Def name TDuration ex -> do
+    val <- eval env ex
+    case val of
+        (VInt i) -> (defineVar env name $ VDuration (toNneg i)) >> return Empty
+        (VDuration p) -> (defineVar env name $ VDuration (toNneg p)) >> return Empty
+
   -- For recursion, binding names must be initialized
   -- before they are stored. (below)
 
@@ -218,4 +224,9 @@ toVDuration :: Expr -> Expr
 toVDuration (VDuration d) = VDuration d
 toVDuration (VInt i)   = VDuration i 
 toVDuration _          = error "Expected VInt or VPitch"
+
+toNneg :: Int -> Int
+toNneg n | n >= 0    = n
+         | otherwise = 0
+
 
