@@ -41,6 +41,7 @@ import Lex
     '||'        { TokenOr }
     '!'         { TokenNot }
     '::'        { TokenCons }
+    '\\'        { TokenLambda }
     '='         { TokenDef }
     '->'        { TokenArrow }
     ':'         { TokenColon }
@@ -65,6 +66,9 @@ import Lex
 
 %%
 
+Program     : {- empty -}                   { [] }
+            | Statements                    { $1 }
+
 Statements  : Statement                     { [$1] }
             | Statement Statements          { $1:$2 }
 
@@ -77,17 +81,17 @@ Definitions : Definition                    { [$1] }
 Definition  : ID ':' Type '=' Expression    { Def $1 $3 $5 }
             | ID ':' 
               '(' Params ')' '->' Type 
-              '=' Expression                { def $1 ($4, $7) $9 }
+              '=' Expression                { def $1 $4 $7 $9 }
             | TEMPO Expression              { Def "#tempo" TInt $2}
 
 Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
             | MUSIC                         { TMusic }
 
-FnType      : '(' AnonParams ')' '->' Type  { ($2, $5) }
-
 Param       : ID ':' Type                   { Param $1 $3 }
-            | ID ':' FnType                 { param $1 $3 }
+            | ID ':' 
+              '(' AnonParams ')' '->' 
+              Type                          { param $1 $4 $7 }
 
 Params      : Param                         { [$1] }
             | Param ',' Params              { $1:$3 }
@@ -100,24 +104,35 @@ AnonParams  : AnonParam                     { [$1] }
 Expressions : Expression                    { [$1] }
             | Expression ',' Expressions    { $1:$3 }
 
-Expression  : NUM                           { VInt $1 }
-            | BOOL                          { VBool $1 }
-            | ID                            { Name $1 }
-            | PITCH                         { VPitch $ parsePitch $1 }
-            | DUR                           { VDuration $ parseDuration $1 }
-            | TEMPO                         { Name "#tempo" }
-            | MUSIC '(' Expressions ')'     { VMusic $3 }
-            | '(' Expression
-              ',' Expression ')'            { VAtom $2 $4 }     -- Note and Chord atoms
-            | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
-            | '|' Expressions '|'           { VPart $2 }
-            | ID '(' Expressions ')'        { FnCall $1 $3 }
-            | '[' Expressions ']'           { VList $2 }
+Expression  : Primitive                     { $1 } 
+            | Derived                       { $1 }
+            | Lambda                        { $1 }
+            | FnCall                        { $1 }
             | Conditional                   { $1 }
+            | Block                         { $1 }
             | UnOp                          { $1 }
             | BinOp                         { $1 }
-            | Block                         { $1 }
             | '(' Expression ')'            { $2 }
+            | ID                            { Name $1 }
+
+Primitive   : NUM                           { VInt $1 }
+            | BOOL                          { VBool $1 }
+            | PITCH                         { VPitch $ parsePitch $1 }
+            | DUR                           { VDuration $ parseDuration $1 }
+
+Derived     : '(' Expression
+              ',' Expression ')'            { VAtom $2 $4 }
+            | '(' '_' ',' Expression ')'    { VAtom Nil $4 }
+            | '|' Expressions '|'           { VPart $2 }
+            | MUSIC '(' Expressions ')'     { VMusic $3 }
+            | '[' Expressions ']'           { VList $2 }
+
+Lambda      : '\\' Params '->' Type ':' 
+              Expression                    { lambda $2 $4 $6 }
+
+FnCall      :  ID '(' Expressions ')'       { FnCall (Name $1) $3 }
+            | '(' Lambda ')' 
+              '(' Expressions ')'           { FnCall $2 $5 }
 
 Conditional : CASE '(' Expression ')'
                 Expression

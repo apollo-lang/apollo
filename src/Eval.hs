@@ -81,10 +81,15 @@ eval env expr = case expr of
 
   Name name -> getVar env name >>= eval env
 
-  FnCall name args -> do
+  FnCall (Name name) args -> do
     VLam params body <- getVar env name
     args' <- mapM (eval env) args
     apply params body env args'
+
+  FnCall (VTLam ts is t e) args -> do
+    --VLam params body <- getVar env name
+    args' <- mapM (eval env) args
+    apply is e env args'
 
   Empty -> error "Error: eval called on Empty"
 
