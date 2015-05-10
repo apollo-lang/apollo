@@ -125,6 +125,6 @@ strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
 strDelim s f = init . concatMap ((++ s) . f)
 
 commaDelim :: [Expr] -> String
-ommaDelim [] = ""
+commaDelim [] = ""
 commaDelim xs = init . concatMap ((++ ",") . showPP) $ xs
 
