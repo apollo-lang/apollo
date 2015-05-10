@@ -91,19 +91,18 @@ mib: Pitch = 51
 
 Here is a table of integer to pitch mapping:
 
-|    | c   | c#/db | d   | d#/eb | e   | f   | f#/gb | g   | g#/ab | a   | a#/bb | b   |
+|oct.| C   | C#/Db | D   | D#/Eb | E   | F   | F#/Gb | G   | G#/Ab | A   | A#/Bb | B   |
 |----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
-| 0  | 0   | 1     | 2   | 3     | 4   | 5   | 6     | 7   | 8     | 9   | 10    | 11  |
-| 1  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
-| 2  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
-| 3  | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
-| 4  | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
-| 5  | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
-| 6  | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
-| 7  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
-| 8  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
-| 9  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-| 10 | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
+|**0** | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
+|**1** | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
+|**2** | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
+|**3** | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
+|**4** | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
+|**5** | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
+|**6** | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
+|**7** | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
+|**8** | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
+|**9** | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
 But a pitch can't be heard without a duration, so we need to define what a duration is. We will then combine the pitch and duration to construct a note.
 
@@ -226,7 +225,7 @@ j: Int = case(i == 0)
              2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here we illustrate another important principle in Apollo. A block has a value that is equal to the value of its last line. Therefore, this case statement returns *1* if `i` is *0*, *i\*2* if `i` is *1* and *2* otherwise.
+Here we illustrate another important principle in Apollo. A block has a value that is equal to the value of its last line. Therefore, this case statement returns `1` if `i` is `0`, `i*2` if `i` is `1` and `2` otherwise.
 
 Functions
 ---------
@@ -273,7 +272,7 @@ factorial: (n: Int) -> Int =
     case (n == 0) 1 otherwise n * factorial(n - 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As in all recursive functions, we need a base case to prevent infinite recursive calls. For this we use conditional statements. The functions reads as "the factorial of `n` is *1* if `n` is *0*, otherwise it is `n` times the factorial of `n - 1`."
+As in all recursive functions, we need a base case to prevent infinite recursive calls. For this we use conditional statements. The function is reads as "the factorial of `n` is `1` if `n` is `0`, otherwise it is `n` times the factorial of `n - 1`."
 
 Lists
 -----
@@ -300,7 +299,7 @@ $ apollo main.ap
 
 *Note that the above assumed that the `apollo` executable is in the user’s `$PATH` environment variable*
 
-This will begin the Apollo interpreter, thereby converting Apollo source code into Haskell code. If the program is free of runtime errors and terminates in a finite amount of time, target Haskell code will output a valid MIDI file. By default, this file will be named main.mid. The output file can then be played through any MIDI player.
+This will begin the Apollo interpreter, thereby converting Apollo source code into MIDI. If the program is free of runtime errors, terminates in a finite amount of time, and assigns `Music` to the variable `main` then a MIDI will be created. By default, this file will be named main.mid. The output file can then be played through any MIDI player.
 
 To input source code into the Apollo compiler via stdin, use `-` as the only argument:
 
