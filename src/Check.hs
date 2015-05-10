@@ -6,6 +6,7 @@ import Control.Monad.Error (throwError, liftIO)
 import Data.IORef (newIORef, readIORef)
 
 import Error
+import Type
 import Expr
 import Env
 

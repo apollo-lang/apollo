@@ -4,20 +4,27 @@ module Env (
 , IOThrowsError
 , liftThrows
 , runIOThrows
-, runTypeExpr
 , getVar
+, setVar
 , defineVar
 , bindVars
 , isBound
+, clone
 ) where
 
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
 import Data.Maybe (isJust)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Error
-import Expr
 
+type Id = String
 type Env a = IORef [(String, IORef a)]
+
+instance Show (IORef a) where
+  show _ = "<ioref>"
+
+instance Ord (IORef a) where
+  compare _ _ = EQ
 
 nullEnv :: IO (Env a)
 nullEnv = newIORef []
@@ -30,11 +37,6 @@ liftThrows (Right val) = return val
 
 runIOThrows :: IOThrowsError String -> IO String
 runIOThrows action = liftM extractValue (runErrorT $ trapError action)
-
-runTypeExpr :: IOThrowsError Expr -> IO Expr
-runTypeExpr typexpr = liftM extractValueM (runErrorT $ typexpr)
-                    where extractValueM (Right val) = val
-                          extractValueM (Left    _) = error "bug: extractValue called with Left"
 
 getVar :: Env a -> Id -> IOThrowsError a
 getVar envRef var = do
@@ -65,9 +67,11 @@ defineVar envRef var value = do
              writeIORef envRef ((var, valueRef) : env)
              return value -- TODO: could be bad; shouldnt return anything but then have to do weird stuff
 
-bindVars :: Env Expr -> [(String, Expr)] -> IO (Env Expr)
+bindVars :: Env a -> [(String, a)] -> IO (Env a)
 bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
      where extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
            addBinding (var, value) = do ref <- newIORef value
                                         return (var, ref)
+
+clone e = liftIO (readIORef e >>= newIORef)
 
