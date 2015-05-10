@@ -17,7 +17,13 @@ typecheck env expr = case expr of
   VBool{}     -> return TBool
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
-  VAtom{}     -> return TAtom
+  
+  VAtom a b     -> do
+    ta <- typecheck env a
+    tb <- typecheck env b
+    if (ta == TInt || ta == TPitch) && (tb == TInt || tb == TDuration)
+    then return TAtom
+    else throwError $ TypeExcept "Atom must contain Pitch and Duration"
 
   VMusic m    -> do
     t <- mapM (typecheck env) m

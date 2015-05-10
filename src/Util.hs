@@ -20,7 +20,7 @@ define :: Id -> Type -> Expr -> Expr
 define i t e = case (t, e) of 
     (TPitch, VInt n) -> Def i t (VPitch (n `mod` 128))
     (TDuration, VInt n) -> Def i t (VDuration n)
-    _                -> Def i t e 
+    _                   -> Def i t e
 
 def :: Id -> ([Param], Type) -> Expr -> Expr
 def iden (params, retType) body = Def iden (TFunc (snd params') retType) (VLam (fst params') body)
@@ -39,9 +39,9 @@ toPitch (VInt i)   = Pitch $ i `mod` 128
 toPitch _          = error "Expected VInt or VPitch"
 
 toDuration :: Expr -> Duration
-toPitch (VDuration p) = Duration p
-toPitch (VInt i)      = Duration i
-toPitch _             = error "Expected VInt or VPitch"
+toDuration (VDuration p) = Duration p
+toDuration (VInt i)      = Duration i
+toDuration _             = error "Expected VInt or VPitch"
 
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
