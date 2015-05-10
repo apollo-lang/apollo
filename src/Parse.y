@@ -2,6 +2,7 @@
 module Parse (
   parse
 ) where
+
 import Control.Monad.Error (liftM, throwError)
 import Error
 import Type
@@ -44,6 +45,7 @@ import Lex
     '\\'        { TokenLambda }
     'h@'        { TokenHead }
     't@'        { TokenTail }
+    '?'         { TokenRandom }
     '='         { TokenDef }
     '->'        { TokenArrow }
     ':'         { TokenColon }
@@ -81,8 +83,8 @@ Definitions : Definition                    { [$1] }
 
 Definition  : ID ':' Type '=' Expression    { Def $1 $3 $5 }
 
-            | ID ':' 
-              '(' Params ')' '->' Type 
+            | ID ':'
+              '(' Params ')' '->' Type
               '=' Expression                { def $1 $4 $7 $9 }
 
             | TEMPO Expression              { Def "#tempo" TInt $2}
@@ -91,8 +93,8 @@ Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
 
 Param       : ID ':' Type                   { Param $1 $3 }
-            | ID ':' 
-              '(' AnonParams ')' '->' 
+            | ID ':'
+              '(' AnonParams ')' '->'
               Type                          { param $1 $4 $7 }
 
 Params      : Param                         { [$1] }
@@ -106,7 +108,7 @@ AnonParams  : AnonParam                     { [$1] }
 Expressions : Expression                    { [$1] }
             | Expression ',' Expressions    { $1:$3 }
 
-Expression  : Primitive                     { $1 } 
+Expression  : Primitive                     { $1 }
             | Derived                       { $1 }
             | Lambda                        { $1 }
             | FnCall                        { $1 }
@@ -116,6 +118,7 @@ Expression  : Primitive                     { $1 }
             | BinOp                         { $1 }
             | '(' Expression ')'            { $2 }
             | ID                            { Name $1 }
+            | Macro                         { $1 }
 
 Primitive   : NUM                           { VInt $1 }
             | BOOL                          { VBool $1 }
@@ -128,11 +131,11 @@ Derived     : '(' Expression
             | '[' Expressions ']'           { VList $2 }
             | '[' ']'                       { VList [] }
 
-Lambda      : '\\' Params '->' Type ':' 
+Lambda      : '\\' Params '->' Type ':'
               Expression                    { lambda $2 $4 $6 }
 
 FnCall      :  ID '(' Expressions ')'       { FnCall (Name $1) $3 }
-            | '(' Lambda ')' 
+            | '(' Lambda ')'
               '(' Expressions ')'           { FnCall $2 $5 }
 
 Conditional : CASE '(' Expression ')'
@@ -162,6 +165,8 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '&&' Expression    { BoolOp And $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
             | Expression '::' Expression    { ArrOp Cons $1 $3 }
+
+Macro       : NUM '?' NUM                   { VInt $ randomRange $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Expression

@@ -1,20 +1,22 @@
-module Util
-    ( def
-    , param
-    , lambda
-    , parsePitch
-    , parseDuration
-    , makeMusic
-    ) where
 
+--------------------------------------------------------------------------
+-- Util: utilities for type and data construction in Apollo expressions
+--------------------------------------------------------------------------
+
+module Util (
+  def
+, param
+, lambda
+, parsePitch
+, parseDuration
+, makeMusic
+, randomRange
+) where
+
+import System.Random
 import Text.Regex.Posix
 import Expr
 import Type
--- import Error
-
--- TODO: use Error monad instead of `error`
-
--- define: For TFunc, store param names with body as FnBody type
 
 def :: Id -> [Param] -> Type -> Expr -> Expr
 def i p t e = Def i (TFunc (snd p') t) (VLam (fst p') e)
@@ -36,11 +38,11 @@ unpackParams = unzip . map (\(Param i t) -> (i, t))
 
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
-unpackList _ = error "Expected expression list"
+unpackList _             = error "Expected expression list"
 
 toPitch :: Expr -> Pitch
 toPitch (VPitch p) = Pitch p
-toPitch (VInt i)   = Pitch $ i `mod` 128 
+toPitch (VInt i)   = Pitch $ i `mod` 128
 toPitch _          = error "Expected VInt or VPitch"
 
 toDuration :: Expr -> Duration
@@ -49,29 +51,29 @@ toDuration (VInt i)      = Duration i
 toDuration _             = error "Expected VInt or VPitch"
 
 makeAtom :: Expr -> Atom
-makeAtom (VAtom Nil (VDuration d))          = AtomRest $ Rest (Duration d)
+makeAtom (VAtom Nil (VDuration d))            = AtomRest $ Rest (Duration d)
 makeAtom (VAtom p@(VPitch _) d@(VDuration _)) = AtomNote $ Note (toPitch p) (toDuration d)
-makeAtom (VAtom pitches d@(VDuration _))      = AtomChord $ Chord (map (\p -> (toPitch p)) $ unpackList pitches) (toDuration d)
-makeAtom _                                  = error "Expected note, chord or rest"
+makeAtom (VAtom pitches d@(VDuration _))      = AtomChord $ Chord (map toPitch $ unpackList pitches) (toDuration d)
+makeAtom _                                    = error "Expected note, chord or rest"
 
 makeMusic :: Expr -> Music
-makeMusic (VList m) = Music $ map ((map makeAtom) . unpackList)  m
-makeMusic _          = error "bug: expected VMusic"
+makeMusic (VList m) = Music $ map (map makeAtom . unpackList)  m
+makeMusic _         = error "Error: name to export to midi must be of type Music"
 
 pitchClass :: String -> Int
-pitchClass "C"  = 0
-pitchClass "D"  = 2
-pitchClass "E"  = 4
-pitchClass "F"  = 5
-pitchClass "G"  = 7
-pitchClass "A"  = 9
-pitchClass "B"  = 11
-pitchClass _    = error "Invalid pitch class"
+pitchClass "C" = 0
+pitchClass "D" = 2
+pitchClass "E" = 4
+pitchClass "F" = 5
+pitchClass "G" = 7
+pitchClass "A" = 9
+pitchClass "B" = 11
+pitchClass _   = error "Invalid pitch class"
 
 accidental :: String -> Int
-accidental "b"  = -1
-accidental "#"  = 1
-accidental _    = 0
+accidental "b" = -1
+accidental "#" = 1
+accidental _   = 0
 
 pitchHeight :: Int -> Int -> Int -> Int
 pitchHeight pc acc octave = (pc + acc) + 12 * (octave + 1)
@@ -80,11 +82,10 @@ parsePitch :: String -> Int
 parsePitch s = case matchPitch s of
     [] -> error "Invalid pitch (no match)"
     ms -> case head ms of
-        [_, pc, acc, octave] ->
-                pitchHeight
-                (pitchClass pc)
-                (accidental acc)
-                (read octave :: Int)
+        [_, pc, acc, octave] -> pitchHeight
+                                (pitchClass pc)
+                                (accidental acc)
+                                (read octave :: Int)
         _ -> error "Invalid pitch (invalid match)"
 
 matchPitch :: String -> [[String]]
@@ -101,4 +102,7 @@ parseDuration s = case matchDuration s of
 
 matchDuration :: String -> [[String]]
 matchDuration s = s =~ "\\\\([0-9]+)(\\.?)"
+
+randomRange :: Int -> Int -> Int
+randomRange a b = head . randomRs (a, b) . mkStdGen $ 13128930232
 
