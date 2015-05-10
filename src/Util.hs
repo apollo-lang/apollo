@@ -56,7 +56,7 @@ makeAtom _                                    = error "Expected note, chord or r
 
 makeMusic :: Expr -> Music
 makeMusic (VList m) = Music $ map (map makeAtom . unpackList)  m
-makeMusic _         = error "bug: expected VMusic"
+makeMusic _         = error "Error: name to export to midi must be of type Music"
 
 pitchClass :: String -> Int
 pitchClass "C" = 0
