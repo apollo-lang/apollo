@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Env (
   Env
 , nullEnv
@@ -13,6 +14,7 @@ module Env (
 ) where
 
 import Control.Monad.Error (ErrorT, throwError, runErrorT, liftM, liftIO)
+import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (isJust)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Error
@@ -73,5 +75,6 @@ bindVars envRef bindings = liftIO (readIORef envRef >>= extendEnv bindings >>= n
            addBinding (var, value) = do ref <- newIORef value
                                         return (var, ref)
 
+clone :: MonadIO m => IORef a -> m (IORef a)
 clone e = liftIO (readIORef e >>= newIORef)
 
