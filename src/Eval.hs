@@ -8,6 +8,7 @@ import Data.IORef (newIORef, readIORef)
 import Error
 import Expr
 import Env
+import Type
 
 eval :: Env Expr -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
@@ -102,6 +103,12 @@ eval env expr = case expr of
   -- HAHA RECURSION YOU SUCKA
   -- For recursion, binding names must be initialized
   -- before they are stored.
+
+  Def name TPitch ex -> do
+    val <- eval env ex
+    case val of 
+        (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
+        (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
 
   Def name _ ex@(VLam p b) -> do
     val <- eval env ex
