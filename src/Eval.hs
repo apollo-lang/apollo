@@ -29,19 +29,11 @@ eval env expr = case expr of
 
   Not e -> do
     e' <- eval env e
-<<<<<<< HEAD
     case e' of 
       VBool b -> return . VBool $ not b
       VList l -> return . VBool $ null l
       _       -> error "Error: expected Bool, Part or List" 
-=======
-    case e' of
-      VBool b -> do
-        return . VBool $ not b
-      VList l -> do
-        return . VBool $ null l
-      _       -> error "Error: expected Bool, Part or List"
->>>>>>> master
+
 
   Neg e -> do
     VInt i <- eval env e
@@ -49,7 +41,6 @@ eval env expr = case expr of
 
   Head l -> do
     l' <- eval env l
-<<<<<<< HEAD
     case l' of 
       VList ll -> return (head ll)
       _       -> error "Error: expected Part or List" 
@@ -59,19 +50,6 @@ eval env expr = case expr of
     case l' of 
       VList (x:xs) -> return (VList xs)
       _       -> error "Error: expected Part or List" 
-=======
-    case l' of
-      VList ll -> do
-        return (head ll)
-      _       -> error "Error: expected Part or List"
-
-  Tail l -> do
-    l' <- eval env l
-    case l' of
-      VList (x:xs) -> do
-        return (VList xs)
-      _       -> error "Error: expected Part or List"
->>>>>>> master
 
   BoolOp op a b -> do
     VBool a' <- eval env a
