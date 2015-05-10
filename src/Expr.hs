@@ -151,7 +151,7 @@ data Atom     = AtomNote Note
 data Music    = Music [[Atom]]           deriving (Eq, Ord, Show)
 
 strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
-strDelim s f [] = ""
+strDelim _ _ [] = ""
 strDelim s f xs = init . concatMap ((++ s) . f) $ xs
 
 commaDelim :: [Expr] -> String

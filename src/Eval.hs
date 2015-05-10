@@ -2,7 +2,7 @@ module Eval
     ( eval
     ) where
 
-import Control.Monad (liftM, liftM2)
+import Control.Monad (liftM)
 import Control.Monad.Error (throwError, liftIO)
 import Data.IORef (newIORef, readIORef)
 import Error
@@ -112,6 +112,7 @@ eval env expr = case expr of
     case val of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
+        _ -> return Empty
 
   
   Def name (TList TPitch) ex -> do
@@ -131,6 +132,7 @@ eval env expr = case expr of
     case val of
         (VInt i) -> (defineVar env name $ VDuration (toNneg i)) >> return Empty
         (VDuration p) -> (defineVar env name $ VDuration (toNneg p)) >> return Empty
+        _ -> return Empty
 
   -- For recursion, binding names must be initialized
   -- before they are stored. (below)
