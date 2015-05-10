@@ -144,14 +144,14 @@ pitch, or the height of a note on a musical staff.
 
 ##### Short-hand notation
 
-A backtick, followed by a single upper-case letter from A to G indicating the
+A single upper-case letter from A to G indicating the
 pitch, followed by an optional `#` or `b` character indicating the accidental
 (sharp or flat, respectively), followed by a number indicating the octave.
 
 For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`A#5
+A#5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the pitch corresponding to A# in the fifth octave.
@@ -177,7 +177,7 @@ This notation is inspired by the way notes are defined in MIDI. It is generated
 by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`[A-G](#|b)?[0-9]
+[A-G](#|b)?[0-9]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ##### Duration
