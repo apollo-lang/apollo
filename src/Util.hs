@@ -1,6 +1,5 @@
 module Util
     ( def
-    , define
     , param
     , parsePitch
     , parseDuration
@@ -16,11 +15,6 @@ import Type
 
 
 -- define: For TFunc, store param names with body as FnBody type
-define :: Id -> Type -> Expr -> Expr
-define i t e = case (t, e) of 
-    (TPitch, VInt n) -> Def i t (VPitch (n `mod` 128))
-    (TDuration, VInt n) -> Def i t (VDuration n)
-    _                   -> Def i t e
 
 def :: Id -> ([Param], Type) -> Expr -> Expr
 def iden (params, retType) body = Def iden (TFunc (snd params') retType) (VLam (fst params') body)
