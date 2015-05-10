@@ -12,13 +12,19 @@ import Type
 
 eval :: Env Expr -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
-  
+
   VInt i      -> return $ VInt i
   VBool b     -> return $ VBool b
-  VPitch p    -> return $ VPitch p
+  VPitch p    -> return $ VPitch (p `mod` 128)
   VDuration d -> return $ VDuration d
 
-  VAtom a b -> liftM2 VAtom (eval env a) (eval env b)
+  VAtom a b -> do
+    a' <- eval env a
+    b' <- eval env b
+    case (a', b') of 
+      (Nil, d)             -> return $ VAtom Nil (toVDuration d)
+      ((VList pitches), d) -> return $ VAtom (VList (map (\p -> (toVPitch p)) pitches)) (toVDuration d)
+      _                    -> return $ VAtom (toVPitch a') (toVDuration b')
 
   VMusic m -> liftM VMusic (mapM (evalM env) m)
 
@@ -30,10 +36,10 @@ eval env expr = case expr of
 
   Not e -> do
     e' <- eval env e
-    case e' of 
+    case e' of
       VBool b -> return . VBool $ not b
       VList l -> return . VBool $ null l
-      _       -> error "Error: expected Bool, Part or List" 
+      _       -> error "Error: expected Bool, Part or List"
 
 
   Neg e -> do
@@ -42,15 +48,15 @@ eval env expr = case expr of
 
   Head l -> do
     l' <- eval env l
-    case l' of 
+    case l' of
       VList ll -> return (head ll)
-      _       -> error "Error: expected Part or List" 
+      _       -> error "Error: expected Part or List"
 
   Tail l -> do
     l' <- eval env l
-    case l' of 
+    case l' of
       VList (_:xs) -> return (VList xs)
-      _       -> error "Error: expected Part or List" 
+      _       -> error "Error: expected Part or List"
 
   BoolOp op a b -> do
     VBool a' <- eval env a
@@ -81,8 +87,7 @@ eval env expr = case expr of
     a' <- eval env a
     l' <- eval env l
     case l' of
-      VList ll -> do
-        return . VList $ a' : ll
+      VList ll -> return . VList $ a' : ll
       _        -> error "Error: expected Part or List"
 
 
@@ -98,18 +103,24 @@ eval env expr = case expr of
         names = map (\(Def name _ _) -> name) body
 
   VLam params body -> clone env >>= \closure -> return (Function params body closure)
+  VTLam _ _ params body -> clone env >>= \closure -> return (Function params body closure)
 
   Function{} -> error "bug / TODO(?): eval called on Function"
 
-  -- HAHA RECURSION YOU SUCKA
-  -- For recursion, binding names must be initialized
-  -- before they are stored.
-
   Def name TPitch ex -> do
     val <- eval env ex
-    case val of 
+    case val of
         (VInt i) -> (defineVar env name $ VPitch (i `mod` 128)) >> return Empty
         (VPitch p) -> (defineVar env name $ VPitch (p `mod` 128)) >> return Empty
+
+  Def name TDuration ex -> do
+    val <- eval env ex
+    case val of
+        (VInt i) -> (defineVar env name $ VDuration (toNneg i)) >> return Empty
+        (VDuration p) -> (defineVar env name $ VDuration (toNneg p)) >> return Empty
+
+  -- For recursion, binding names must be initialized
+  -- before they are stored. (below)
 
   Def name _ ex@(VLam p b) -> do
     _ <- eval env ex
@@ -127,7 +138,7 @@ eval env expr = case expr of
     args' <- mapM (eval env) args
     apply p b closure args'
 
-  FnCall (VTLam _ is _ e) args -> do
+  FnCall (VTLam _ _ is e) args -> do
     args' <- mapM (eval env) args
     apply is e env args'
 
@@ -203,4 +214,19 @@ apply params body closure args =
   createEnv args >>= flip eval body
     where
       createEnv = bindVars closure . zip params
+
+toVPitch :: Expr -> Expr
+toVPitch (VPitch p) = VPitch $ p `mod` 128 
+toVPitch (VInt i)   = VPitch $ i `mod` 128 
+toVPitch _          = error "Expected VInt or VPitch"
+
+toVDuration :: Expr -> Expr
+toVDuration (VDuration d) = VDuration d
+toVDuration (VInt i)   = VDuration i 
+toVDuration _          = error "Expected VInt or VPitch"
+
+toNneg :: Int -> Int
+toNneg n | n >= 0    = n
+         | otherwise = 0
+
 

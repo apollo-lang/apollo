@@ -17,11 +17,11 @@ typecheck env expr = case expr of
   VBool{}     -> return TBool
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
-  
+
   VAtom a b     -> do
     ta <- typecheck env a
     tb <- typecheck env b
-    if (ta == TNil || ta == TInt || ta == TPitch || ta == TList TPitch || ta == TList TInt ) 
+    if (ta == TNil || ta == TInt || ta == TPitch || ta == TList TPitch || ta == TList TInt )
       && (tb == TInt || tb == TDuration || tb == TList TDuration || tb == TList TInt)
     then return TAtom
     else throwError $ TypeExcept "Atom must contain Pitch and Duration"
@@ -106,6 +106,8 @@ typecheck env expr = case expr of
     tb <- typecheck env b
     case (ta, tb) of
       (TInt, TInt)   -> return TBool
+      (TPitch, TPitch)   -> return TBool
+      (TDuration, TDuration)   -> return TBool
       (TBool, TBool) -> return TBool
       (TList t, TList t') ->
         if (t == t') && (op == Eq || op == NEq)
@@ -121,7 +123,7 @@ typecheck env expr = case expr of
     tb <- typecheck env b
     case (ta, tb) of
       (TInt, TInt) -> return TInt
-      (TPitch, TInt) -> 
+      (TPitch, TInt) ->
         if op == Add || op == Sub
         then return TPitch
         else throwError (TypeMismatch (show op) ta tb)
@@ -208,6 +210,13 @@ typecheck env expr = case expr of
       getType (TFunc _ returnType) = returnType
       getType other                = other
 
+  VTLam pTypes rType params body -> do
+    e <- bindVars env (zip params pTypes)
+    r <- typecheck e body
+    if rType == r
+    then return (TFunc pTypes rType)
+    else throwError (TypeRMismatch "<lambda>" rType r)
+
   Nil       -> return TNil
 
   other -> return (TErrVerbose (show other)) -- error $ "ERR: got: " ++ show other
@@ -218,7 +227,7 @@ uniform ys = all (== head ys) ys
 
 
 match :: Type -> Type -> Bool
-match a b = case (a, b) of 
+match a b = case (a, b) of
         (TPitch, TInt)    -> True
         (TDuration, TInt) -> True
         _                 -> False

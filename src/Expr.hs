@@ -36,7 +36,7 @@ data Expr
     | Name Id
     | Def Id Type Expr
     | VLam [Id] Expr                -- Untyped lambdas
-    | VTLam [Type] [Id] Type Expr   -- Typed lambdas
+    | VTLam [Type] Type [Id] Expr   -- Typed lambdas
     | Function [Id] Expr (Env Expr) -- A function with its closure
     | Block [Expr] Expr
     | If Expr Expr Expr
@@ -51,7 +51,32 @@ data Expr
     | ArrOp AOpr Expr Expr
     | Empty                     -- Value of definitions
     | Nil                       -- Value of '_' token
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
+
+instance Show Expr where
+    show (VInt  i)      = show i
+    show (VBool b)      = show b
+    show (VDuration d)  = "(" ++ show d ++ ")"
+    show (VPitch p)     = "(" ++ show p ++ ")"
+    show (VAtom p d)    = "(Atom " ++ show p ++ " " ++ show d ++ ")"
+    show (VMusic m)     = "(Music " ++ strDelim " " show m ++ ")"
+    show (VList es)     = "(List" ++ (strDelim " " id . map show) es  ++ ")"
+    show (Name n)       = n
+    show (Def i _ e)    = "(Def " ++ i ++ " " ++ show e ++ ")"
+    show (VLam is e)    = "(Lambda " ++ strDelim " " id is ++ " . " ++ show e ++ ")"
+    show (Block es e)   = "(Block " ++ (strDelim " " id . map show) es ++ " " ++ show e ++ ")"
+    show (If e1 e2 e3)  = "(If " ++ show e1 ++ " " ++ show e2 ++ " " ++ show e3 ++ ")"
+    show (FnCall e1 e2) = "(" ++ show e1 ++ " " ++ strDelim " " show e2 ++ ")"
+    show (Neg e)        = "(Neg " ++ show e ++ ")"
+    show (Not e)        = "(Not " ++ show e ++ ")"
+    show (Head e)       = "(Head " ++ show e ++ ")"
+    show (Tail e)       = "(Tail " ++ show e ++ ")"
+    show (IntOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show (BoolOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show (CompOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show (ArrOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show Nil            = "Nil"
+    show _              = "<?>"
 
 -- | showPP is used for pretty-printing values after evaluation,
 -- whereas the derived Show for Expr is used to print the AST
@@ -72,9 +97,12 @@ showPP (If e1 e2 e3)  = "(If " ++ showPP e1 ++ " " ++ showPP e2 ++ " " ++ showPP
 showPP (FnCall e1 e2) = "(" ++ show e1 ++ " " ++ strDelim " " showPP e2 ++ ")"
 showPP (Neg e)        = "(Neg " ++ showPP e ++ ")"
 showPP (Not e)        = "(Not " ++ showPP e ++ ")"
+showPP (Head e)       = "(Head " ++ show e ++ ")"
+showPP (Tail e)       = "(Tail " ++ show e ++ ")"
 showPP (IntOp o a b)  = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
 showPP (BoolOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
 showPP (CompOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
+showPP (ArrOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
 showPP Nil            = "Nil"
 showPP _              = "<?>"
 
@@ -123,7 +151,8 @@ data Atom     = AtomNote Note
 data Music    = Music [[Atom]]           deriving (Eq, Ord, Show)
 
 strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
-strDelim s f = init . concatMap ((++ s) . f)
+strDelim s f [] = ""
+strDelim s f xs = init . concatMap ((++ s) . f) $ xs
 
 commaDelim :: [Expr] -> String
 commaDelim [] = ""
