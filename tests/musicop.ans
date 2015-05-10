@@ -1,0 +1,60 @@
+(70)
+(68)
+Type error: Pitch and Int are wrong operand types for `*`
+Type error: Pitch and Int are wrong operand types for `/`
+Type error: Pitch and Int are wrong operand types for `%`
+
+Type error: Pitch and Bool are wrong operand types for `+`
+Type error: Pitch and Bool are wrong operand types for `-`
+Type error: Pitch and Bool are wrong operand types for `*`
+Type error: Pitch and Bool are wrong operand types for `/`
+Type error: Pitch and Bool are wrong operand types for `%`
+
+Type error: Pitch and Pitch are wrong operand types for `+`
+Type error: Pitch and Pitch are wrong operand types for `-`
+Type error: Pitch and Pitch are wrong operand types for `*`
+Type error: Pitch and Pitch are wrong operand types for `/`
+Type error: Pitch and Pitch are wrong operand types for `%`
+
+Type error: Pitch and Duration are wrong operand types for `+`
+Type error: Pitch and Duration are wrong operand types for `-`
+Type error: Pitch and Duration are wrong operand types for `*`
+Type error: Pitch and Duration are wrong operand types for `/`
+Type error: Pitch and Duration are wrong operand types for `%`
+
+Type error: Pitch and [Int] are wrong operand types for `+`
+Type error: Pitch and [Int] are wrong operand types for `-`
+Type error: Pitch and [Int] are wrong operand types for `*`
+Type error: Pitch and [Int] are wrong operand types for `/`
+Type error: Pitch and [Int] are wrong operand types for `%`
+
+
+Type error: Duration and Int are wrong operand types for `+`
+Type error: Duration and Int are wrong operand types for `-`
+(32)
+(8)
+Type error: Duration and Int are wrong operand types for `%`
+
+Type error: Duration and Bool are wrong operand types for `+`
+Type error: Duration and Bool are wrong operand types for `-`
+Type error: Duration and Bool are wrong operand types for `*`
+Type error: Duration and Bool are wrong operand types for `/`
+Type error: Duration and Bool are wrong operand types for `%`
+
+Type error: Duration and Pitch are wrong operand types for `+`
+Type error: Duration and Pitch are wrong operand types for `-`
+Type error: Duration and Pitch are wrong operand types for `*`
+Type error: Duration and Pitch are wrong operand types for `/`
+Type error: Duration and Pitch are wrong operand types for `%`
+
+(32)
+(16)
+Type error: Duration and Duration are wrong operand types for `*`
+Type error: Duration and Duration are wrong operand types for `/`
+Type error: Duration and Duration are wrong operand types for `%`
+
+Type error: Duration and [Int] are wrong operand types for `+`
+Type error: Duration and [Int] are wrong operand types for `-`
+Type error: Duration and [Int] are wrong operand types for `*`
+Type error: Duration and [Int] are wrong operand types for `/`
+Type error: Duration and [Int] are wrong operand types for `%`
