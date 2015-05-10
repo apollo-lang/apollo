@@ -36,7 +36,7 @@ data Expr
     | Name Id
     | Def Id Type Expr
     | VLam [Id] Expr                -- Untyped lambdas
-    | VTLam [Type] [Id] Type Expr   -- Typed lambdas
+    | VTLam [Type] Type [Id] Expr   -- Typed lambdas
     | Function [Id] Expr (Env Expr) -- A function with its closure
     | Block [Expr] Expr
     | If Expr Expr Expr
