@@ -10,7 +10,7 @@ module Main (
 import Control.Monad (liftM, unless, when)
 import Control.Monad.Error (throwError, liftIO, runErrorT)
 import System.Environment (getArgs)
-import System.IO (hFlush, stdout)
+import System.IO (hFlush, stdout, isEOF)
 import Data.IORef (readIORef)
 import Parse
 import Check
@@ -116,7 +116,12 @@ until_ prdc prompt action = do
          (action result >> until_ prdc prompt action)
 
 readPrompt :: String -> IO String
-readPrompt prompt = flushStr prompt >> getLine
+readPrompt prompt = do
+  _ <- flushStr prompt
+  end <- isEOF
+  if end
+  then return ":quit"
+  else getLine
   where
     flushStr str = putStr str >> hFlush stdout
 
@@ -128,7 +133,7 @@ interpretLine env tEnv inp = case inp of
  where
   astCheck ast = liftThrows $ if length ast == 1
                               then return ast
-                              else  -- throwError $ Default $ ">>" ++ show ast
+                              else
                                 if null ast
                                 then throwError $ Default ""
                                 else throwError $ Default "REPL received >1 expression"
