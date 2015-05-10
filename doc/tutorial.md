@@ -226,7 +226,7 @@ j: Int = case(i == 0)
              2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here we illustrate another important principle in Apollo. A block has a value that is equal to the value of its last line. Therefore, this case statement returns *1* if `i` is *0*, *i\*2* if `i` is *1* and *2* otherwise.
+Here we illustrate another important principle in Apollo. A block has a value that is equal to the value of its last line. Therefore, this case statement returns `1` if `i` is `0`, `i*2` if `i` is `1` and `2` otherwise.
 
 Functions
 ---------
@@ -273,7 +273,7 @@ factorial: (n: Int) -> Int =
     case (n == 0) 1 otherwise n * factorial(n - 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As in all recursive functions, we need a base case to prevent infinite recursive calls. For this we use conditional statements. The functions reads as "the factorial of `n` is *1* if `n` is *0*, otherwise it is `n` times the factorial of `n - 1`."
+As in all recursive functions, we need a base case to prevent infinite recursive calls. For this we use conditional statements. The function is reads as "the factorial of `n` is `1` if `n` is `0`, otherwise it is `n` times the factorial of `n - 1`."
 
 Lists
 -----
@@ -300,7 +300,7 @@ $ apollo main.ap
 
 *Note that the above assumed that the `apollo` executable is in the user’s `$PATH` environment variable*
 
-This will begin the Apollo interpreter, thereby converting Apollo source code into Haskell code. If the program is free of runtime errors and terminates in a finite amount of time, target Haskell code will output a valid MIDI file. By default, this file will be named main.mid. The output file can then be played through any MIDI player.
+This will begin the Apollo interpreter, thereby converting Apollo source code into MIDI. If the program is free of runtime errors, terminates in a finite amount of time, and assigns `Music` to the variable `main` then a MIDI will be created. By default, this file will be named main.mid. The output file can then be played through any MIDI player.
 
 To input source code into the Apollo compiler via stdin, use `-` as the only argument:
 
