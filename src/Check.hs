@@ -2,7 +2,7 @@ module Check (
   typecheck
 ) where
 
-import Control.Monad.Error (throwError, liftIO)
+import Control.Monad.Error (throwError, liftIO, liftM)
 import Data.IORef (newIORef, readIORef)
 
 import Error
@@ -24,14 +24,14 @@ typecheck env expr = case expr of
     if null t
     then throwError $ TypeExcept "Music cannot be empty"
     else
-      if uniform t && (head t) == (TList TAtom)
+      if uniform t && head t == TList TAtom
       then return TMusic
       else throwError $ TypeExcept "Music only takes lists of Atoms"
 
   VList xs -> do
     t <- mapM (typecheck env) xs
     if null t
-      then return $ TListEmpty
+      then return TListEmpty
     else
       if uniform t
       then return $ TList (head t)
@@ -43,19 +43,30 @@ typecheck env expr = case expr of
       TBool -> do
         t1 <- typecheck env tr
         t2 <- typecheck env fl
-        if t1 == t2
-        then return t1
-        else throwError $ TypeExcept "If: case mismatch"
+        if t1 == t2 || bothList t1 t2
+           then return (isNotEmptyOf t1 t2)
+           else throwError $ TypeExcept "If: case mismatch"
       _    -> throwError $ TypeExcept "If: bool-cond not bool"
+   where
+     bothList TList{} TListEmpty = True
+     bothList TListEmpty TList{} = True
+     bothList _ _                = False
+     isNotEmptyOf TListEmpty x = x
+     isNotEmptyOf x TListEmpty = x
+     isNotEmptyOf x _ = x
 
   Not e -> do
     t <- typecheck env e
-    if t == TBool
+    if t == TBool || isList t
     then return TBool
     else
       case t of
         (TList _) -> return t
         _         -> throwError (TypeUMismatch "!" t)
+   where
+    isList TListEmpty = True
+    isList (TList _)  = True
+    isList _          = False
 
   Neg e -> do
     t <- typecheck env e
@@ -115,7 +126,7 @@ typecheck env expr = case expr of
         else throwError (TypeMismatch (show op) ta (TList t))
       TListEmpty -> return (TList ta)
 
-      _ -> throwError $ TypeExcept "Expected list"
+      _ -> throwError $ TypeExcept ("Expected list; got " ++ show tl)
 
   Block body ret -> do
     env' <- clone env
@@ -126,7 +137,36 @@ typecheck env expr = case expr of
         removeNames = filter (\(n,_) -> n `notElem` names)
         names = map (\(Def name _ _) -> name) body
 
-  Def name (TFunc p r) body -> return TError -- TODO
+  -- TODO NOTE: had to work around fact that fn types aren't a single value here vs elsewhere
+
+  FnCall id args -> do
+    (TFunc tps tr) <- getVar env id
+    if length tps /= length args
+    then throwError . Default $ "arg count mismatch for " ++ id
+    else do
+      ta <- mapM (check env) (zip tps args)
+      if ta == tps
+      then return tr
+      else throwError . Default $ "expected args: " ++ show tps ++ "; actual: " ++ show ta ++ " for " ++ id
+   where
+     check e (param, arg) = if isTFunc param && isName arg
+                            then getVar env (getName arg)
+                            else typecheck env arg
+     isTFunc TFunc{} = True
+     isTFunc _       = False
+     isName Name{} = True
+     isName _      = False
+     getName (Name a) = a
+
+  -- TODO: check param count on call; this is currently done, but should we add another `if` to make it more explicit?
+
+  Def name t@(TFunc pTypes rType) (VLam params body) -> do
+    _ <- defineVar env name t  -- done first so recusion works
+    e <- bindVars env (zip params pTypes)
+    r <- typecheck e body
+    if rType == r
+    then return TEmpty
+    else throwError (TypeRMismatch name rType t)
 
   Def name t ex -> do
     t' <- typecheck env ex
@@ -134,12 +174,13 @@ typecheck env expr = case expr of
     then defineVar env name t
     else throwError (TypeDMismatch t t')
 
-  Name name -> getVar env name
+  Name name -> liftM getType (getVar env name)
+    where
+      getType (TFunc _ returnType) = returnType
+      getType other                = other
 
-  other -> return (TEmpty (show other)) -- error $ "ERR: got: " ++ show other
+  other -> return (TErrVerbose (show other)) -- error $ "ERR: got: " ++ show other
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
-
-
 

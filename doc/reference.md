@@ -144,14 +144,14 @@ pitch, or the height of a note on a musical staff.
 
 ##### Short-hand notation
 
-A backtick, followed by a single upper-case letter from A to G indicating the
+A single upper-case letter from A to G indicating the
 pitch, followed by an optional `#` or `b` character indicating the accidental
 (sharp or flat, respectively), followed by a number indicating the octave.
 
 For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`A#5
+A#5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the pitch corresponding to A# in the fifth octave.
@@ -160,7 +160,7 @@ Not including an accidental indicates that the note is natural. In this case we
 make the pitch a sharp by using `#`. The integer for the octave must be in the
 range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
 
-|oct.| c   | c#/db | d   | d#/eb | e   | f   | f#/gb | g   | g#/ab | a   | a#/bb | b   |
+|oct.| C/B#| C#/Db | D   | D#/Eb | E/Fb| F/E#| F#/Gb | G   | G#/Ab | A   | A#/Bb | B/Cb|
 |----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
 | 0  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
 | 1  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
@@ -171,13 +171,13 @@ range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
 | 6  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
 | 7  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
 | 8  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-| 9  | 120 | 121   | 122 | 123   | 124 | 125 |       |     |       |     |       |     |
+| 9  | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
 This notation is inspired by the way notes are defined in MIDI. It is generated
 by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-`[A-G](#|b)?[0-9]
+[A-G](#|b)?[0-9]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ##### Duration
