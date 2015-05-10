@@ -1,6 +1,7 @@
 module Util
     ( def
     , param
+    , lambda
     , parsePitch
     , parseDuration
     , makeMusic
@@ -12,16 +13,23 @@ import Expr
 
 -- TODO: use Error monad instead of `error`
 
-def :: Id -> ([Param], Type) -> Expr -> Expr
-def id (params, retType) body = Def id (TFunc (snd params') retType) (VLam (fst params') body)
-  where params' = unzip $ unpackParam params
+def :: Id -> [Param] -> Type -> Expr -> Expr
+def i p t e = Def i (TFunc (snd p') t) (VLam (fst p') e)
+  where
+    p' = unpackParams p
 
-param :: Id -> ([Param], Type) -> Param
-param id (params, t) = Param id (TFunc (snd params') t)
-  where params' = unzip $ unpackParam params
+param :: Id -> [Param] -> Type -> Param
+param i p t = Param i (TFunc (snd p') t)
+  where
+    p' = unpackParams p
 
-unpackParam :: [Param] -> [(Id, Type)]
-unpackParam = map (\(Param i t) -> (i, t))
+lambda :: [Param] -> Type -> Expr -> Expr
+lambda p t e = VTLam (snd p') (fst p') t e
+  where
+    p' = unpackParams p
+
+unpackParams :: [Param] -> ([Id], [Type])
+unpackParams = unzip . map (\(Param i t) -> (i, t))
 
 unpackList :: Expr -> [Expr]
 unpackList (VList exprs) = exprs
