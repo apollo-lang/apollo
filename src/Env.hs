@@ -67,8 +67,8 @@ defineVar envRef var value = do
              writeIORef envRef ((var, valueRef) : env)
              return value -- TODO: could be bad; shouldnt return anything but then have to do weird stuff
 
-bindVars :: Env a -> [(String, a)] -> IO (Env a)
-bindVars envRef bindings = readIORef envRef >>= extendEnv bindings >>= newIORef
+bindVars :: Env a -> [(String, a)] -> IOThrowsError (Env a)
+bindVars envRef bindings = liftIO (readIORef envRef >>= extendEnv bindings >>= newIORef)
      where extendEnv bndgs env = liftM (++ env) (mapM addBinding bndgs)
            addBinding (var, value) = do ref <- newIORef value
                                         return (var, ref)
