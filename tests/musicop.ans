@@ -58,3 +58,9 @@ Type error: Duration and [Int] are wrong operand types for `-`
 Type error: Duration and [Int] are wrong operand types for `*`
 Type error: Duration and [Int] are wrong operand types for `/`
 Type error: Duration and [Int] are wrong operand types for `%`
+
+True
+True
+False
+False
+Type error: Pitch and Duration are wrong operand types for `==`
