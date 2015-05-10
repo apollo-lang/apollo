@@ -16,8 +16,6 @@ data Type = TInt
           | TList Type
           | TListEmpty
           | TNil
-          | TErrVerbose String   -- TODO: remove
-          | TError          -- TODO: remove
           | TFunc [Type] Type
           | TEmpty
           deriving (Eq, Ord)
@@ -31,8 +29,6 @@ instance Show Type where
   show TMusic          = "Music"
   show (TList t)       = "[" ++ show t ++ "]"
   show TListEmpty      = "[]"
-  show (TErrVerbose t) = "VERBOSE ERROR <" ++ show t ++ ">"  -- TODO: remove
-  show TError          = "shouldnt show for TError"          -- TODO: remove
   show (TFunc p t)     = "(" ++ strDelim ", " show p ++ ") -> " ++ show t
   show _               = "<!>"
 
