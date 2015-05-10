@@ -1,6 +1,8 @@
 Development and run-time environment
 ------------------------------------
 
+**Souren Papazian**
+
 ### Development Environment
 
 Apollo was developed in the Unix environment. [Git][] was used for version control, while [GitHub][] was used for repository hosting, management, and code review. [Travis Ci][] was used for continuous integration and monitored via its integration with GitHub.
