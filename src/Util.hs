@@ -27,7 +27,7 @@ param i p t = Param i (TFunc (snd p') t)
     p' = unpackParams p
 
 lambda :: [Param] -> Type -> Expr -> Expr
-lambda p t e = VTLam (snd p') (fst p') t e
+lambda p t e = VTLam (snd p') t (fst p') e
   where
     p' = unpackParams p
 

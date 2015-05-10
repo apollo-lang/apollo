@@ -27,7 +27,7 @@ instance Show Type where
     show TMusic         = "Music"
     show (TList t)      = "[" ++ show t ++ "]"
     show TListEmpty = "[]"
-    show (TErrVerbose t)  = "shouldnt show for TEmpty <" ++ show t ++ ">" -- TODO: remove
+    show (TErrVerbose t)  = "VERBOSE ERROR <" ++ show t ++ ">" -- TODO: remove
     show TError    = "shouldnt show for TError" -- TODO: remove
     show (TFunc p t)    = "(" ++ strDelim ", " show p ++ ") -> " ++ show t
     show _              = "<!>"
