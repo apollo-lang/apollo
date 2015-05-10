@@ -1,10 +1,14 @@
+
+-------------------------------------------------------------------------------
+-- Check: module for static typechecking an Apollo expression
+-------------------------------------------------------------------------------
+
 module Check (
   typecheck
 ) where
 
 import Control.Monad.Error (throwError, liftIO, liftM)
 import Data.IORef (newIORef, readIORef)
-
 import Error
 import Type
 import Expr
@@ -18,15 +22,19 @@ typecheck env expr = case expr of
   VPitch{}    -> return TPitch
   VDuration{} -> return TDuration
 
-  VAtom a b     -> do
+  VAtom a b -> do
     ta <- typecheck env a
     tb <- typecheck env b
-    if (ta == TNil || ta == TInt || ta == TPitch || ta == TList TPitch || ta == TList TInt )
-      && (tb == TInt || tb == TDuration)
+    if (ta == TNil
+     || ta == TInt
+     || ta == TPitch
+     || ta == TList TPitch
+     || ta == TList TInt )
+     && (tb == TInt || tb == TDuration)
     then return TAtom
     else throwError $ TypeExcept "Atom must contain Pitch and Duration"
 
-  VMusic m    -> do
+  VMusic m -> do
     t <- mapM (typecheck env) m
     if null t
     then throwError $ TypeExcept "Music cannot be empty"
@@ -38,14 +46,14 @@ typecheck env expr = case expr of
   VList xs -> do
     t <- mapM (typecheck env) xs
     if null t
-      then return TListEmpty
+    then return TListEmpty
     else
       if uniform t
       then return $ TList (head t)
-      else 
-        if pitchOrInt t 
+      else
+        if pitchOrInt t
         then return $ TList TPitch
-        else 
+        else
           if durOrInt t
           then return $ TList TDuration
           else throwError $ TypeExcept "list is irregular"
@@ -59,7 +67,7 @@ typecheck env expr = case expr of
         if t1 == t2 || bothList t1 t2
            then return (isNotEmptyOf t1 t2)
            else throwError $ TypeExcept "If: case mismatch"
-      _    -> throwError $ TypeExcept "If: bool-cond not bool"
+      _ -> throwError $ TypeExcept "If: bool-cond not bool"
    where
      bothList TList{} TListEmpty = True
      bothList TListEmpty TList{} = True
@@ -87,7 +95,6 @@ typecheck env expr = case expr of
     then return TInt
     else throwError (TypeUMismatch "-" t)
 
-
   Head l -> do
     tl <- typecheck env l
     case tl of
@@ -111,57 +118,48 @@ typecheck env expr = case expr of
     ta <- typecheck env a
     tb <- typecheck env b
     case (ta, tb) of
-      (TInt, TInt)   -> return TBool
-      (TPitch, TPitch)   -> return TBool
-      (TDuration, TDuration)   -> return TBool
-      (TBool, TBool) -> return TBool
-      (TList t, TList t') ->
-        if (t == t') && (op == Eq || op == NEq)
-        then return TBool
-        else throwError (TypeMismatch (show op) ta tb)
-      (TList _, TListEmpty) -> return TBool
-      (TListEmpty, TList _) -> return TBool
+      (TInt, TInt)            -> return TBool
+      (TPitch, TPitch)        -> return TBool
+      (TDuration, TDuration)  -> return TBool
+      (TBool, TBool)          -> return TBool
+      (TList t, TList t')     -> if (t == t') && (op == Eq || op == NEq)
+                                 then return TBool
+                                 else throwError (TypeMismatch (show op) ta tb)
+      (TList _, TListEmpty)   -> return TBool
+      (TListEmpty, TList _)   -> return TBool
       (TListEmpty, TListEmpty) -> return TListEmpty
-      _              -> throwError (TypeMismatch (show op) ta tb)
+      _ -> throwError (TypeMismatch (show op) ta tb)
 
   IntOp op a b -> do
     ta <- typecheck env a
     tb <- typecheck env b
     case (ta, tb) of
-      (TInt, TInt) -> return TInt
-      (TPitch, TInt) ->
-        if op == Add || op == Sub
-        then return TPitch
-        else throwError (TypeMismatch (show op) ta tb)
-      (TInt, TPitch) ->
-        if op == Add
-        then return TPitch
-        else throwError (TypeMismatch (show op) ta tb)
-      (TInt, TDuration) ->
-        if op == Mul || op == Div
-        then return TDuration
-        else throwError (TypeMismatch (show op) ta tb)
-      (TDuration, TInt) ->
-        if op == Mul || op == Div
-        then return TDuration
-        else throwError (TypeMismatch (show op) ta tb)
-      (TDuration, TDuration) ->
-        if op == Add || op == Sub
-        then return TDuration
-        else throwError (TypeMismatch (show op) ta tb)
-
-      _            -> throwError (TypeMismatch (show op) ta tb)
+      (TInt, TInt)           -> return TInt
+      (TPitch, TInt)         -> if op == Add || op == Sub
+                                then return TPitch
+                                else throwError (TypeMismatch (show op) ta tb)
+      (TInt, TPitch)         -> if op == Add
+                                then return TPitch
+                                else throwError (TypeMismatch (show op) ta tb)
+      (TInt, TDuration)      -> if op == Mul || op == Div
+                                then return TDuration
+                                else throwError (TypeMismatch (show op) ta tb)
+      (TDuration, TInt)      -> if op == Mul || op == Div
+                                then return TDuration
+                                else throwError (TypeMismatch (show op) ta tb)
+      (TDuration, TDuration) -> if op == Add || op == Sub
+                                then return TDuration
+                                else throwError (TypeMismatch (show op) ta tb)
+      _ -> throwError (TypeMismatch (show op) ta tb)
 
   ArrOp op a l -> do
     ta <- typecheck env a
     tl <- typecheck env l
     case tl of
-      (TList t) ->
-        if ta == t
-        then return $ TList ta
-        else throwError (TypeMismatch (show op) ta (TList t))
+      (TList t)  -> if ta == t
+                    then return (TList ta)
+                    else throwError (TypeMismatch (show op) ta (TList t))
       TListEmpty -> return (TList ta)
-
       _ -> throwError $ TypeExcept ("Expected list; got " ++ show tl)
 
   Block body ret -> do
@@ -173,8 +171,6 @@ typecheck env expr = case expr of
         removeNames = filter (\(n,_) -> n `notElem` names)
         names = map (\(Def name _ _) -> name) body
 
-  -- TODO NOTE: had to work around fact that fn types aren't a single value here vs elsewhere
-
   FnCall (Name name) args -> do
     (TFunc tps tr) <- getVar env name
     if length tps /= length args
@@ -183,22 +179,24 @@ typecheck env expr = case expr of
       ta <- mapM (check env) (zip tps args)
       if ta == tps
       then return tr
-      else throwError . Default $ "expected args: " ++ show tps ++ "; actual: " ++ show ta ++ " for " ++ name
+      else throwError . Default $ "expected args: " ++ show tps ++
+                                  "; actual: " ++ show ta ++ " for " ++ name
    where
      check _ (param, arg) = if isTFunc param && isName arg
                             then getVar env (getName arg)
                             else typecheck env arg
-     isTFunc TFunc{}    = True
-     isTFunc _          = False
-     isName Name{}      = True
-     isName _           = False
-     getName (Name a)   = a
-     getName _          = ""
+     isTFunc TFunc{}  = True
+     isTFunc _        = False
+     isName Name{}    = True
+     isName _         = False
+     getName (Name a) = a
+     getName _        = ""
 
-  -- TODO: check param count on call; this is currently done, but should we add another `if` to make it more explicit?
+  -- To enable recursive functions, env-bindings must be made before
+  -- typchecking, then updated with the result. (below)
 
   Def name t@(TFunc pTypes rType) (VLam params body) -> do
-    _ <- defineVar env name t  -- done first so recusion works
+    _ <- defineVar env name t
     e <- bindVars env (zip params pTypes)
     r <- typecheck e body
     if rType == r
@@ -208,7 +206,7 @@ typecheck env expr = case expr of
   Def name t ex -> do
     t' <- typecheck env ex
     if t == t' || t == TMusic && t' == (TList $ TList TAtom) || match t t'
-    then defineVar env name t
+    then defineVar env name t >> return TEmpty
     else throwError (TypeDMismatch t t')
 
   Name name -> liftM getType (getVar env name)
@@ -223,27 +221,24 @@ typecheck env expr = case expr of
     then return (TFunc pTypes rType)
     else throwError (TypeRMismatch "<lambda>" rType r)
 
-  Nil       -> return TNil
+  Nil -> return TNil
 
-  other -> return (TErrVerbose (show other)) -- error $ "ERR: got: " ++ show other
+  other -> return (TErrVerbose (show other))
 
 
 uniform :: Eq a => [a] -> Bool
 uniform ys = all (== head ys) ys
 
-
 match :: Type -> Type -> Bool
-match a b = case (a, b) of
-        (TPitch, TInt)    -> True
-        (TDuration, TInt) -> True
-        (TList TPitch, TList TInt) -> True
-        (TList TDuration, TList TInt) -> True
-        _                 -> False
+match TPitch TInt                    = True
+match TDuration TInt                 = True
+match (TList TPitch) (TList TInt)    = True
+match (TList TDuration) (TList TInt) = True
+match _ _                            = False
 
 pitchOrInt :: [Type] -> Bool
-pitchOrInt [] = True
-pitchOrInt (x:xs) = (x == TPitch || x == TInt) && (pitchOrInt xs)
+pitchOrInt = foldr (\x -> (&&) (x == TPitch || x == TInt)) True
 
 durOrInt :: [Type] -> Bool
-durOrInt [] = True
-durOrInt (x:xs) = (x == TDuration || x == TInt) && (pitchOrInt xs)
+durOrInt = foldr (\ x -> (&&) (x == TDuration || x == TInt)) True
+

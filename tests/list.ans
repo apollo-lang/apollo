@@ -1,6 +1,6 @@
 Type error: [] is wrong operand type for unary `t@`
 Type error: [] is wrong operand type for unary `h@`
-[1,(69)]
+[(1),(69)]
 Type error: "list is irregular"
 Type error: "list is irregular"
 [1]

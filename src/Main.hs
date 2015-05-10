@@ -1,3 +1,8 @@
+
+--------------------------------------------------------------------------
+-- Main: interpreter, repl, and command-line interfaces
+--------------------------------------------------------------------------
+
 module Main (
   main
 ) where
@@ -23,9 +28,11 @@ main = getArgs >>= \args ->
        case args of
          ["--ast"]  -> putAst
          ["--repl"] -> runRepl
-         ["-h"]     -> runHelp
-         ["--help"] -> runHelp
-         []         -> interpret
+         ["--help"] -> usage
+         ["-h"]     -> usage
+         ["-"]      -> getContents >>= interpret "main.mid"
+         [fname]    -> readFile fname >>= interpret "main.mid"
+         [fname, "-o", ofile] -> readFile fname >>= interpret ofile
          _          -> putStrLn "Invalid arguments"
 
 -- Parse and evaluate a program ---------------------------------------------
@@ -33,24 +40,28 @@ main = getArgs >>= \args ->
 loadPrelude :: Env Type -> Env Expr -> IO String
 loadPrelude typeEnv env = runIOThrows $ toAst typeEnv prelude >>= execAst env
 
-interpret :: IO ()
-interpret = do
-  src <- getContents
+interpret :: String -> String -> IO ()
+interpret ofile src = do
   env <- nullEnv
   typeEnv <- nullEnv
   _ <- loadPrelude typeEnv env
-  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
+  results <- runIOThrows (interp typeEnv env)
   put results
+    where
+      interp t e = toAst t src >>=
+                   execAst e >>= \r ->
+                   handleExport e ofile "main" >>
+                   return r
 
-handleMain :: Env Expr -> String -> IOThrowsError ()
-handleMain env filename = do
-  mainExists <- liftIO (isBound env "main")
+handleExport :: Env Expr -> String -> String -> IOThrowsError ()
+handleExport env filename mainName = do
+  mainExists <- liftIO (isBound env mainName)
   tempo <- getTempo env
   liftIO $ when mainExists (export tempo)
     where
       export tempo = getMain >>= \m -> exportMusic tempo filename (makeMusic m)
-      getMain = runUnsafe (getVar env "main")
-      runUnsafe action = liftM extractValue (runErrorT action)
+      getMain = runUnchecked (getVar env mainName)
+      runUnchecked action = liftM extractValue (runErrorT action)
 
 getTempo :: Env Expr -> IOThrowsError Int
 getTempo env = do
@@ -59,37 +70,34 @@ getTempo env = do
                 then getVar env "#tempo"
                 else return defaultTempo
   return tempo
-    where defaultTempo = VInt 120
+    where
+      defaultTempo = VInt 120
 
 toAst :: Env Type -> String -> IOThrowsError [Expr]
 toAst env src = liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> return ast
 
 execAst :: Env Expr -> [Expr] -> IOThrowsError String
 execAst env ast = liftM (unlines . map showPP . filter notEmpty) (exec env ast)
-    where
-      notEmpty :: Expr -> Bool
-      notEmpty Empty = False
-      notEmpty _     = True
-
-      exec :: Env Expr -> [Expr] -> IOThrowsError [Expr]
-      exec _   []         = return []
-      exec envr (e:exprs) = do
-        x <- eval envr e
-        y <- exec envr exprs
-        return (x:y)
+  where
+    notEmpty Empty = False
+    notEmpty _     = True
+    exec _   []         = return []
+    exec envr (e:exprs) = do
+      x <- eval envr e
+      y <- exec envr exprs
+      return (x:y)
 
 put :: String -> IO ()
-put r
-  | r == ""          = putStr r
-  | '\n' `notElem` r = putStrLn r
-  | otherwise        = putStr r
+put r | r == ""          = putStr r
+      | '\n' `notElem` r = putStrLn r
+      | otherwise        = putStr r
 
 -- Parse a program's syntax tree --------------------------------------------
 
 putAst :: IO ()
 putAst = getContents >>= \x -> putStrLn $ case parse x of
-                                 (Left  err) -> show err
-                                 (Right ast) -> show ast
+                                 Left  err -> show err
+                                 Right ast -> show ast
 
 -- Read-Evaluate-print Loop -------------------------------------------------
 
@@ -109,34 +117,35 @@ until_ prdc prompt action = do
 readPrompt :: String -> IO String
 readPrompt prompt = flushStr prompt >> getLine
   where
-    flushStr :: String -> IO ()
     flushStr str = putStr str >> hFlush stdout
 
 interpretLine :: Env Expr -> Env Type -> String -> IO ()
-interpretLine env tEnv inp =
-  if inp == ":browse" -- TODO: strip whitespace
-  then getBindings >>= putStr . unlines
-  else runIOThrows (toAst tEnv inp >>= astCheck >>= execAst env) >>= put
-    where
-      astCheck :: [Expr] -> IOThrowsError [Expr]
-      astCheck ast = liftThrows $
-        if length ast == 1
-        then return ast
-        else throwError $ Default "REPL received >1 expression"
-      getBindings = do
-        e <- readIORef tEnv
-        mapM listing e
-      listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+interpretLine env tEnv inp = case inp of
+  ":browse" -> getBindings >>= putStr . unlines
+  (':':'e':'x':'p':'o':'r':'t':' ':name) -> runUnchecked (handleExport env "_repl.mid" name)
+  src -> runIOThrows (toAst tEnv src >>= astCheck >>= execAst env) >>= put
+ where
+  astCheck ast = liftThrows $ if length ast == 1
+                              then return ast
+                              else throwError $ Default "REPL received >1 expression"
+  getBindings = do
+    e <- readIORef tEnv
+    mapM listing e
+  listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+  runUnchecked action = liftM extractValue (runErrorT action)
 
 -- Help interface -----------------------------------------------------------
 
-runHelp :: IO()
-runHelp = do
-  putStrLn "Apollo: algorithmic music composition"
+usage :: IO()
+usage = do
+  putStrLn "Apollo: a language for algorithmic music composition"
   putStrLn ""
-  putStrLn "Usage: apollo [options] < sourcefile.ap"
-  putStrLn "    --repl    Start Apollo interactive mode (Read-Evaluate-Print-Loop)"
-  putStrLn "    --ast     Print a program's abstract syntax tree"
-  putStrLn "    --help    This help message"
+  putStrLn "Usage: apollo [options|-] <source file> [-o <output>]"
   putStrLn ""
+  putStrLn "Options:"
+  putStrLn "       --repl      Start Read-Evaluate-Print-Loop"
+  putStrLn "       --ast       Print a program's abstract syntax tree"
+  putStrLn "    -h|--help      Print this message"
+  putStrLn "    -o <output>    Output midi to specified filename if source file present"
+  putStrLn "       -           Read from stdin"
 
