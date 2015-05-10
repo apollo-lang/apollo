@@ -1,0 +1,6 @@
+twice: (f: (n: Int) -> Int, x: Int) = f(f(x))
+
+pow4: (x: Int) -> Int = twice(square, x)
+
+twice(5)
+pow4(5)
