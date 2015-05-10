@@ -27,7 +27,7 @@ of algorithms and the musician to compose in code.  An Apollo source program
 produces as output a MIDI file, which is a standardized way to store a musical
 piece.
 
-### Why is it called Apollo?
+### Origin of the Name
 
 Apollo combines the power of source code, or Apollonian logic, with the art of
 music, the domain of the god Apollo. The logo is derived from a combination of
@@ -41,9 +41,8 @@ following patterns.
 
 ### First-class functions
 
-Functions are first-class citizens in Apollo. This means that functions can be:
- * Passed as function parameters
- * Returned as values by other functions
+Functions are first-class citizens in Apollo. This means that functions, among
+other things, can be passed as function parameters.
 
 ### Immutable data
 
@@ -66,19 +65,15 @@ Keywords are reserved for the language and cannot be used as identifiers.
 
 The list of keywords is:
 
- * `Int`
- * `Bool`
- * `True`
- * `False`
  * `case`
  * `otherwise`
  * `where`
- * `List`
+ * `Int`
+ * `Bool`
  * `Pitch`
- * `Note`
- * `Chord`
- * `Rest`
+ * `Duration`
  * `Atom`
+ * `Music`
 
 ### Identifiers
 
@@ -107,7 +102,19 @@ See Section 4 for more information on operators.
 
 ### Separators
 
-Symbols that separate tokens. They are: `(`, `)`, `[`, `]`, `{`, `}`, and `,`.
+Symbols that separate tokens: 
+
+ * `=`
+ * `->`
+ * `:`
+ * `,`
+ * `(`
+ * `)`
+ * `[`
+ * `]`
+ * `{`
+ * `}`
+ * `_`
 
 Whitespace is ignored --- and hence is not considered a token --- but serves as
 a token separator.
@@ -134,31 +141,40 @@ them from identifiers.
 
  * `Int`: 29 bit signed integer (corresponding to Haskell's `Int` type).
  * `Bool`: boolean value; either `True` or `False`.
+ * `Pitch`: integer ranging from 0 to 127, interpreted as a musical
+   pitch, or the height of a note on a musical staff. `Pitch` values are
+   constructed $mod 128$.
+ * `Duration`: non-negative integer indicating a multiple of the smallest
+   possible duration (a 64th note, or a 64th of a beat in 4/4 time). Negative
+   `Duration` values are constructed as `0`.
 
-### Aliased Types
+Note that, although `Pitch` and `Duration` represent integers, they are not
+equivalent to `Int`. In other words, they cannot be used interchangeably.
+Type coercion is used in some instances to make the types uniform.
 
-#### Pitch
+#### Short-hand notation for `Pitch` and `Duration`
 
-A type alias for an `Int`, ranging from 0 to 127, interpreted as a musical
-pitch, or the height of a note on a musical staff.
+When not constructed with integers, `Pitch`es and `Duration`s can be
+conveniently expressed in a short-hand notation inspired by musical
+conventions.
 
-##### Short-hand notation
+##### Pitch
 
-A single upper-case letter from A to G indicating the
-pitch, followed by an optional `#` or `b` character indicating the accidental
-(sharp or flat, respectively), followed by a number indicating the octave.
+A single upper-case letter from A to G indicating the pitch, followed by an
+optional `#` or `b` character indicating the accidental (sharp or flat,
+respectively), followed by a number indicating the octave.
 
 For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A#5
+C4          -- C on the fourth octave.  Translates to 60
+A#5         -- A#5 on the fifth octave. Translates to 82
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the pitch corresponding to A# in the fifth octave.
+###### Pitch to Integer Table
 
-Not including an accidental indicates that the note is natural. In this case we
-make the pitch a sharp by using `#`. The integer for the octave must be in the
-range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
+The following table represents the mappings of pitches to integers, according
+to the MIDI standard.
 
 |oct.| C/B#| C#/Db | D   | D#/Eb | E/Fb| F/E#| F#/Gb | G   | G#/Ab | A   | A#/Bb | B/Cb|
 |----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
@@ -173,17 +189,13 @@ range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
 | 8  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
 | 9  | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
-This notation is inspired by the way notes are defined in MIDI. It is generated
-by the regular expression
+This notation is described by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [A-G](#|b)?[0-9]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ##### Duration
-
-A type alias for an `Int` ranging from 1 to 256, which indicates a multiple of
-the smallest possible duration -- a 64th note or a 64th of a beat in 4/4 time.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 d: Duration = 32    -- 32 64th notes
@@ -199,13 +211,13 @@ of three components:
 These are some examples:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\1		-- Whole note.          Equivalent to 64
-\2		-- Half note.           Equivalent to 32
-\4		-- Quarter note.        Equivalent to 16
-\8      -- Eigth note.          Equivalent to 8
-\16     -- Sixteenth note.      Equivalent to 4
-\32     -- Thirtysecond note.   Equivalent to 2
-\64     -- Sixtyfourth note.    Equivalent to 1
+\1		-- Whole note.          Translates to 64
+\2		-- Half note.           Translates to 32
+\4		-- Quarter note.        Translates to 16
+\8      -- Eigth note.          Translates to 8
+\16     -- Sixteenth note.      Translates to 4
+\32     -- Thirtysecond note.   Translates to 2
+\64     -- Sixtyfourth note.    Translates to 1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using this notation, one can declare a Duration in the following way:
@@ -236,216 +248,156 @@ one exception is lists, which are declared using brackets: `[...]`.
 	a: [Int] = [1, 2, 3]
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Atom`: a polymorphic type indicating a musical sound-unit. Instances of
-    `Atom` can be either a `Note`, a `Chord`, or a `Rest`. For example:
+ * `Atom`: a pair representing a musical sound unit. `Atom` values can be
+   constructed in three ways:
+    1. (Pitch, Duration) represents a note
+    2. ([Pitch], Duration) represents a chord
+    3. (Nil, Duration) represents a rest
+
+    These are some examples:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Atom = Note(A5, \8)
-	c: Atom = Chord([A5, C#5, E5], \4)
-	r: Atom = Rest(_, \4)
+	note: Atom = (A5, \8)               -- A5 note, eighth note
+	chord: Atom = ([A5, C#6, E6], \2)   -- A major chord, half note
+	rest: Atom = (_, \4)                -- Rest, quarter note
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- * `Note`: an instance of the Atom type consisting of a `Pitch` and a
-   `Duration`. For example:
+ * `Music`: a list of lists of `Atom`s. Each list of `Atom`s in a `Music` value
+   represents a musical part -- a melodic line or a chordal accompaniment, for
+   instance.
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Atom = Note(A5, \4)
+	aMajor: Atom = ([A5, C#5, E5], \4)
+	bMinor: Atom = ([B5, D#5, F#5], \4)
+	eMajor: Atom = ([E5, G#5, B5], \4)
+
+	back: [Atom] = [aMajor, bMinor, eMajor]
+	lead: [Atom] = [(A5, \4), (F#5, \4), (E4, \4)]
+
+	song: Music = [lead, back]
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * `Chord`: an instance of the `Atom` type consisting of a list of `Pitch`es
-    and a `Duration`. For example:
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	c: Atom = Chord([A5, C#5, E5], \4)
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * `Rest`: an instance of the `Atom` type consisting of `Duration`. A `Rest`
-    indicates a space in which no notes are played. For example:
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	r: Atom = Rest(_, \4)
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * `Rhythm`: a list of `Duration`s. For example:
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	r: Rhythm = Rhythm([\4, \8, \8])
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * `Part`: a is a list of `Atom`s. This is useful for distinguishing
-   separate but simultaneously-occurring lines of music. For example:
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	p: Part = Part([Note(A5, 1), Note(C#5, 2)])
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- * `Music`: the `Music` data type is initialized with a list containing all
-   `Part`s in the composition. When the output MIDI file is generated, all
-   parts contained in a `Music` element are sounded simultaneously. For
-   example:
-
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	aMajor: Atom = Chord([A5, C#5, E5], \4)
-	bMinor: Atom = Chord([B5, D#5, F#5], \4)
-	eMajor: Atom = Chord([E5, G#5, B5], \4)
-
-	back: Part = Part([aMajor, bMinor, eMajor])
-	lead: Part = Part([Note(A5, \4), Note(F#5, \4), Note(E4, \4)])
-
-	song: Music = Music([lead, back])
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-### Type System
-
-Apollo types are polymorphic. This means that a type can take on different
-shapes. Apollo types adhere to the following rules:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Pitch   : Int
-
-Duration: Int
-
-Rhythm	: Rhythm [Duration]
-
-Atom    : Note Pitch Duration
-        | Rest Duration
-        | Chord [Pitch] Duration
-
-Part    : Part [Atom]
-
-Music   : Music [Part]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The items on the left side are types; the items on the right side are instances
-of those types, together with their components.
-
-Consider the `Atom` type. The `Atom` type has three instances with names
-`Note`, `Rest`, and `Chord`. The `Note` instance, for example, takes two
-parameters: the first one with type Pitch and the second one with type
-Duration.
-
-Types like Pitch and Duration are just different names for the Int type.
 
 Operators
 ---------
 
+### Arithmetic Operators
+
+#### `expression + expression`
+#### `expression - expression`
+#### `expression * expression`
+#### `expression / expression`
+#### `expression + expression`
+
+| `+`      | addition              | 5          | left          | Binary        |
+| `-`      | subtraction           | 5          | left          | Binary        |
+| `*`      | multiplication        | 6          | left          | Binary        |
+| `/`      | division              | 6          | left          | Binary        |
+| `%`      | modulo                | 6          | left          | Binary        |
+| `-`      | unary minus           | 7          | right         | Unary         |
+
 The behavior of each operator is defined based on the type(s) to which it is
-applied. Certain operators such a `/` (integer division) are defined only for a
-single pair of types (in this case, two `Ints`). Other operators are overloaded
-such that their behavior depends on the types to which it is applied. For
-example, the `+` operator preforms infix addition when applied to a pair of
-`Int`s, whereas it preforms list concatenation when applied to a pair of
-`List`s.
+applied. The following table outlines the possible combinations of arithmetic
+operations:
+
+| Operand A | Operator  | Operand B | Result    |
+|-----------|-----------|-----------|-----------|
+| Int       | +         | Int       | Int       |
+| Int       | +         | Pitch     | Pitch     |
+| Pitch     | +         | Int       | Pitch     |
+| Duration  | +         | Duration  | Duration  |
+| Int       | -         | Int       | Int       |
+| Pitch     | -         | Int       | Pitch     |
+| Duration  | -         | Duration  | Duration  |
+| Int       | *         | Int       | Int       |
+| Int       | *         | Duration  | Duration  |
+| Duration  | *         | Int       | Duration  |
+| Int       | /         | Int       | Int       |
+| Duration  | /         | Int       | Duration  |
+| Int       | %         | Int       | Int       |
 
 When an operator is applied to a type with which it is not compatible, a
 compile-time error is triggered.
 
-### Arithmetic Operators
+### Comparison Operators
 
-#### `expression * expression`
-
-If the two expressions are of type `Int`, `*` corresponds to regular
-multiplication. If the first expression is a `List` and the second expression
-is an `Int`, `*` concatenates that list to itself as many times as specified by
-the second expression.
-
-#### `expression / expression`
-
-The two expressions must be of type `Int`. The operator yields the integer
-quotient of the first expression divided by the second expression.
-
-#### `expression % expression`
-
-The two expressions must be of type `Int`. The operator yields the integer
-remainder of the first expression divided by the second expression.
-
-#### `expression + expression`
-
-When the two expressions are of type `Int`, the result is addition. When the
-two expressions are `List`s, `+` corresponds to list concatenation and
-concatenates the second list to the end of the first.
-
-#### `expression - expression`
-
-The two expressions must be of type `Int`. The operator yields the subtraction
-of the second expression from the first expression.
+| `==`     | equality              | 3          | left          | Binary        |
+| `!=`     | not equality          | 3          | left          | Binary        |
+| `<`      | less than             | 3          | left          | Binary        |
+| `>`      | greater than          | 3          | left          | Binary        |
+| `<=`     | less than or equal    | 3          | left          | Binary        |
+| `>=`     | greater than or equal | 3          | left          | Binary        |
 
 ### Boolean Operators
 
-#### `expression == expression`
+| `!`      | negation              | 7          | right         | Unary         |
+| `&&`     | logical AND           | 2          | left          | Binary        |
+| `||`     | logical OR            | 1          | left          | Binary        |
 
-Returns `True` if and only if the expressions have the same value, which can be
-of any integral type (`Int`, `Pitch`, `Duration`) or a `List`. In the latter
-case, this is evaluated in terms of element-by-element value of a `List` rather
-than a memory-reference value, for example.
+### List operators
 
-#### `expression != expression`
-
-Returns `True` if and only if the expressions have different values, which
-could be of any integral type (`Int`, `Pitch`, `Duration`) or a `List`. In the
-latter case, this is evaluated in terms of element-by-element value of a `List`
-rather than a memory-reference value, for example.
-
-#### `expression > expression`
-
-If the expressions both have integral type, then `>` yields `True` if and only
-if the expression on the left side is larger than the expression on the right
-side.
-
-#### `expression < expression`
-
-If the expressions both have integral type, then `<` yields `True` if and only
-if the expression on the left side is smaller than the expression on the right
-side.
-
-#### `expression >= expression`
-
-If the expressions both have integral type, then `>=` yields `True` if and only
-if the expression on the left side is larger than or equal to the expression on
-the right side.
-
-#### `expression <= expression`
-
-If both expressions have integral type, then `<=` yields `True` if and only if
-the expression on the left side is smaller than or equal to the expression on
-the right side.
-
-#### `expression && expression`
-
-If both expressions are of `Bool` type, then `&&` yields `True` if and only if
-both expressions evaluate to `True`; otherwise, the entire expression evaluates
-to `False`.
-
-#### `expression || expression`
-
-If both expressions are of `Bool` type, then `||` yields true if at least one
-of the expressions evaluates to `True`. It yields `False` if and only if both
-expressions are `False`.
+| `!`      | negation              | 7          | right         | Unary         |
+| `h@a`    | list head             | 7          | right         | Unary         |
+| `t@a`    | list tail             | 7          | right         | Unary         |
+| `::`     | cons                  | 4          | right         | Binary        |
 
 ### Operator Precedence and Associativity
 
-| Operator | Description           | Precedence | Associativity |
-| -------- | --------------------- | ---------- | ------------- |
-| `-`      | unary minus           | 7          | N/A           |
-| `!`      | not                   | 7          | N/A           |
-| `*`      | multiplication        | 6          | left          |
-| `/`      | division              | 6          | left          |
-| `%`      | modulo                | 6          | left          |
-| `+`      | infix addition        | 5          | left          |
-| `-`      | infix subtraction     | 5          | left          |
-| `+`      | list concatenation    | 4          | right         |
-| `==`     | equality              | 3          | left          |
-| `!=`     | not equality          | 3          | left          |
-| `<`      | less than             | 3          | left          |
-| `>`      | greater than          | 3          | left          |
-| `<=`     | less than or equal    | 3          | left          |
-| `>=`     | greater than or equal | 3          | left          |
-| `&&`     | logical AND           | 2          | left          |
-| `||`     | logical OR            | 1          | left          |
-| `=`      | definition            | 0          | N/A[^assn]    |
+| Operator | Description           | Precedence | Associativity | Type          |
+|----------|-----------------------|------------|---------------|---------------|
+| `-`      | unary minus           | 7          | right         | Unary         |
+| `!`      | negation              | 7          | right         | Unary         |
+| `h@a`    | list head             | 7          | right         | Unary         |
+| `t@a`    | list tail             | 7          | right         | Unary         |
+| `*`      | multiplication        | 6          | left          | Binary        |
+| `/`      | division              | 6          | left          | Binary        |
+| `%`      | modulo                | 6          | left          | Binary        |
+| `+`      | addition              | 5          | left          | Binary        |
+| `-`      | subtraction           | 5          | left          | Binary        |
+| `::`     | cons                  | 4          | right         | Binary        |
+| `==`     | equality              | 3          | left          | Binary        |
+| `!=`     | not equality          | 3          | left          | Binary        |
+| `<`      | less than             | 3          | left          | Binary        |
+| `>`      | greater than          | 3          | left          | Binary        |
+| `<=`     | less than or equal    | 3          | left          | Binary        |
+| `>=`     | greater than or equal | 3          | left          | Binary        |
+| `&&`     | logical AND           | 2          | left          | Binary        |
+| `||`     | logical OR            | 1          | left          | Binary        |
+| `=`      | definition            | 0          | N/A[^assn]    | Binary        |
 
 [^assn]: nested-definition is not allowed, so associativity rules are not
 applicable to the definition operator.
+
+Definitions
+-----------
+
+Definitions bind an identifier to a type and a value. The syntax for
+definitions is the following:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<id>: <type> = <expression>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If, for example, we want to define an `Int` *x* whose value is 4, we would
+write the following line:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x: Int = 4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Definitions have no value, that is, they do not return anything. Therefore,
+nested definitions are invalid:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+y: Int = (x: Int = 4)     -- invalid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because names are immutable in Apollo, any name must be defined in the same
+line that it is declared. Declaring a name without a value is not allowed, and
+so the following is invalid:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+y: Int                  -- invalid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Functions
 ---------
@@ -465,8 +417,8 @@ nested, that is, a function can contain one or more functions within itself.
 Functions and values are declared using the same syntax. Functions, however,
 have different types -- they take one or more types and return another type.
 Like mathematical functions, they map elements in one or more sets to an
-element in another set. Let's define a function that takes an integer x and
-returns its square.
+element in another set. Consider the following function that takes an integer x
+and returns its square.
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 square: (x: Int) -> Int = x * x
@@ -478,7 +430,8 @@ A function consists of a declaration and definition. The declaration of square i
 square: (x: Int) -> Int
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-which reads as "square is a function that takes an Int whose identifier is x and returns an Int."
+which reads as "square is a function that takes an Int whose identifier is x
+and returns an Int."
 
 The definition is whatever is to the right side of the definition operator:
     
@@ -506,8 +459,7 @@ Functions can be recursive, that is, they can call themselves. Consider the
 following function for computing the factorial of an integer n:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-factorial: (n: Int) -> Int = 
-    case (n == 0) 1 otherwise n * factorial(n - 1)
+factorial: (n: Int) -> Int = case (n == 0) 1 otherwise n * factorial(n - 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As in all recursive functions, we need a base case to prevent infinite
@@ -515,26 +467,16 @@ recursive calls. For this we use conditional statements. The functions reads as
 "the factorial of n is 1 if n is 0, otherwise it is n times the factorial
 of n - 1."
  
-Looping
--------
-
-Looping can be simulated using recursion. To create a subroutine that should
-loop, a recursive function can be defined. A simple example of a recursive
-loop:
+Recursive functions can be used to simulate looping. Consider the following
+example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-addX: (foo: Int, x: Int) = case (x == 0) { foo }
-                           otherwise   { addX(foo + 1, x - 1) }
+addX: (foo: Int, x: Int) = case (x == 0) foo
+                           otherwise     addX(foo + 1, x - 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Statements
+Expressions
 -----------
-
-There are two kinds of statements in Apollo:
- * Expressions
- * Definitions
-
-#### Expressions
 
 Expressions are statements with a value. Because Apollo imposes functional
 purity, a value expression can always be replaced with its value.
@@ -548,42 +490,12 @@ y > 18
 [1,2,3]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Definitions
-
-Definitions, unlike expressions, have no value. They consist of an identifier,
-a type, and an expression.
-
-The syntax for definitions is the following:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<id>: <type> = <expression>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If, for example, we want to define an `Int` *x* whose value is 4, we would
-write the following line:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-x: Int = 4
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Since definitions are value-less, nested definitions are invalid:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int = (x: Int = 4)     -- invalid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Because names are immutable in Apollo, any name must be defined in the same
-line that it is declared. Declaring a name without a value is not allowed, and
-so the following is invalid:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int                  -- invalid
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #### Blocks
 
 A block is an expression delimited by curly braces. Using the `where` keyword,
-blocks can be used to declare local-scope auxiliary values or functions.
+blocks can be used to declare local-scope auxiliary values or functions. In
+other words, blocks consist of an expression followed by a list of definitions.
+
 Consider the following two versions of a function that computes the surface
 area of a cylinder:
 
@@ -591,7 +503,7 @@ area of a cylinder:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
-    sideArea + (2 * baseArea)
+    sideArea + 2 * baseArea
     where
         sideArea: Int = 2 * pi * r * h
         baseArea: Int = pi * r * r
@@ -601,14 +513,14 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 ##### Two: without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cylinderArea: (r: Int, h: Int) -> Int = 2 * pi * r * h + 2 * (pi * r * r)
+cylinderArea: (r: Int, h: Int) -> Int = (2 * pi * r * h) + 2 * (pi * r * r)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Both versions produce the same result, but the first one is arguably more
 readable and modular.
 
-Now consider a tail-recursive implementation of factorial that uses a block to
-define an auxiliary function:
+Consider the following implementation of factorial that uses a block to
+define a tail-recursive auxiliary function:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 factorial: (n: Int) -> Int = {
@@ -643,23 +555,29 @@ foo: Int = case (1 > 2) 1
            otherwise    5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here foo is an integer whose value is determined by a case statement. The first two case
-statements evaluate to `False` and their return value is ignored. The third statement is the 
-first one to evaluate to `True` and foo is therefore bound to the value `3`.
+Here foo is an integer whose value is determined by a case statement. The first
+two case statements evaluate to `False` and their return value is ignored. The
+third statement is the first one to evaluate to `True` and foo is therefore
+bound to the value `3`.
 
-Program Structure and Scope
----------------------------
+Program Structure
+-----------------
 
-A program in Apollo is made up of one or more valid statements. A program
-begins in a main variable, which is of type Music and is required for a program
-to compile. For example:
+A program in Apollo is consists of one or more valid statements. A statement in
+Apollo is either an expression or a definition.
+
+The lifetime of an Apollo program begins in the main value, which is of type
+Music and is required for a program to compile. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = Music([Part([Note(`A5, \4)])])
+main: Music = [[(`A5, \4)]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The program will compile to a MIDI file containing a single note -- an a in the
+This program will compile to a MIDI file containing a single note -- an A in the
 fifth octave with a quarter-note duration.
+
+Scope
+-----
 
 ### Block Scoping
 
@@ -686,3 +604,19 @@ f: (x: Int) -> Int = {
         g: (x: Int) -> Int = x * x  -- x refers to parameter of g
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Lambda Scoping (Free vs Bound Variables)
+
+TODO
+
+Standard Library
+----------------
+
+The Apollo standard library, or prelude, contains functions that can be called
+by the user in any program. These include canonical list functions like `map`,
+`reduce`, `fold`, and `zip` that can be used to leverage the power of
+functional programming for music composition.
+
+Every time an Apollo program is run, the prelude is loaded into the runtime
+environment.
+
