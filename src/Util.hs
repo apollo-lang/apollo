@@ -2,6 +2,7 @@ module Util
     ( def
     , define
     , param
+    , lambda
     , parsePitch
     , parseDuration
     , makeMusic
@@ -14,7 +15,6 @@ import Type
 
 -- TODO: use Error monad instead of `error`
 
-
 -- define: For TFunc, store param names with body as FnBody type
 define :: Id -> Type -> Expr -> Expr
 define i t e = case (t, e) of 
@@ -22,16 +22,27 @@ define i t e = case (t, e) of
     (TDuration, VInt n) -> Def i t (VDuration n)
     _                   -> Def i t e
 
-def :: Id -> ([Param], Type) -> Expr -> Expr
-def iden (params, retType) body = Def iden (TFunc (snd params') retType) (VLam (fst params') body)
-  where params' = unzip $ unpackParam params
+def :: Id -> [Param] -> Type -> Expr -> Expr
+def i p t e = Def i (TFunc (snd p') t) (VLam (fst p') e)
+  where
+    p' = unpackParams p
 
-param :: Id -> ([Param], Type) -> Param
-param iden (params, t) = Param iden (TFunc (snd params') t)
-  where params' = unzip $ unpackParam params
+param :: Id -> [Param] -> Type -> Param
+param i p t = Param i (TFunc (snd p') t)
+  where
+    p' = unpackParams p
 
-unpackParam :: [Param] -> [(Id, Type)]
-unpackParam = map (\(Param i t) -> (i, t))
+lambda :: [Param] -> Type -> Expr -> Expr
+lambda p t e = VTLam (snd p') (fst p') t e
+  where
+    p' = unpackParams p
+
+unpackParams :: [Param] -> ([Id], [Type])
+unpackParams = unzip . map (\(Param i t) -> (i, t))
+
+unpackList :: Expr -> [Expr]
+unpackList (VList exprs) = exprs
+unpackList _ = error "Expected expression list"
 
 toPitch :: Expr -> Pitch
 toPitch (VPitch p) = Pitch p
@@ -42,10 +53,6 @@ toDuration :: Expr -> Duration
 toDuration (VDuration p) = Duration p
 toDuration (VInt i)      = Duration i
 toDuration _             = error "Expected VInt or VPitch"
-
-unpackList :: Expr -> [Expr]
-unpackList (VList exprs) = exprs
-unpackList _ = error "Expected expression list"
 
 makeAtom :: Expr -> Atom
 makeAtom (VAtom Nil (VDuration d))          = AtomRest $ Rest (Duration d)
