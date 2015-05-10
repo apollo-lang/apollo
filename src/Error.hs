@@ -49,5 +49,5 @@ trapError action = catchError action (return . show)
 
 extractValue :: Either ApolloError a -> a
 extractValue (Right val) = val
-extractValue (Left todo) = error $ "bug: extractValue called with Left (" ++ show todo ++ ")"
+extractValue (Left _)    = error $ "bug: extractValue called with Left"
 
