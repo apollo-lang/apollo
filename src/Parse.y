@@ -75,7 +75,7 @@ Statement   : Definition                    { $1 }
 Definitions : Definition                    { [$1] }
             | Definition Definitions        { $1:$2 }
 
-Definition  : ID ':' Type '=' Expression    { Def $1 $3 $5 }
+Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
             | ID ':'
               '(' Params ')' '->' Type
               '=' Expression                { def $1 ($4, $7) $9 }
