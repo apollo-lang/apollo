@@ -21,7 +21,8 @@ typecheck env expr = case expr of
   VAtom a b     -> do
     ta <- typecheck env a
     tb <- typecheck env b
-    if (ta == TInt || ta == TPitch) && (tb == TInt || tb == TDuration)
+    if (ta == TNil || ta == TInt || ta == TPitch || ta == TList TPitch || ta == TList TInt ) 
+      && (tb == TInt || tb == TDuration || tb == TList TDuration || tb == TList TInt)
     then return TAtom
     else throwError $ TypeExcept "Atom must contain Pitch and Duration"
 
@@ -162,6 +163,8 @@ typecheck env expr = case expr of
     else throwError (TypeDMismatch t t')
 
   Name name -> getVar env name
+
+  Nil       -> return TNil
 
   other -> return (TEmpty (show other)) -- error $ "ERR: got: " ++ show other
 
