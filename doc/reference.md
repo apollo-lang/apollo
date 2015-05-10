@@ -175,18 +175,18 @@ A#5         -- A#5 on the fifth octave. Translates to 82
 The following table represents the mappings of pitches to integers, according
 to the MIDI standard.
 
-|oct.| C   | C#/Db | D   | D#/Eb | E   | F   | F#/Gb | G   | G#/Ab | A   | A#/Bb | B   |
-|----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
-|*0* | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
-|*1* | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
-|*2* | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
-|*3* | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
-|*4* | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
-|*5* | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
-|*6* | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
-|*7* | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
-|*8* | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-|*9* | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
+| octave| C   | C#/Db | D   | D#/Eb | E   | F   | F#/Gb | G   | G#/Ab | A   | A#/Bb | B   |
+|-------|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
+| **0** | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
+| **1** | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
+| **2** | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
+| **3** | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
+| **4** | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
+| **5** | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
+| **6** | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
+| **7** | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
+| **8** | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
+| **9** | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
 This notation is described by the regular expression
 
@@ -279,48 +279,18 @@ one exception is lists, which are declared using brackets: `[...]`.
 Operators
 ---------
 
-### Arithmetic Operators
+### Operators on Primitive Data Types
+
+#### Arithmetic Operators
 
 Arithmetic operators are only defined for numeric primitive data types (i.e.,
-`Int`, `Pitch`, and `Duration`).
-
-#### `a + b`
-
-The sum of `a` and `b`.
-
-| Int       | +         | Int       | Int       |
-| Int       | +         | Pitch     | Pitch     |
-| Pitch     | +         | Int       | Pitch     |
-| Duration  | +         | Duration  | Duration  |
-
-#### `a - b`
-
-The sum of `a` and `b`.
-
-| Int       | -         | Int       | Int       |
-| Pitch     | -         | Int       | Pitch     |
-| Duration  | -         | Duration  | Duration  |
-
-#### `a * b`
-
-| Int       | *         | Int       | Int       |
-| Int       | *         | Duration  | Duration  |
-| Duration  | *         | Int       | Duration  |
-
-#### `a / b`
-
-| Int       | *         | Int       | Int       |
-| Int       | *         | Duration  | Duration  |
-| Duration  | *         | Int       | Duration  |
-
-#### `a % b`
-#### `- a`
+`Int`, `Pitch`, and `Duration`). They are undefined for `Bool`.
 
 The behavior of each operator is defined based on the type(s) to which it is
 applied. The following table outlines the possible combinations of arithmetic
 operations:
 
-| Type of a | Operator  | Operand B | Result    |
+| Operand A | Operator  | Operand B | Result    |
 |-----------|-----------|-----------|-----------|
 | Int       | +         | Int       | Int       |
 | Int       | +         | Pitch     | Pitch     |
@@ -339,27 +309,75 @@ operations:
 When an operator is applied to a type with which it is not compatible, a
 compile-time error is triggered.
 
-### Comparison Operators
+#### Comparison Operators
 
-#### `a == b`
-#### `a != b`
-#### `a < b`
-#### `a > b`
-#### `a <= b`
-#### `a >= b`
+These are only defined for expressions whose types are the same.
 
-### Boolean Operators
+##### `a == b`
 
-#### `!a`
-#### `a && b`
-#### `a || b`
+Evaluates to `True` if `a` is equal to `b`.
 
-### List operators
+##### `a != b`
 
-#### `!list`
-#### `h@list`
-#### `t@list`
-#### `a :: list`
+Evaluates to `True` if `a` is not equal to `b`.
+
+##### `a < b`
+
+Evaluates to `True` if `a` is less than `b`. 
+
+##### `a > b`
+
+Evaluates to `True` if `a` is greater than `b`.
+
+##### `a <= b`
+
+Evaluates to `True` if `a` is less than or equal to `b`.
+
+##### `a >= b`
+
+Evaluates to `True` if `a` is greater than or equal to `b`.
+
+#### Boolean Operators
+
+These are only defined for `Bool`s.
+
+##### `!a`
+
+Evaluates to `True` if `a` is `False`. Evaluates to `False` if `a` is `True`.
+
+##### `a && b`
+
+Evaluates to `True` if `a` and `b` are `True`. Evaluates to `False` otherwise.
+
+##### `a || b`
+
+Evaluates to `True` if either `a` or `b` are `False`. Evaluates to `False`
+otherwise.
+
+### Operators on Derived Data Types
+
+#### List Operators
+
+##### `!list`
+
+Evaluates to `True` if `list` is empty and to `False` otherwise.
+
+##### `h@list`
+
+Evaluates to the head, or first element, of `list`. 
+
+##### `t@list`
+
+Evaluates to the tail, or the rest, of `list`. The tail of a list is the list
+containing every element except the head.
+
+##### `a :: list`
+
+Evaluates to a new list created by prepending `a` to `list`. For example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 :: [2,3,4]                -- Evaluates to [1,2,3,4]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Operator Precedence and Associativity
 
@@ -418,6 +436,41 @@ so the following is invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 y: Int                  -- invalid
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Type Coercion
+-------------
+
+Type coercion allows us to conveniently go from `Int` to `Pitch` or `Duration`,
+without the need for an explicit conversion function. Coercion works
+differently for a naked list expression and for a definition. In the case of
+naked expressions, any list containing either one or more `Pitch` elements and
+`Int`s is converted to a `[Pitch]` list:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1,C4, 5]                   -- Evaluates to [(1),(60),(5)]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The same holds for a list containing `Int` and `Duration` elements:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1,\4, 5]                   -- Evaluates to [(1),(60),(5)]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For definitions however, the compiler looks at the type of the list that is
+being defined. If it is a `[Pitch]` any `Int` in the list is converted to a
+`Pitch`, e.g.:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+a: [Pitch]  = [1,2,3]       -- Defines a as [(1),(2),(3)] ([Pitch])
+a: [Duration] = [1,2,3]     -- Defines a as [(1),(2),(3)] ([Duration])
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+However, if we remove the additional context (i.e., the expected type), the
+list interpreted as `[Int]`:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1,2,3]                     -- Evaluates to [1,2,3]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Functions
@@ -492,9 +545,33 @@ an integer x and returns x^4.
 pow4: (x: Int) -> Int = twice(square, x)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Lambda Expressions
+### Anonymous Functions and Lambda Expressions
 
-TODO
+Apollo supports typed lambda expressions as anonymous functions. Consider the
+following example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(\x: Int -> Int: x)(3)              -- Evaluates to 3
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The lambda expression on the left maps an Int to itself. Calling it on 3,
+evaluates, as expected, to 3.
+
+Lambda expressions can be passed as arguments to other functions. Recall the
+`twice` function, which takes a function `f` that maps an `Int` to an `Int` and
+an `Int` `x` and applied `f` twice to `x`. Whereas before we implemented `pow4`
+by calling `twice` on a `square` function, with lambda expressions, we can
+avoid implementing `square` to achieve the same result:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pow4: (x: Int) -> Int = twice(\x: Int -> Int: x * x, x)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Lambda expressions can take multiple parameters. For example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(\x: Int, y: Int -> Int: x + y)(3, 4)       -- Evaluates to 7
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Expressions
 -----------
@@ -556,40 +633,6 @@ factorial: (n: Int) -> Int = {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Type Coercion
-
-Type coercion allows us to conveniently go from `Int` to `Pitch` or `Duration`,
-without the need for an explicit conversion function. Coercion works
-differently for a naked list expression and for a definition. In the case of
-naked expressions, any list containing either one or more `Pitch` elements and
-`Int`s is converted to a `[Pitch]` list:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-[1,C4, 5]                   -- Evaluates to [(1),(60),(5)]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The same holds for a list containing `Int` and `Duration` elements:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-[1,\4, 5]                   -- Evaluates to [(1),(60),(5)]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For definitions however, the compiler looks at the type of the list that is
-being defined. If it is a `[Pitch]` any `Int` in the list is converted to a
-`Pitch`, e.g.:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-a: [Pitch]  = [1,2,3]       -- Defines a as [(1),(2),(3)] ([Pitch])
-a: [Duration] = [1,2,3]     -- Defines a as [(1),(2),(3)] ([Duration])
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-However, if we remove the additional context (i.e., the expected type), the
-list interpreted as `[Int]`:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-[1,2,3]                     -- Evaluates to [1,2,3]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Control Flow
 ------------
 
@@ -633,6 +676,36 @@ main: Music = [[(`A5, \4)]]
 This program will compile to a MIDI file containing a single note -- an A in the
 fifth octave with a quarter-note duration.
 
+### MIDI
+
+Apollo outputs MIDI files that adhere to the standard MIDI protocol.
+
+#### Tempo
+
+The default tempo for an Apollo MIDI output file is 120 beats per minute.
+However, the user can specify any other value in the Apollo program by using a
+`#tempo` mark followed by an integer value. For instance, we could modify the
+previous program in the following way:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#tempo 160
+
+main: Music = [[(`A5, \4)]]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new program will compile to file with a 160 beats per minute tempo.
+
+### Meter
+
+The default meter for an Apollo MIDI output file is 4 / 4. As of now, this
+cannot be changed.
+
+### Velocity (Volume)
+
+The default value for the velocity, or volume, of notes in an Apollo MIDI
+output file is 80, which, in musical terms, is roughly equivalent to mezzo
+forte. As of now, this cannot be changed.
+
 Scoping
 -------
 
@@ -664,7 +737,26 @@ f: (x: Int) -> Int = {
 
 ### Lambda Expressions
 
-Following the conventions of lambda expressions
+Scoping for lambda expressions in Apollo behaves according to the free and
+bound variables of the expression. Consider the following example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\x: Int -> Int: x + y
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since `x` is the argument of the expression, `x` is a bound variable. `y`, on
+the other hand, is a free variable. In Apollo, `y` will be evaluated by
+considering the nearest binding of a value to the name `y`, if there is any.
+Consider the following program:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+y: Int = 3
+
+(\x: Int -> Int: x * y)(4)              -- Evaluate to 12
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The last value to be bound to the name `y` is an `Int` with value 3. Therefore,
+the lambda expression will use this value to evaluate `y`.
 
 Standard Library
 ----------------
