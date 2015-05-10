@@ -4,7 +4,7 @@ Apollo Language Whitepaper
 Team number 8. Contributors:
 
 - **Tester & Validator:** Roberto Jose De Amorim (rja2139)
-- **System Architect::** Benjamin Matthew Kogan (bmk2130)
+- **System Architect:** Benjamin Matthew Kogan (bmk2130)
 - **Language & Tools Guru:** Javier Llaca (jl3960)
 - **Project Manager:** Reza Nayebi (rn2324)
 - **System Integrator:** Souren Sarkis Papazian (ssp2155)
