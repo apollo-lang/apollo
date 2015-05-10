@@ -1,10 +1,10 @@
 % Apollo Language Reference Manual
 % **Team 8**
-  **Tester & Validator:** Roberto Jose De Amorim (rja2139)
-  **Language & Tools Guru:** Benjamin Matthew Kogan (bmk2130)
-  **System Integrator:** Javier Llaca (jl3960)
+  **System Architect:** Benjamin Matthew Kogan (bmk2130)
+  **Language & Tools Guru:** Javier Llaca (jl3960)
   **Project Manager:** Reza Nayebi (rn2324)
-  **System Architect:** Souren Sarkis Papazian (ssp2155)
+  **Tester & Validator:** Roberto Jose De Amorim (rja2139)
+  **System Integrator:** Souren Sarkis Papazian (ssp2155)
 % March 25, 2015
 
 ![](./img/lrm-logo.png)
@@ -16,18 +16,17 @@ Introduction
 ------------
 
 Apollo is a functional programming language for algorithmic music composition.
-Apollo is intended to be usable by a programmer with knowledge of basic
-functional constructs and no prior experience with music creation. The
-fine-details of synthesizing music are abstracted such that familiar
-programming types like integers can be interpreted by the compiler as musical
-sequences. At the same time, more experienced musicians can directly manipulate
-note and chord types while leveraging Apollo's programming constructs to create
-novel compositions. In effect, Apollo empowers the programmer to hear the sound
-of algorithms and the musician to compose in code.  An Apollo source program
-produces as output a MIDI file, which is a standardized way to store a musical
-piece.
+It is intended to be usable by a programmer with knowledge of basic functional
+constructs and no prior experience with music creation. The fine-details of
+synthesizing music are abstracted such that familiar programming types like
+integers can be interpreted by the compiler as musical sequences. At the same
+time, more experienced musicians can directly manipulate note and chord types
+while leveraging Apollo's programming constructs to create novel compositions.
+In effect, Apollo empowers the programmer to hear the sound of algorithms and
+the musician to compose in code.  An Apollo source program produces as output a
+MIDI file, which is a standardized way to store a musical piece.
 
-### Origin of the Name
+### Origin of the Name and Logo
 
 Apollo combines the power of source code, or Apollonian logic, with the art of
 music, the domain of the god Apollo. The logo is derived from a combination of
@@ -162,7 +161,7 @@ conventions.
 
 A single upper-case letter from A to G indicating the pitch, followed by an
 optional `#` or `b` character indicating the accidental (sharp or flat,
-respectively), followed by a number indicating the octave.
+respectively), followed by a number from 0 to 9 indicating the octave.
 
 For example:
 
@@ -176,18 +175,18 @@ A#5         -- A#5 on the fifth octave. Translates to 82
 The following table represents the mappings of pitches to integers, according
 to the MIDI standard.
 
-|oct.| C/B#| C#/Db | D   | D#/Eb | E/Fb| F/E#| F#/Gb | G   | G#/Ab | A   | A#/Bb | B/Cb|
+|oct.| C   | C#/Db | D   | D#/Eb | E   | F   | F#/Gb | G   | G#/Ab | A   | A#/Bb | B   |
 |----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
-| 0  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
-| 1  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
-| 2  | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
-| 3  | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
-| 4  | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
-| 5  | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
-| 6  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
-| 7  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
-| 8  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-| 9  | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
+|*0* | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
+|*1* | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
+|*2* | 36  | 37    | 38  | 39    | 40  | 41  | 42    | 43  | 44    | 45  | 46    | 47  |
+|*3* | 48  | 49    | 50  | 51    | 52  | 53  | 54    | 55  | 56    | 57  | 58    | 59  |
+|*4* | 60  | 61    | 62  | 63    | 64  | 65  | 66    | 67  | 68    | 69  | 70    | 71  |
+|*5* | 72  | 73    | 74  | 75    | 76  | 77  | 78    | 79  | 80    | 81  | 82    | 83  |
+|*6* | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
+|*7* | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
+|*8* | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
+|*9* | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
 This notation is described by the regular expression
 
@@ -250,16 +249,16 @@ one exception is lists, which are declared using brackets: `[...]`.
 
  * `Atom`: a pair representing a musical sound unit. `Atom` values can be
    constructed in three ways:
-    1. (Pitch, Duration) represents a note
-    2. ([Pitch], Duration) represents a chord
-    3. (Nil, Duration) represents a rest
+    1. `(Pitch, Duration)` represents a note
+    2. `([Pitch], Duration)` represents a chord
+    3. `(Nil, Duration)` represents a rest
 
     These are some examples:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	note: Atom = (A5, \8)               -- A5 note, eighth note
-	chord: Atom = ([A5, C#6, E6], \2)   -- A major chord, half note
-	rest: Atom = (_, \4)                -- Rest, quarter note
+	note: Atom = (A5, \8)               -- An A5 note (eighth note duration)
+	chord: Atom = ([A5, C#6, E6], \2)   -- An A major chord (half note duration)
+	rest: Atom = (_, \4)                -- A Rest (quarter note duration)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Music`: a list of lists of `Atom`s. Each list of `Atom`s in a `Music` value
@@ -282,24 +281,46 @@ Operators
 
 ### Arithmetic Operators
 
-#### `expression + expression`
-#### `expression - expression`
-#### `expression * expression`
-#### `expression / expression`
-#### `expression + expression`
+Arithmetic operators are only defined for numeric primitive data types (i.e.,
+`Int`, `Pitch`, and `Duration`).
 
-| `+`      | addition              | 5          | left          | Binary        |
-| `-`      | subtraction           | 5          | left          | Binary        |
-| `*`      | multiplication        | 6          | left          | Binary        |
-| `/`      | division              | 6          | left          | Binary        |
-| `%`      | modulo                | 6          | left          | Binary        |
-| `-`      | unary minus           | 7          | right         | Unary         |
+#### `a + b`
+
+The sum of `a` and `b`.
+
+| Int       | +         | Int       | Int       |
+| Int       | +         | Pitch     | Pitch     |
+| Pitch     | +         | Int       | Pitch     |
+| Duration  | +         | Duration  | Duration  |
+
+#### `a - b`
+
+The sum of `a` and `b`.
+
+| Int       | -         | Int       | Int       |
+| Pitch     | -         | Int       | Pitch     |
+| Duration  | -         | Duration  | Duration  |
+
+#### `a * b`
+
+| Int       | *         | Int       | Int       |
+| Int       | *         | Duration  | Duration  |
+| Duration  | *         | Int       | Duration  |
+
+#### `a / b`
+
+| Int       | *         | Int       | Int       |
+| Int       | *         | Duration  | Duration  |
+| Duration  | *         | Int       | Duration  |
+
+#### `a % b`
+#### `- a`
 
 The behavior of each operator is defined based on the type(s) to which it is
 applied. The following table outlines the possible combinations of arithmetic
 operations:
 
-| Operand A | Operator  | Operand B | Result    |
+| Type of a | Operator  | Operand B | Result    |
 |-----------|-----------|-----------|-----------|
 | Int       | +         | Int       | Int       |
 | Int       | +         | Pitch     | Pitch     |
@@ -320,25 +341,25 @@ compile-time error is triggered.
 
 ### Comparison Operators
 
-| `==`     | equality              | 3          | left          | Binary        |
-| `!=`     | not equality          | 3          | left          | Binary        |
-| `<`      | less than             | 3          | left          | Binary        |
-| `>`      | greater than          | 3          | left          | Binary        |
-| `<=`     | less than or equal    | 3          | left          | Binary        |
-| `>=`     | greater than or equal | 3          | left          | Binary        |
+#### `a == b`
+#### `a != b`
+#### `a < b`
+#### `a > b`
+#### `a <= b`
+#### `a >= b`
 
 ### Boolean Operators
 
-| `!`      | negation              | 7          | right         | Unary         |
-| `&&`     | logical AND           | 2          | left          | Binary        |
-| `||`     | logical OR            | 1          | left          | Binary        |
+#### `!a`
+#### `a && b`
+#### `a || b`
 
 ### List operators
 
-| `!`      | negation              | 7          | right         | Unary         |
-| `h@a`    | list head             | 7          | right         | Unary         |
-| `t@a`    | list tail             | 7          | right         | Unary         |
-| `::`     | cons                  | 4          | right         | Binary        |
+#### `!list`
+#### `h@list`
+#### `t@list`
+#### `a :: list`
 
 ### Operator Precedence and Associativity
 
@@ -411,35 +432,46 @@ They are defined as follows:
 add: (x: Int, y: Int) -> Int = x + y
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Functions can be recursive, that is, they can call themselves. They can also be
-nested, that is, a function can contain one or more functions within itself.
+This defines a function `add` which takes an `Int` `x` and an `Int` `y` and
+returns the sum of `x` and `y`.
 
-Functions and values are declared using the same syntax. Functions, however,
-have different types -- they take one or more types and return another type.
-Like mathematical functions, they map elements in one or more sets to an
-element in another set. Consider the following function that takes an integer x
-and returns its square.
+### Types
+
+Functions take one or more types and return another type. Like functions in
+mathematics, they map elements in one or more sets to an element in another
+set. Consider the following function that takes an integer x and returns its
+square.
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 square: (x: Int) -> Int = x * x
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A function consists of a declaration and definition. The declaration of square is
-    
+We say the type of `square` is `(Int) -> Int`. It maps from the set of integers
+to the set of integers.
+
+### Recursion
+
+Functions can be recursive, that is, they can call themselves. Consider the
+following function for computing the factorial of an integer `n`:
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-square: (x: Int) -> Int
+factorial: (n: Int) -> Int = case (n == 0) 1 otherwise n * factorial(n - 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-which reads as "square is a function that takes an Int whose identifier is x
-and returns an Int."
+This is a declarative implementation of factorial. In other words, instead of
+specifying how to compute, it specifies what should be computed. The functions
+reads as "The factorial of 0 is 1, otherwise it is n times the factorial of n -
+1."
+ 
+Recursive functions can be used to simulate looping. Consider the following
+function, which adds an `Int` `x` to an `Int` `n`:
 
-The definition is whatever is to the right side of the definition operator:
-    
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-x * x
+addX: (n: Int, x: Int) = case (x == 0) n
+                         otherwise     addX(a + 1, x - 1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that declarations cannot exist on their own; they require a definition.
+### Higher-Order Functions
 
 Functions in Apollo can be passed as parameters to other functions. Example:
         
@@ -447,7 +479,12 @@ Functions in Apollo can be passed as parameters to other functions. Example:
 twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The twice function takes a function f and applies it twice to the argument x.
+The twice function takes a function `f`, which takes an `Int` and returns an
+`Int`, and applies it twice to the argument x. Note how the parameters to `f`
+in `twice` are not named, only the types are included. In general, When
+defining a function `f` that takes a function `g` as a parameter, the
+parameters to `g` need not be named.
+
 Now we can use our two functions to declare a new function, pow4, which takes
 an integer x and returns x^4.
 
@@ -455,25 +492,9 @@ an integer x and returns x^4.
 pow4: (x: Int) -> Int = twice(square, x)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Functions can be recursive, that is, they can call themselves. Consider the
-following function for computing the factorial of an integer n:
+### Lambda Expressions
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-factorial: (n: Int) -> Int = case (n == 0) 1 otherwise n * factorial(n - 1)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As in all recursive functions, we need a base case to prevent infinite
-recursive calls. For this we use conditional statements. The functions reads as
-"the factorial of n is 1 if n is 0, otherwise it is n times the factorial
-of n - 1."
- 
-Recursive functions can be used to simulate looping. Consider the following
-example:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-addX: (foo: Int, x: Int) = case (x == 0) foo
-                           otherwise     addX(foo + 1, x - 1)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TODO
 
 Expressions
 -----------
@@ -496,10 +517,12 @@ A block is an expression delimited by curly braces. Using the `where` keyword,
 blocks can be used to declare local-scope auxiliary values or functions. In
 other words, blocks consist of an expression followed by a list of definitions.
 
+The value of a block is the value of the expression it contains.
+
 Consider the following two versions of a function that computes the surface
 area of a cylinder:
 
-##### One: using a block:
+##### One - using a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
@@ -510,7 +533,7 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-##### Two: without a block:
+##### Two - without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = (2 * pi * r * h) + 2 * (pi * r * r)
@@ -531,6 +554,40 @@ factorial: (n: Int) -> Int = {
             otherwise       aux(n - 1, acc * n)
         }
 }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### Type Coercion
+
+Type coercion allows us to conveniently go from `Int` to `Pitch` or `Duration`,
+without the need for an explicit conversion function. Coercion works
+differently for a naked list expression and for a definition. In the case of
+naked expressions, any list containing either one or more `Pitch` elements and
+`Int`s is converted to a `[Pitch]` list:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1,C4, 5]                   -- Evaluates to [(1),(60),(5)]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The same holds for a list containing `Int` and `Duration` elements:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1,\4, 5]                   -- Evaluates to [(1),(60),(5)]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For definitions however, the compiler looks at the type of the list that is
+being defined. If it is a `[Pitch]` any `Int` in the list is converted to a
+`Pitch`, e.g.:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+a: [Pitch]  = [1,2,3]       -- Defines a as [(1),(2),(3)] ([Pitch])
+a: [Duration] = [1,2,3]     -- Defines a as [(1),(2),(3)] ([Duration])
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+However, if we remove the additional context (i.e., the expected type), the
+list interpreted as `[Int]`:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[1,2,3]                     -- Evaluates to [1,2,3]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Control Flow
@@ -576,10 +633,10 @@ main: Music = [[(`A5, \4)]]
 This program will compile to a MIDI file containing a single note -- an A in the
 fifth octave with a quarter-note duration.
 
-Scope
------
+Scoping
+-------
 
-### Block Scoping
+### Blocks
 
 An execution block is a list of statements enclosed between the starting curly
 brace `{` and the respective closing brace `}`. Blocks can be nested. Names
@@ -590,7 +647,7 @@ redefines a name defined in a containing block, the former shadows the latter
 (i.e. the former is unaffected by the later, but it is not accessible within
 the block in which the later is accessible).
 
-### Function Scoping
+### Functions
 
 Since a function is effectively a parameterized name assigned to a block, the
 body of a function follows the rules of block scoping. This means that a
@@ -605,9 +662,9 @@ f: (x: Int) -> Int = {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Lambda Scoping (Free vs Bound Variables)
+### Lambda Expressions
 
-TODO
+Following the conventions of lambda expressions
 
 Standard Library
 ----------------

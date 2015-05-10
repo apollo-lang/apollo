@@ -57,7 +57,7 @@ handleExport :: Env Expr -> String -> String -> IOThrowsError ()
 handleExport env filename mainName = do
   mainExists <- liftIO (isBound env mainName)
   tempo <- getTempo env
-  liftIO $ when mainExists (export tempo)
+  liftIO $ when mainExists (export tempo >> putStrLn ("Music in `" ++ mainName ++ "` exported to " ++ filename))
     where
       export tempo = getMain >>= \m -> exportMusic tempo filename (makeMusic m)
       getMain = runUnchecked (getVar env mainName)
