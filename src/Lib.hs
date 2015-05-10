@@ -22,6 +22,13 @@ prelude = unlines
 
   , "  length: (xs: [Int]) -> Int = case (!xs) 0 otherwise 1 + length(t@xs)"
 
+  , "  last: (xs: [Int]) -> Int = case (length(xs) == 1) h@xs otherwise last(t@xs)"
+
+  , "  init: (xs: [Int]) -> [Int] = case (length(xs) == 1) [] otherwise h@xs :: init(t@xs)"
+
+  , "  reverse: (xs: [Int]) -> [Int] = case (!xs) [] otherwise last(xs) :: reverse(init(xs))"
+
   ]
   -- TODO: foldl
   -- TODO: cases for things other than `Int`s
+
