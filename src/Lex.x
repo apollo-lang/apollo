@@ -76,6 +76,7 @@ tokens :-
     \\                              { \s -> TokenLambda }
     "h@"                            { \s -> TokenHead }
     "t@"                            { \s -> TokenTail }
+    \?                              { \s -> TokenRandom }
 
     -- Separators
     \=                              { \s -> TokenDef }
@@ -120,6 +121,7 @@ data Token = TokenId String
            | TokenLambda
            | TokenHead
            | TokenTail
+           | TokenRandom
            | TokenDef
            | TokenArrow
            | TokenColon

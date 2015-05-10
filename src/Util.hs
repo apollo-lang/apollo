@@ -5,6 +5,7 @@ module Util
     , parsePitch
     , parseDuration
     , makeMusic
+    , random
     ) where
 
 import Text.Regex.Posix
@@ -101,4 +102,7 @@ parseDuration s = case matchDuration s of
 
 matchDuration :: String -> [[String]]
 matchDuration s = s =~ "\\\\([0-9]+)(\\.?)"
+
+random :: Int -> Int -> Int
+random _ _ = 0
 
