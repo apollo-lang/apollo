@@ -106,7 +106,8 @@ runRepl = do
   env  <- nullEnv
   tEnv <- nullEnv
   _ <- loadPrelude tEnv env
-  until_ (== "quit") (readPrompt "apollo> ") (interpretLine env tEnv)
+  _ <- replUsage
+  until_ (== ":quit") (readPrompt "apollo> ") (interpretLine env tEnv)
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
 until_ prdc prompt action = do
@@ -127,7 +128,10 @@ interpretLine env tEnv inp = case inp of
  where
   astCheck ast = liftThrows $ if length ast == 1
                               then return ast
-                              else throwError $ Default "REPL received >1 expression"
+                              else  -- throwError $ Default $ ">>" ++ show ast
+                                if null ast
+                                then throwError $ Default ""
+                                else throwError $ Default "REPL received >1 expression"
   getBindings = do
     e <- readIORef tEnv
     mapM listing e
@@ -148,4 +152,17 @@ usage = do
   putStrLn "    -h|--help      Print this message"
   putStrLn "    -o <output>    Output midi to specified filename if source file present"
   putStrLn "       -           Read from stdin"
+
+replUsage :: IO ()
+replUsage = do
+  putStrLn $ "Apollo repl, version " ++ showVersion ++ ": https://github.com/apollo-lang/apollo"
+  putStrLn   ""
+  putStrLn   "Commands:"
+  putStrLn   "  :browse            See all current bindings and their types"
+  putStrLn   "  :export <name>     Export a name of type Music to `_repl.mid`"
+  putStrLn   "  :quit              Exit the repl"
+  putStrLn   ""
+    where
+      showVersion = init (concatMap ((++ ".") . show) version)
+      version = [0,0,0,0] :: [Int]
 
