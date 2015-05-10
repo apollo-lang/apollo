@@ -127,6 +127,7 @@ check() {
         let lineno=lineno+1
         continue
       fi
+      # Keep track of line numbers to extract them from the answer file
       let lineno=lineno+1
 
       if test "$ast" -eq 1; then
@@ -135,15 +136,15 @@ check() {
         local interp=$(evalAPS "$line")
       fi
 
-      local answer=$(awk "NR==$lineno" "$answ")
+      local answer=$(awk "NR==$lineno" "$answ") # awk helps us grab the appropriate line from the ans file
       local result=$(compare "$interp" "$answer")
       if test -n "$result"; then
-      # If one of the lines generate an error, that test stops and no further lines are tested
+      # If one of the lines generates an error, that test stops and no further lines are tested
         break
       fi
     done < "$test"
   else
-    # Much simples testing when we deal with the whole source file
+    # Much simpler testing when we deal with the whole source file
     if test "$ast" -eq 1; then
       local interp=$(evaluate $test --ast)
     else
@@ -162,6 +163,7 @@ check() {
     # If the script is run with -q (quiet) the error message is not printed
       red
       if test $aps -eq 1; then
+        # If we're running in aps mode, we print the line where the error happened
         red "  Error in line: $lineno"
       fi
       red "  $divider"
@@ -196,6 +198,7 @@ handle_flags() {
   esac
 }
 
+# cd to test directory if not already there
 change_dir_if_necessary() {
   local cwd=$(basename $(pwd))
   local test_dir="tests"
@@ -213,6 +216,7 @@ run_tests() {
   for test in $tests; do
     check $test
     if test $? -eq 1; then
+      # If the exit status is ever != 0, we store it so that we can later exit the script in error
       exit_status=1
     fi
   done
@@ -228,4 +232,5 @@ main() {
 
 main $@
 exit $exit_status
+
 
