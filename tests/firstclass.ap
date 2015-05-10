@@ -5,3 +5,6 @@ twice(f, 2)
 myMap: (f: (Int) -> Int, a: [Int]) -> [Int] = case (!a) [] otherwise f(h@a) :: myMap(f, t@a)
 square: (a: Int) -> Int = a * a
 myMap(square, [1,2,3,4,5])
+
+pow4: (x: Int) -> Int = twice(square, x)
+pow4(5)

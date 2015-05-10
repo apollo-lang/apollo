@@ -1,1 +1,27 @@
--- not yet implemented
+{-	f: (m: Int) -> Int = {
+		g(m, 4)
+		where
+			g: (x: Int, y: Int) -> Int = x + y
+	}
+
+	foo: Int = {
+		length * bar
+		where
+			length: Int = 5
+			bar: Int = 4
+	}
+
+	cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
+		sideArea + circleArea
+		where
+			sideArea: Int = b * h
+			circleArea: Int = {
+				2 * pi * r * r
+				where
+					pi: Int = 3
+			}
+	} -}
+10 -- test
+--	f(5)
+--	foo
+--	cylinderVolume(2, 3, 4)
