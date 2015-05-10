@@ -44,6 +44,7 @@ import Lex
     '\\'        { TokenLambda }
     'h@'        { TokenHead }
     't@'        { TokenTail }
+    '?'         { TokenRandom }
     '='         { TokenDef }
     '->'        { TokenArrow }
     ':'         { TokenColon }
@@ -162,6 +163,8 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '&&' Expression    { BoolOp And $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
             | Expression '::' Expression    { ArrOp Cons $1 $3 }
+
+Macro       : NUM '?' NUM                   { random $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Expression
