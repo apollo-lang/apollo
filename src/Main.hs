@@ -153,7 +153,7 @@ usage = do
   putStrLn ""
   putStrLn "Options:"
   putStrLn "       --repl      Start Read-Evaluate-Print-Loop"
-  putStrLn "       --ast       Print a program's abstract syntax tree"
+  putStrLn "       --ast       Print the abstract syntax tree of source input through stdin"
   putStrLn "    -h|--help      Print this message"
   putStrLn "    -o <output>    Output midi to specified filename if source file present"
   putStrLn "       -           Read from stdin"
