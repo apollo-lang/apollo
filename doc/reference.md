@@ -160,7 +160,7 @@ Not including an accidental indicates that the note is natural. In this case we
 make the pitch a sharp by using `#`. The integer for the octave must be in the
 range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
 
-|oct.| c   | c#/db | d   | d#/eb | e   | f   | f#/gb | g   | g#/ab | a   | a#/bb | b   |
+|oct.| C/B#| C#/Db | D   | D#/Eb | E/Fb| F/E#| F#/Gb | G   | G#/Ab | A   | A#/Bb | B/Cb|
 |----|-----|-------|-----|-------|-----|-----|-------|-----|-------|-----|-------|-----|
 | 0  | 12  | 13    | 14  | 15    | 16  | 17  | 18    | 19  | 20    | 21  | 22    | 23  |
 | 1  | 24  | 25    | 26  | 27    | 28  | 29  | 30    | 31  | 32    | 33  | 34    | 35  |
