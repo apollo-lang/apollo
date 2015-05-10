@@ -4,24 +4,24 @@ Apollo Language Whitepaper
 Team number 8. Contributors:
 
 - **Tester & Validator:** Roberto Jose De Amorim (rja2139)
-- **Language & Tools Guru:** Benjamin Matthew Kogan (bmk2130)
-- **System Integrator:** Javier Llaca (jl3960)
+- **System Architect::** Benjamin Matthew Kogan (bmk2130)
+- **Language & Tools Guru:** Javier Llaca (jl3960)
 - **Project Manager:** Reza Nayebi (rn2324)
-- **System Architect:** Souren Sarkis Papazian (ssp2155)
+- **System Integrator:** Souren Sarkis Papazian (ssp2155)
 
 Implementation language: Haskell.
 
 Introduction
 ------------
 
-Apollo is a programming language for algorithmic and musical composition. The language provides an interface to leverage light-weight functional paradigms in order to produce a target program that generates a musical output when run. Apollo is intended to be usable by a programmer with knowledge of basic functional constructs and no prior experience with music creation. The fine-details of synthesizing music are abstracted into a familiar typed-interface. Instead of direct note-manipulation, common programming types like integers and characters are mapped to musical values when interpreted. In effect, Apollo thus allows the programmer to *hear the sound of an algorithm*.
+Apollo is a functional programming language for algorithmic and musical composition. The language provides an interface to leverage functional paradigms in order to produce a target program that generates a musical output when run. Apollo is intended to be usable by a programmer with knowledge of basic functional constructs and no prior experience with music creation. The fine-details of synthesizing music are abstracted into a familiar typed-interface. Instead of direct note-manipulation, common programming types like integers are mapped to musical values when interpreted.
 
 Rationale
 ---------
 
 There are a number of extant music programming languages such as [RTcmix][] and [SuperCollider][]. Apollo shares with these languages an interest in providing an abstraction for music creation to the programmer. Apollo differs from these in the depth and the intent of its abstractions. Virtually all common music programming languages provide a direct interface to sonic manipulation on the level of notes and frequencies. This allows the programmer to *act* as a musician by writing code.
 
-Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifics of musical articulation are eschewed. In the place of deep --- but complex --- sonic articulation, the programmer should be able to interpret familiar data-values using a `play` function or optionally act on a discrete note-type for greater control, if desired. Instead of conceiving of specific musical compositions prior to programming, the user conceives of a program that is transformed into music during execution. Apollo thus takes a more experimental approach where the programmer is able to *become* a musician through the act of programming.
+Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifics of musical articulation are eschewed. In the place of deep --- but complex --- sonic articulation, the programmer should be able to interact with familiar data-values and combine them by assigning them to a `main` variable that will be translated into music. Apollo thus takes a more experimental approach where the programmer is able to *become* a musician through the act of programming. 
 
 [RTcmix]: http://rtcmix.org
 [SuperCollider]: http://supercollider.sourceforge.net
@@ -32,10 +32,8 @@ Language Features
 - Simple
 - Abstract
 - Statically-typed
-- Imperative, but with light-weight functional tools
+- Functional
 - Interpreted
-- First-class functions
-- Concise --- to a degree alike Python or Ruby, but with the addition of type declarations
 - Easily usable by musicians and programmers alike with minimal learning curve
 - Uses MIDI as a representation of music
 - Single-threaded
@@ -45,38 +43,28 @@ Use Case
 
 The algorithm for producing a number in the Fibonacci sequence given its index presents an interesting use case for Apollo. The algorithm is both simple and familiar; however, it yields interesting consequences when return values are translated to musical notes.
 
-*Note that the code below is intended as a sketch of functionality. The syntax used is alike a statically-typed variant of Python for the sake of familiarity, but may not be the exact syntax used by Apollo.*
 
-    def fib(n: Int) -> Int:
-        if n == 0:
-            play(0)
-        elif n == 1:
-            play(1)
-        else:
-            play(fib(n-1) + fib(n-2))
+```
+#tempo 160
 
-First, a few of Apollo's constructs must be explained in brief. The `play` function maps a given integer value (for example) to a scaled note. The note is then added in sequence to the global representation of a composition and then the value of the integer argument is returned by the function. The composition's representation is alike an array where elements occur in sequential units of time. As the program executes, the composition is translated to MIDI and printed to `stdout` so that it may be redirected into a file.
+fibonacci: (n: Int) -> Int = 
+    case (n <= 1) 1 
+    otherwise     fibonacci(n - 1) + fibonacci(n - 2)
 
-The result of executing the above code is distinct from simply mapping the play function over a pre-determined section of the Fibonacci sequence. The latter would produce a result to the effect of mapping `play` over the sequence `[0, 1, 1, 2, 3]` if `n = 4`. The former also plays intermediary values in sequence, effectively building a recursive tree of the function's return values in sound. Visually, this would be represented as follows:
+fibSeq: (n: Int) -> [Int] = mapII(fibonacci, sequence(0, n))
 
-*In the tree below, non-terminal nodes represent indices of the Fibonacci sequence for which recusive calls to `fib` are made. Terminal nodes represent return values, which are then propogated up through the tree.*
+mySeq: [Pitch] = mapII(\x: Int -> Int: x + 40, fibSeq(20))
 
-                                    (4)
-                                  /     \
-                                 /       \
-                                /         \
-                              (3)    +     (2)
-                             /   \        /   \
-                            /     \      /     \
-                          (2)  +  (1)  (1)  +  (0)
-                         /   \     |    |       |
-                       (1) + (0)   1    1       0
-                        |     |
-                        1     0
+notesA: [Pitch] = replicateP(mySeq, 20)
 
-The tree above propagates into the following sequence to be played: `[1, 0, 1, 1, 2, 1, 0, 1, 3]`.
+rhythm: [Duration] = uniform(\8, lenP(notesA))
 
-By a simple modification of a Fibonacci algorithm (the substitution of `play` for `return`), the programmer is able to produce a sonic representation of an algorithm's *process*, as opposed to the data it produces. Without immediately realizing the tree-structure created in the act of finding a Fibonacci sequence number, the programmer is able to hear the shape of it using Apollo.
+partA: [Atom] = zip(notesA, rhythm)
 
-We intend to create more complex tooling for Apollo than is demonstrated by this use case. A simple but powerful set of built-in functional tools and more complex (yet abstract) sonic manipulations will enable a rich set of musical experiences to be producible using Apollo. But as with the Fibonacci example, we hope that the process of exploring algorithms through music --- and vice-versa --- will be sonically interesting, revealing of deeper truths regarding the nature of algorithms, and overall, fun.
+main: Music = [partA]
+```
+
+This example is very representative of the kind of programs that can be written in Apollo. First the global tempo is defined as `160` (BPM) using the global `#tempo`, which can only be defined once in a program. What follows is the implementation of the well-known `fib` function (returning the nth Fibonacci number) in Apollo. The function is simple but demonstrated the simplicity and readability of the Apollo programming language. Next the function `fibSeq` is used to create a list by mapping the `fibonacci` function over `sequence(0,n)` (`[0,1,...,n-1]`) and stores the result as a list of pitches transposed by 20 semi-tones using the `mapII` function with a lambda expression. Next a uniform rhythm of eigth notes is created using the `uniform` function. The list of pitches and our rhythm are zipped to form two lists of atoms (which are notes, chords or rests). Finally, `main` (a reserved word for a name that points to the music that is to be created) is defined as a list containing our part. The result of executing the above code will be a MIDI file containing our music, namely the first 20 numbers in the Fibonacci sequence plus 20 as pitches. 
+
+We thus see the power provided by functional programming for music creation as provided by Apollo. The ability to easily define functions to interact with musical types in an intuitive way makes Apollo easy to learn and understand. Despite its simplicity, Apollo can also produce a rich set of musical experiences and can therefore be used both by music-loving programmers and by musicians fascinated by the power of algorithms.
 
