@@ -1,4 +1,6 @@
-module Midi where
+module Midi (
+  exportMusic
+) where
 
 import Codec.Midi
 import Expr
