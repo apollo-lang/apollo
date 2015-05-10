@@ -29,9 +29,9 @@ instance Show Type where
     show TListEmpty = "[]"
     show (TErrVerbose t)  = "shouldnt show for TEmpty <" ++ show t ++ ">" -- TODO: remove
     show TError    = "shouldnt show for TError" -- TODO: remove
-    show (TFunc p t)    = "(" ++ strDelim "," show p ++ ") -> " ++ show t
+    show (TFunc p t)    = "(" ++ strDelim ", " show p ++ ") -> " ++ show t
     show _              = "<!>"
 
 strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
-strDelim s f = init . concatMap ((++ s) . f)
+strDelim s f = init . init . concatMap ((++ s) . f)
 
