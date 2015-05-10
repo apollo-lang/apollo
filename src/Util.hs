@@ -51,7 +51,7 @@ toDuration _             = error "Expected VInt or VPitch"
 makeAtom :: Expr -> Atom
 makeAtom (VAtom Nil (VDuration d))            = AtomRest $ Rest (Duration d)
 makeAtom (VAtom p@(VPitch _) d@(VDuration _)) = AtomNote $ Note (toPitch p) (toDuration d)
-makeAtom (VAtom pitches d@(VDuration _))      = AtomChord $ Chord (map (toPitch p) $ unpackList pitches) (toDuration d)
+makeAtom (VAtom pitches d@(VDuration _))      = AtomChord $ Chord (map toPitch $ unpackList pitches) (toDuration d)
 makeAtom _                                    = error "Expected note, chord or rest"
 
 makeMusic :: Expr -> Music
