@@ -10,9 +10,10 @@ module Util (
 , parsePitch
 , parseDuration
 , makeMusic
-, random
+, randomRange
 ) where
 
+import System.Random
 import Text.Regex.Posix
 import Expr
 import Type
@@ -102,6 +103,6 @@ parseDuration s = case matchDuration s of
 matchDuration :: String -> [[String]]
 matchDuration s = s =~ "\\\\([0-9]+)(\\.?)"
 
-random :: Int -> Int -> Int
-random _ _ = 0
+randomRange :: Int -> Int -> Int
+randomRange a b = head . randomRs (a, b) . mkStdGen $ 13128930232
 

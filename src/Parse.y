@@ -166,7 +166,7 @@ BinOp       : Expression '+'  Expression    { IntOp  Add $1 $3 }
             | Expression '||' Expression    { BoolOp Or  $1 $3 }
             | Expression '::' Expression    { ArrOp Cons $1 $3 }
 
-Macro       : NUM '?' NUM                   { VInt $ random $1 $3 }
+Macro       : NUM '?' NUM                   { VInt $ randomRange $1 $3 }
 
 Block       : '{' Expression '}'            { Block [] $2 }
             | '{' Expression
