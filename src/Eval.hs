@@ -11,7 +11,7 @@ import Env
 
 eval :: Env Expr -> Expr -> IOThrowsError Expr
 eval env expr = case expr of
-
+  
   VInt i      -> return $ VInt i
   VBool b     -> return $ VBool b
   VPitch p    -> return $ VPitch p
@@ -30,10 +30,8 @@ eval env expr = case expr of
   Not e -> do
     e' <- eval env e
     case e' of 
-      VBool b -> do
-        return . VBool $ not b
-      VList l -> do
-        return . VBool $ null l
+      VBool b -> return . VBool $ not b
+      VList l -> return . VBool $ null l
       _       -> error "Error: expected Bool, Part or List" 
 
   Neg e -> do
@@ -43,15 +41,13 @@ eval env expr = case expr of
   Head l -> do
     l' <- eval env l
     case l' of 
-      VList ll -> do
-        return (head ll)
+      VList ll -> return (head ll)
       _       -> error "Error: expected Part or List" 
 
   Tail l -> do
     l' <- eval env l
     case l' of 
-      VList (x:xs) -> do
-        return (VList xs)
+      VList (x:xs) -> return (VList xs)
       _       -> error "Error: expected Part or List" 
 
   BoolOp op a b -> do
@@ -74,16 +70,15 @@ eval env expr = case expr of
         restricted Div = True
         restricted Mod = True
         restricted _   = False
-        isZero (VInt x)                 = x == 0
-        isZero (VPitch (Pitch x))       = x == 0
-        isZero (VDuration (Duration x)) = x == 0
+        isZero (VInt x)      = x == 0
+        isZero (VPitch x)    = x == 0
+        isZero (VDuration x) = x == 0
 
   ArrOp op a l -> do
     a' <- eval env a
     l' <- eval env l
     case l' of 
-      VList ll -> do
-        return . VList $ a' : ll
+      VList ll -> return . VList $ a' : ll
       _        -> error "Error: expected Part or List" 
 
   VList xs -> liftM VList (mapM (eval env) xs)
@@ -141,12 +136,23 @@ matchI :: IOpr -> Expr -> Expr -> IOThrowsError Expr
 matchI op (VInt a) (VInt b) =
   return . VInt $ applyI op a b
 
-matchI op (VPitch (Pitch a)) (VPitch (Pitch b)) =
-  return . VPitch . Pitch . (`mod` pitchLimit) $ applyI op a b
-    where pitchLimit = 128
+matchI op (VPitch a) (VPitch b) =
+  return . VPitch . (`mod` 128) $ applyI op a b
 
-matchI op (VDuration (Duration a)) (VDuration (Duration b)) =
-  return . VDuration . Duration $ applyI op a b
+matchI op (VInt a) (VPitch b) =
+  return . VPitch . (`mod` 128) $ applyI op a b
+
+matchI op (VPitch a) (VInt b) =
+  return . VPitch . (`mod` 128) $ applyI op a b
+
+matchI op (VDuration a) (VDuration b) =
+  return . VDuration $ applyI op a b
+
+matchI op (VDuration a) (VInt b) =
+  return . VDuration $ applyI op a b
+
+matchI op (VInt a) (VDuration b) =
+  return . VDuration $ applyI op a b
 
 matchI _ _ _ = error "TODO this should be taken care of in typechecking"
   -- throwError $ TypeMismatch (show op) (typeOf a) (show b)

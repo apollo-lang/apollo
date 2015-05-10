@@ -42,7 +42,7 @@ interpret = do
       (VInt v) <- (runTypeExpr $ eval env t)
       (runTypeExpr $ eval env m) >>= exportMusic v "main.mid" . makeMusic
     else
-      (runTypeExpr $ eval env m) >>= exportMusic 24 "main.mid" . makeMusic
+      (runTypeExpr $ eval env m) >>= exportMusic 120 "main.mid" . makeMusic
   else return ()
   put results
 

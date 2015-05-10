@@ -37,7 +37,6 @@ instance Show Type where
     show TDuration = "Duration"
     show TPitch    = "Pitch"
     show TAtom     = "Atom"
-    -- show TPart     = "Part"
     show TMusic    = "Music"
     show (TList t) = "[" ++ show t ++ "]"
     show TListEmpty = "[]"
@@ -55,8 +54,8 @@ type Id = String
 data Expr
     = VInt Int
     | VBool Bool
-    | VDuration Duration
-    | VPitch Pitch
+    | VDuration Int
+    | VPitch Int
     | VAtom Expr Expr
     | VMusic [Expr]
     | VList [Expr]
