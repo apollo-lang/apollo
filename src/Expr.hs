@@ -69,9 +69,12 @@ instance Show Expr where
     show (FnCall e1 e2) = "(" ++ show e1 ++ " " ++ strDelim " " show e2 ++ ")"
     show (Neg e)        = "(Neg " ++ show e ++ ")"
     show (Not e)        = "(Not " ++ show e ++ ")"
+    show (Head e)       = "(Head " ++ show e ++ ")"
+    show (Tail e)       = "(Tail " ++ show e ++ ")"
     show (IntOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
     show (BoolOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
     show (CompOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
+    show (ArrOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
     show Nil            = "Nil"
     show _              = "<?>"
 
@@ -94,9 +97,12 @@ showPP (If e1 e2 e3)  = "(If " ++ showPP e1 ++ " " ++ showPP e2 ++ " " ++ showPP
 showPP (FnCall e1 e2) = "(" ++ show e1 ++ " " ++ strDelim " " showPP e2 ++ ")"
 showPP (Neg e)        = "(Neg " ++ showPP e ++ ")"
 showPP (Not e)        = "(Not " ++ showPP e ++ ")"
+showPP (Head e)       = "(Head " ++ show e ++ ")"
+showPP (Tail e)       = "(Tail " ++ show e ++ ")"
 showPP (IntOp o a b)  = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
 showPP (BoolOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
 showPP (CompOp o a b) = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
+showPP (ArrOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
 showPP Nil            = "Nil"
 showPP _              = "<?>"
 
@@ -145,7 +151,8 @@ data Atom     = AtomNote Note
 data Music    = Music [[Atom]]           deriving (Eq, Ord, Show)
 
 strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
-strDelim s f = init . concatMap ((++ s) . f)
+strDelim s f [] = ""
+strDelim s f xs = init . concatMap ((++ s) . f) $ xs
 
 commaDelim :: [Expr] -> String
 commaDelim [] = ""

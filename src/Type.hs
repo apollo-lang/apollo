@@ -33,5 +33,6 @@ instance Show Type where
     show _              = "<!>"
 
 strDelim :: (Show a) => String -> (a -> String) -> [a] -> String
-strDelim s f = init . init . concatMap ((++ s) . f)
+strDelim s f []  = ""
+strDelim s f xs = init . init . concatMap ((++ s) . f) $ xs
 
