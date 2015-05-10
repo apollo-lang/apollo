@@ -15,19 +15,15 @@ Getting Started
 ---------------
 
 Apollo requires [Haskell Platform][]. Once you have that installed, the
-following series of commands will install all necessary dependencies and build
-the compiler:
+following series of commands will install all necessary dependencies and then build and install the compiler:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ make config
-$ make
+$ cabal install happy alex
+$ make install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `make config` command is used to set up a [sandbox][] for project
-dependencies. It is not strictly necessary, but it is highly recommended.
-
 [haskell platform]: https://www.haskell.org/platform
-[sandbox]: https://www.haskell.org/cabal/users-guide/installing-packages.html#developing-with-sandboxes
 
 Usage
 -----
