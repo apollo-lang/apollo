@@ -89,22 +89,37 @@ eval env expr = case expr of
   VList xs -> liftM VList (mapM (eval env) xs)
 
   Block body ret -> do
-    closure <- liftIO (foldr addBinding (readIORef env) body >>= newIORef)
-    eval closure ret
+    env' <- clone env
+    mapM_ (eval env') body
+    eval env' ret
       where
-        addBinding (Def name _ ex) envMap = liftM2 (:) (makeRef name ex) envMap
-        makeRef name ex = newIORef ex >>= \e -> return (name, e)
+        clone e = liftIO (readIORef e >>= newIORef . removeNames)
+        removeNames = filter (\(n,_) -> n `notElem` names)
+        names = map (\(Def name _ _) -> name) body
 
-  FnBody _ body -> eval env body
+  VLam params body -> clone env >>= \closure -> return (Function params body closure)
 
-  Def name _ ex -> defineVar env name ex >> return Empty
+  Function{} -> error "bug / TODO(?): eval called on Function"
 
-  Name name -> getVar env name >>= eval env
+  -- HAHA RECURSION YOU SUCKA
+  -- For recursion, binding names must be initialized
+  -- before they are stored.
+
+  Def name _ ex@(VLam p b) -> do
+    val <- eval env ex
+    defineVar env name Empty
+    env' <- clone env
+    setVar env' name (Function p b env')
+    return Empty
+
+  Def name _ ex -> eval env ex >>= defineVar env name >> return Empty
+
+  Name name -> getVar env name
 
   FnCall name args -> do
-    FnBody params body <- getVar env name
+    Function p b closure <- getVar env name
     args' <- mapM (eval env) args
-    apply params body env args'
+    apply p b closure args'
 
   Empty -> error "Error: eval called on Empty"
 

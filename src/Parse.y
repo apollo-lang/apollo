@@ -4,6 +4,7 @@ module Parse (
 ) where
 import Control.Monad.Error (liftM, throwError)
 import Error
+import Type
 import Expr
 import Util
 import Lex
@@ -74,19 +75,27 @@ Statement   : Definition                    { $1 }
 Definitions : Definition                    { [$1] }
             | Definition Definitions        { $1:$2 }
 
-Definition  : ID ':' Type '=' Expression    { define $1 $3 $5 }
-            | TEMPO Expression              { define "#tempo" TInt $2}
+Definition  : ID ':' Type '=' Expression    { Def $1 $3 $5 }
+            | ID ':'
+              '(' Params ')' '->' Type
+              '=' Expression                { def $1 ($4, $7) $9 }
+            | TEMPO Expression              { Def "#tempo" TInt $2}
 
 Type        : TYPE                          { $1 }
             | '[' Type ']'                  { TList $2 }
-            | FnType                        { $1 }
 
-FnType      : '(' Params ')' '->' Type      { TFunc $2 $5 }
+FnType      : '(' AnonParams ')' '->' Type  { ($2, $5) }
 
 Param       : ID ':' Type                   { Param $1 $3 }
+            | ID ':' FnType                 { param $1 $3 }
 
 Params      : Param                         { [$1] }
             | Param ',' Params              { $1:$3 }
+
+AnonParam   : Type                          { Param "" $1 }
+
+AnonParams  : AnonParam                     { [$1] }
+            | AnonParam ',' AnonParams      { $1:$3 }
 
 Expressions : Expression                    { [$1] }
             | Expression ',' Expressions    { $1:$3 }
@@ -102,7 +111,7 @@ Expression  : NUM                           { VInt $1 }
             | '(' '_' ',' Expression ')'    { VAtom Nil $4 }    -- Rest atom
             | ID '(' Expressions ')'        { FnCall $1 $3 }
             | '[' Expressions ']'           { VList $2 }
-            | '[' ']'                       { VList [] }           
+            | '[' ']'                       { VList [] }
             | Conditional                   { $1 }
             | UnOp                          { $1 }
             | BinOp                         { $1 }

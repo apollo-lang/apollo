@@ -2,13 +2,14 @@ module Main (
   main
 ) where
 
-import Control.Monad (liftM, unless)
-import Control.Monad.Error (throwError)
+import Control.Monad (liftM, unless, when)
+import Control.Monad.Error (throwError, liftIO, runErrorT)
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 import Parse
 import Check
 import Error
+import Type
 import Expr
 import Eval
 import Env
@@ -32,25 +33,33 @@ interpret = do
   src <- getContents
   env <- nullEnv
   typeEnv <- nullEnv
-  results <- runIOThrows $ toAst typeEnv src >>= execAst env
-  checkMain <- isBound env "main"
-  checkTemp <- isBound env "#tempo"
-  if checkMain then do
-    m <- (runTypeExpr $ getVar env "main")  
-    if checkTemp then do
-      t <- (runTypeExpr $ getVar env "#tempo")
-      (VInt v) <- (runTypeExpr $ eval env t)
-      (runTypeExpr $ eval env m) >>= exportMusic v "main.mid" . makeMusic
-    else
-      (runTypeExpr $ eval env m) >>= exportMusic 24 "main.mid" . makeMusic
-  else return ()
+  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env "main.mid" >> return r
   put results
+
+handleMain :: Env Expr -> String -> IOThrowsError ()
+handleMain env filename = do
+  mainExists <- liftIO (isBound env "main")
+  tempo <- getTempo env
+  liftIO $ when mainExists (export tempo)
+    where
+      export tempo = getMain >>= \m -> exportMusic tempo filename (makeMusic m)
+      getMain = runUnsafe (getVar env "main")
+      runUnsafe action = liftM extractValue (runErrorT action)
+
+getTempo :: Env Expr -> IOThrowsError Int
+getTempo env = do
+  tempoExists <- liftIO (isBound env "#tempo")
+  VInt tempo <- if tempoExists
+                then getVar env "#tempo"
+                else return defaultTempo
+  return tempo
+    where defaultTempo = VInt 120
 
 toAst :: Env Type -> String -> IOThrowsError [Expr]
 toAst env src = liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> return ast
 
 execAst :: Env Expr -> [Expr] -> IOThrowsError String
-execAst env ast = liftM (unlines . map showVal . filter notEmpty) (exec env ast)
+execAst env ast = liftM (unlines . map showPP . filter notEmpty) (exec env ast)
     where
       notEmpty :: Expr -> Bool
       notEmpty Empty = False
