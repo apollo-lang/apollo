@@ -171,7 +171,7 @@ range `[0-9]`. In this case we use the pitch `A` in the fifth octave.
 | 6  | 84  | 85    | 86  | 87    | 88  | 89  | 90    | 91  | 92    | 93  | 94    | 95  |
 | 7  | 96  | 97    | 98  | 99    | 100 | 101 | 102   | 103 | 104   | 105 | 106   | 107 |
 | 8  | 108 | 109   | 110 | 111   | 112 | 113 | 114   | 115 | 116   | 117 | 118   | 119 |
-| 9  | 120 | 121   | 122 | 123   | 124 | 125 |       |     |       |     |       |     |
+| 9  | 120 | 121   | 122 | 123   | 124 | 125 | 126   | 127 |       |     |       |     |
 
 This notation is inspired by the way notes are defined in MIDI. It is generated
 by the regular expression
