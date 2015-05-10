@@ -15,7 +15,7 @@ The interpreter itself is written in Haskell and targeted to GHC 7.8.3. [Cabal][
 
 ### Makefile commands
 
-#### `make config`:
+#### `make config`
 
 Installs all dependencies using the Cabal config. Cabal is a Haskell package-manager and build system. We used a Cabal sandbox to avoid any conflicts with existing Haskell packages and to install any missing or outdated packages. The sandbox essentially builds all packages in isolation much like Python’s `virtualenv`. This makes compiling the source code on different systems much simpler not only for the user, but also for ourselves during development.
 
