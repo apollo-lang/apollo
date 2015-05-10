@@ -14,7 +14,7 @@ notesA: [Pitch] = replicateP(mySeq, 20)
 
 notesB: [Pitch] = reverseP(notesA)
 
-rhythm: [Duration] = uniform(\8, lenP(notesA))
+rhythm: [Duration] = uniform(\8, lengthP(notesA))
 
 partA: [Atom] = zip(notesA, rhythm)
 
