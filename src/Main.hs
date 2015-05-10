@@ -1,3 +1,8 @@
+
+--------------------------------------------------------------------------
+-- Main: interpreter, repl, and command-line interfaces
+--------------------------------------------------------------------------
+
 module Main (
   main
 ) where
@@ -5,7 +10,7 @@ module Main (
 import Control.Monad (liftM, unless, when)
 import Control.Monad.Error (throwError, liftIO, runErrorT)
 import System.Environment (getArgs)
-import System.IO (hFlush, stdout)
+import System.IO (hFlush, stdout, isEOF)
 import Data.IORef (readIORef)
 import Parse
 import Check
@@ -23,8 +28,8 @@ main = getArgs >>= \args ->
        case args of
          ["--ast"]  -> putAst
          ["--repl"] -> runRepl
-         ["--help"] -> putHelp
-         ["-h"]     -> putHelp
+         ["--help"] -> usage
+         ["-h"]     -> usage
          ["-"]      -> getContents >>= interpret "main.mid"
          [fname]    -> readFile fname >>= interpret "main.mid"
          [fname, "-o", ofile] -> readFile fname >>= interpret ofile
@@ -40,18 +45,23 @@ interpret ofile src = do
   env <- nullEnv
   typeEnv <- nullEnv
   _ <- loadPrelude typeEnv env
-  results <- runIOThrows $ toAst typeEnv src >>= execAst env >>= \r -> handleMain env ofile >> return r-- ofile >> return r
+  results <- runIOThrows (interp typeEnv env)
   put results
+    where
+      interp t e = toAst t src >>=
+                   execAst e >>= \r ->
+                   handleExport e ofile "main" >>
+                   return r
 
-handleMain :: Env Expr -> String -> IOThrowsError ()
-handleMain env filename = do
-  mainExists <- liftIO (isBound env "main")
+handleExport :: Env Expr -> String -> String -> IOThrowsError ()
+handleExport env filename mainName = do
+  mainExists <- liftIO (isBound env mainName)
   tempo <- getTempo env
   liftIO $ when mainExists (export tempo)
     where
       export tempo = getMain >>= \m -> exportMusic tempo filename (makeMusic m)
-      getMain = runUnsafe (getVar env "main")
-      runUnsafe action = liftM extractValue (runErrorT action)
+      getMain = runUnchecked (getVar env mainName)
+      runUnchecked action = liftM extractValue (runErrorT action)
 
 getTempo :: Env Expr -> IOThrowsError Int
 getTempo env = do
@@ -60,37 +70,34 @@ getTempo env = do
                 then getVar env "#tempo"
                 else return defaultTempo
   return tempo
-    where defaultTempo = VInt 120
+    where
+      defaultTempo = VInt 120
 
 toAst :: Env Type -> String -> IOThrowsError [Expr]
 toAst env src = liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> return ast
 
 execAst :: Env Expr -> [Expr] -> IOThrowsError String
 execAst env ast = liftM (unlines . map showPP . filter notEmpty) (exec env ast)
-    where
-      notEmpty :: Expr -> Bool
-      notEmpty Empty = False
-      notEmpty _     = True
-
-      exec :: Env Expr -> [Expr] -> IOThrowsError [Expr]
-      exec _   []         = return []
-      exec envr (e:exprs) = do
-        x <- eval envr e
-        y <- exec envr exprs
-        return (x:y)
+  where
+    notEmpty Empty = False
+    notEmpty _     = True
+    exec _   []         = return []
+    exec envr (e:exprs) = do
+      x <- eval envr e
+      y <- exec envr exprs
+      return (x:y)
 
 put :: String -> IO ()
-put r
-  | r == ""          = putStr r
-  | '\n' `notElem` r = putStrLn r
-  | otherwise        = putStr r
+put r | r == ""          = putStr r
+      | '\n' `notElem` r = putStrLn r
+      | otherwise        = putStr r
 
 -- Parse a program's syntax tree --------------------------------------------
 
 putAst :: IO ()
 putAst = getContents >>= \x -> putStrLn $ case parse x of
-                                 (Left  err) -> show err
-                                 (Right ast) -> show ast
+                                 Left  err -> show err
+                                 Right ast -> show ast
 
 -- Read-Evaluate-print Loop -------------------------------------------------
 
@@ -99,7 +106,8 @@ runRepl = do
   env  <- nullEnv
   tEnv <- nullEnv
   _ <- loadPrelude tEnv env
-  until_ (== "quit") (readPrompt "apollo> ") (interpretLine env tEnv)
+  _ <- replUsage
+  until_ (== ":quit") (readPrompt "apollo> ") (interpretLine env tEnv)
 
 until_ :: Monad m => (a -> Bool) -> m a -> (a -> m ()) -> m ()
 until_ prdc prompt action = do
@@ -108,38 +116,58 @@ until_ prdc prompt action = do
          (action result >> until_ prdc prompt action)
 
 readPrompt :: String -> IO String
-readPrompt prompt = flushStr prompt >> getLine
+readPrompt prompt = do
+  _ <- flushStr prompt
+  end <- isEOF
+  if end
+  then return ":quit"
+  else getLine
   where
-    flushStr :: String -> IO ()
     flushStr str = putStr str >> hFlush stdout
 
 interpretLine :: Env Expr -> Env Type -> String -> IO ()
-interpretLine env tEnv inp =
-  if inp == ":browse" -- TODO: strip whitespace
-  then getBindings >>= putStr . unlines
-  else runIOThrows (toAst tEnv inp >>= astCheck >>= execAst env) >>= put
-    where
-      astCheck :: [Expr] -> IOThrowsError [Expr]
-      astCheck ast = liftThrows $
-        if length ast == 1
-        then return ast
-        else throwError $ Default "REPL received >1 expression"
-      getBindings = do
-        e <- readIORef tEnv
-        mapM listing e
-      listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+interpretLine env tEnv inp = case inp of
+  ":browse" -> getBindings >>= putStr . unlines
+  (':':'e':'x':'p':'o':'r':'t':' ':name) -> runUnchecked (handleExport env "_repl.mid" name)
+  src -> runIOThrows (toAst tEnv src >>= astCheck >>= execAst env) >>= put
+ where
+  astCheck ast = liftThrows $ if length ast == 1
+                              then return ast
+                              else
+                                if null ast
+                                then throwError $ Default ""
+                                else throwError $ Default "REPL received >1 expression"
+  getBindings = do
+    e <- readIORef tEnv
+    mapM listing e
+  listing (name, typ) = readIORef typ >>= \t -> return (name ++ " : " ++ show t)
+  runUnchecked action = liftM extractValue (runErrorT action)
 
 -- Help interface -----------------------------------------------------------
 
-putHelp :: IO()
-putHelp = do
+usage :: IO()
+usage = do
   putStrLn "Apollo: a language for algorithmic music composition"
   putStrLn ""
-  putStrLn "Usage: apollo [options] <source file> [-o <output>]"
+  putStrLn "Usage: apollo [options|-] <source file> [-o <output>]"
   putStrLn ""
   putStrLn "Options:"
   putStrLn "       --repl      Start Read-Evaluate-Print-Loop"
   putStrLn "       --ast       Print a program's abstract syntax tree"
   putStrLn "    -h|--help      Print this message"
   putStrLn "    -o <output>    Output midi to specified filename if source file present"
+  putStrLn "       -           Read from stdin"
+
+replUsage :: IO ()
+replUsage = do
+  putStrLn $ "Apollo repl, version " ++ showVersion ++ ": https://github.com/apollo-lang/apollo"
+  putStrLn   ""
+  putStrLn   "Commands:"
+  putStrLn   "  :browse            See all current bindings and their types"
+  putStrLn   "  :export <name>     Export a name of type Music to `_repl.mid`"
+  putStrLn   "  :quit              Exit the repl"
+  putStrLn   ""
+    where
+      showVersion = init (concatMap ((++ ".") . show) version)
+      version = [0,0,0,0] :: [Int]
 
