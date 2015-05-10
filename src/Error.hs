@@ -1,9 +1,15 @@
-module Error
-    ( ApolloError (..)
-    , ThrowsError
-    , trapError
-    , extractValue
-    ) where
+
+------------------------------------------------------------------------------
+-- Error: monad for representing errors in the Apollo language
+------------------------------------------------------------------------------
+
+module Error (
+  ApolloError (..)
+, ThrowsError
+, trapError
+, extractValue
+) where
+
 import Control.Monad.Error (Error(noMsg,strMsg), MonadError, catchError)
 
 import Type

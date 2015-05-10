@@ -15,16 +15,16 @@ Getting Started
 ---------------
 
 Apollo requires [Haskell Platform][]. Once you have that installed, the
-following series of commands will install all necessary dependencies, build
-the compiler, and run the integration test suite in that order:
+following series of commands will install all necessary dependencies and build
+the compiler:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ make config
 $ make
-$ make test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `make config` command is used to set up a [sandbox][] for project dependencies. It is not strictly necessary, but it is highly recommended.
+The `make config` command is used to set up a [sandbox][] for project
+dependencies. It is not strictly necessary, but it is highly recommended.
 
 [haskell platform]: https://www.haskell.org/platform
 [sandbox]: https://www.haskell.org/cabal/users-guide/installing-packages.html#developing-with-sandboxes
@@ -32,26 +32,5 @@ The `make config` command is used to set up a [sandbox][] for project dependenci
 Usage
 -----
 
-*Note: the `apollo` CLI is still subject to change.*
+Use the `--help` flag to see all options.
 
-By default, `apollo` will evaluate a program sent through `stdin`:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ echo "1 + 1" | ./apollo
-2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To parse a program's abstract syntax tree, use the `--ast` flag:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ echo "case (False) 1 otherwise 2" | ./apollo --ast
-Program [StExp (Cond (ApolloBool False) (ApolloInt 1) (ApolloInt 2))]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To use Apollo's Read-Evaluate-Print Loop, use the `--repl` flag:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ ./apollo --repl
-apollo> 1 + 1
-2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

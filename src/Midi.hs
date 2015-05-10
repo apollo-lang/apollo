@@ -1,30 +1,36 @@
+
+--------------------------------------------------------------------------
+-- Midi: module for creating and exporting to a midi file
+--------------------------------------------------------------------------
+
 module Midi (
   exportMusic
 ) where
 
-import Codec.Midi
+import Codec.Midi (Message(..), Midi(..), FileType(MultiTrack), TimeDiv(TicksPerBeat),
+                   Ticks, Key, Channel, Velocity, exportFile)
 import Expr
 
 musicToTrack :: Music -> Int -> [[(Ticks, Message)]]
 musicToTrack (Music m) tempo = map (addTM tempo) (concatMap partToTrack m)
 
 addTM :: Int -> [(Ticks, Message)] -> [(Ticks, Message)]
-addTM tempo tracks' = [(0, TempoChange tempo)] ++ tracks'
+addTM tempo tracks' = (0, TempoChange tempo) : tracks'
 
 midiFromMusic :: Music -> Int -> Midi
 midiFromMusic m tempo = Midi
     { fileType = MultiTrack
-    , timeDiv = TicksPerBeat 16 -- depends on how we convert durations i think
+    , timeDiv = TicksPerBeat 16  -- depends on how we convert durations i think
     , tracks = musicToTrack m $ quot 60000000 tempo}
 
 export :: Midi -> String -> IO ()
 export themidi filename = exportFile filename themidi
 
--- best function
+-- Best function
 exportMusic :: Int -> String -> Music -> IO ()
 exportMusic tempo filename music = export (midiFromMusic music tempo) filename
 
--- returns lenght of longest atom
+-- Returns lenght of longest atom
 longestAtom :: [Atom] -> Int
 longestAtom p = maximum $ map sizeOfAtom p
   where
@@ -35,11 +41,11 @@ longestAtom p = maximum $ map sizeOfAtom p
 -- not of length l
 appendRests :: Int -> Atom -> [[(Ticks, Message)]]
 appendRests l (AtomNote n@(Note (Pitch _) d))
-    = noteToTrack n : (replicate (l - 1) (restToTrack (Rest d)))
+    = noteToTrack n : replicate (l - 1) (restToTrack (Rest d))
 appendRests l (AtomRest r@(Rest _))
-    = restToTrack r : (replicate (l - 1) (restToTrack r))
+    = restToTrack r : replicate (l - 1) (restToTrack r)
 appendRests l (AtomChord c@(Chord a d))
-    = chordToTrack c ++ (replicate (l - (length a)) (restToTrack (Rest d)))
+    = chordToTrack c ++ replicate (l - length a) (restToTrack (Rest d))
 
 -- Takes a part and outputs [[Track]] with padding using partToTracKHelp
 partToTrack :: [Atom] -> [[(Ticks, Message)]]

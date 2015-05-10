@@ -1,4 +1,11 @@
-module Lib where
+
+--------------------------------------------------------------------------
+-- Lib: Apollo standard library prelude
+--------------------------------------------------------------------------
+
+module Lib (
+  prelude
+) where
 
 prelude :: String
 prelude = unlines
@@ -49,6 +56,4 @@ prelude = unlines
   , "  reverseP: (xs: [Pitch]) -> [Pitch] = case (!xs) [] otherwise lastP(xs) :: reverseP(initP(xs))"
 
   ]
-  -- TODO: foldl
-  -- TODO: cases for things other than `Int`s
 
