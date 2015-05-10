@@ -1,0 +1,3 @@
+Type error: `f` defined with return-type of Int, but actual return-type is (Int) -> Int
+expected args: [Pitch]; actual: [Int] for f 
+Type error: definition of Int, but assigned to Bool
