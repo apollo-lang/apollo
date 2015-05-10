@@ -30,7 +30,7 @@ Let's look at a very basic program in Apollo, namely one that creates a MIDI fil
 main: Music = [[(C5, \4 )]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type Music that contains what will eventually be written to our MIDI file. The Music is in fact just a list of lists of Atoms. An Atom, in turn, is simply a note, a chord or a rest (here a single note (`` C5, \4 ``)), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
+Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type Music that contains what will eventually be written to our MIDI file. The Music is in fact just a list of lists of Atoms. An Atom, in turn, is simply a note, a chord or a rest (here a single note `( C5, \4 )`), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
 
 You can put this source code in a file, say hello.ap. Assuming that you are in a UNIX environment, you would enter the following command:
 
@@ -287,12 +287,12 @@ mult2: (x: Int) -> Int = x * 2
 r: [Duration] = mapII(mult2, [16,32,32])
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this example, the `mult2` function takes an integer and multiplies it by two. The mapII function then takes the `mult2` function and a list of integers and multiplies every integer by 2, effectively slowing down the rhythm by a half.
+In this example, the `mult2` function takes an integer and multiplies it by two. The mapII function (for map from `Int` to `Int`) then takes the `mult2` function and a list of integers and multiplies every integer by 2, effectively slowing down the rhythm by a half.
 
 Compiling and Running
 ---------------------
 
-To compile a valid Apollo source code file (for example, main.ao), simply run the Apollo compiler with the path to the source file as its first command line argument:
+To compile a valid Apollo source code file (for example, main.ap), simply run the Apollo compiler with the path to the source file as its first command line argument:
 
 ~~~
 $ apollo main.ap
@@ -300,7 +300,7 @@ $ apollo main.ap
 
 *Note that the above assumed that the `apollo` executable is in the user’s `$PATH` environment variable*
 
-This will begin the Apollo interpreter, thereby converting Apollo source code into Haskell code. If the program is free of runtime errors and terminates in a finite amount of time, target Haskell code will output a valid MIDI file. By default, this file will be named out.mid. The output file can then be played through any MIDI player.
+This will begin the Apollo interpreter, thereby converting Apollo source code into Haskell code. If the program is free of runtime errors and terminates in a finite amount of time, target Haskell code will output a valid MIDI file. By default, this file will be named main.mid. The output file can then be played through any MIDI player.
 
 To input source code into the Apollo compiler via stdin, use `-` as the only argument:
 
