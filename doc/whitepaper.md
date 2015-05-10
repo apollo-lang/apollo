@@ -57,7 +57,7 @@ mySeq: [Pitch] = mapII(\x: Int -> Int: x + 40, fibSeq(20))
 
 notesA: [Pitch] = replicateP(mySeq, 20)
 
-rhythm: [Duration] = uniform(\8, lenP(notesA))
+rhythm: [Duration] = uniform(\8, lengthP(notesA))
 
 partA: [Atom] = zip(notesA, rhythm)
 
