@@ -167,7 +167,7 @@ For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 C4          -- C on the fourth octave.  Translates to 60
-A#5         -- A#5 on the fifth octave. Translates to 82
+A#5         -- A# on the fifth octave. Translates to 82
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ###### Pitch to Integer Table
@@ -670,7 +670,7 @@ The lifetime of an Apollo program begins in the main value, which is of type
 Music and is required for a program to compile. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = [[(`A5, \4)]]
+main: Music = [[(A5, \4)]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This program will compile to a MIDI file containing a single note -- an A in the
@@ -690,7 +690,7 @@ previous program in the following way:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #tempo 160
 
-main: Music = [[(`A5, \4)]]
+main: Music = [[(A5, \4)]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The new program will compile to file with a 160 beats per minute tempo.
