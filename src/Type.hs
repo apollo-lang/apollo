@@ -11,6 +11,7 @@ data Type
     | TMusic
     | TList Type
     | TListEmpty
+    | TNil
     | TErrVerbose String   -- TODO: remove
     | TError          -- TODO: remove
     | TFunc [Type] Type
