@@ -42,7 +42,13 @@ typecheck env expr = case expr of
     else
       if uniform t
       then return $ TList (head t)
-      else throwError $ TypeExcept "list is irregular"
+      else 
+        if pitchOrInt t 
+        then return $ TList TPitch
+        else 
+          if durOrInt t
+          then return $ TList TDuration
+          else throwError $ TypeExcept "list is irregular"
 
   If test tr fl -> do
     t <- typecheck env test
@@ -230,5 +236,14 @@ match :: Type -> Type -> Bool
 match a b = case (a, b) of
         (TPitch, TInt)    -> True
         (TDuration, TInt) -> True
+        (TList TPitch, TList TInt) -> True
+        (TList TDuration, TList TInt) -> True
         _                 -> False
 
+pitchOrInt :: [Type] -> Bool
+pitchOrInt [] = True
+pitchOrInt (x:xs) = (x == TPitch || x == TInt) && (pitchOrInt xs)
+
+durOrInt :: [Type] -> Bool
+durOrInt [] = True
+durOrInt (x:xs) = (x == TDuration || x == TInt) && (pitchOrInt xs)
