@@ -8,7 +8,11 @@ prelude = unlines
 
   , "  mapID: (f: (Int) -> Duration, a: [Int]) -> [Duration] = case (!a) [] otherwise f(h@a) :: mapID(f, t@a)"
 
-  , "  len: (xs: [Int]) -> Int = case(xs == []) 0 otherwise 1 + len(t@xs)"
+  , "  mapIB: (f: (Int) -> Bool, a: [Int]) -> [Bool] = case (!a) [] otherwise f(h@a) :: mapIB(f, t@a)"
+
+  , "  lenI: (xs: [Int]) -> Int = case(xs == []) 0 otherwise 1 + lenI(t@xs)"
+
+  , "  lenB: (xs: [Bool]) -> Int = case(xs == []) 0 otherwise 1 + lenB(t@xs)"
 
   , "  concat: (x1: [Int], x2: [Int]) -> [Int] = case(!x1) x2 otherwise (h@x1 :: concat(t@x1, x2))"
 
@@ -28,6 +32,13 @@ prelude = unlines
 
   , "  uniform: (d: Duration, n: Int) -> [Duration] = case (n == 0) [] otherwise d :: uniform(d, n - 1)"
 
+  , "  last: (xs: [Int]) -> Int = case (length(xs) == 1) h@xs otherwise last(t@xs)"
+
+  , "  init: (xs: [Int]) -> [Int] = case (length(xs) == 1) [] otherwise h@xs :: init(t@xs)"
+
+  , "  reverse: (xs: [Int]) -> [Int] = case (!xs) [] otherwise last(xs) :: reverse(init(xs))"
+
   ]
   -- TODO: foldl
   -- TODO: cases for things other than `Int`s
+
