@@ -103,21 +103,14 @@ eval env expr = case expr of
   -- For recursion, binding names must be initialized
   -- before they are stored.
 
-  Def name _ ex@(VLam p b) -> do
-    val <- eval env ex
-    defineVar env name Empty
-    env' <- clone env
-    setVar env' name (Function p b env')
-    return Empty
-
-  Def name _ ex -> eval env ex >>= defineVar env name >> return Empty
-
-  Name name -> getVar env name
-
-  FnCall name args -> do
-    Function p b closure <- getVar env name
+  FnCall (Name name) args -> do
+    VLam params body <- getVar env name
     args' <- mapM (eval env) args
     apply p b closure args'
+
+  FnCall (VTLam ts is t e) args -> do
+    args' <- mapM (eval env) args
+    apply is e env args'
 
   Empty -> error "Error: eval called on Empty"
 

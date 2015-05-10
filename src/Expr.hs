@@ -35,11 +35,11 @@ data Expr
     | VList [Expr]
     | Name Id
     | Def Id Type Expr
-    | VLam [Id] Expr                -- a function expression
-    | Function [Id] Expr (Env Expr) -- a function with its closure
+    | VLam [Id] Expr                -- Untyped lambdas
+    | VTLam [Type] [Id] Type Expr   -- Typed lambdas
     | Block [Expr] Expr
     | If Expr Expr Expr
-    | FnCall Id [Expr]
+    | FnCall Expr [Expr]
     | Neg Expr
     | Not Expr
     | Head Expr
@@ -68,7 +68,7 @@ showPP (Def i _ e)    = "(Def " ++ i ++ " " ++ showPP e ++ ")"
 showPP (VLam is e)    = "(Lambda " ++ strDelim " " id is ++ " . " ++ showPP e ++ ")"
 showPP (Block es e)   = "(Block " ++ strDelim " " showPP es ++ " " ++ showPP e ++ ")"
 showPP (If e1 e2 e3)  = "(If " ++ showPP e1 ++ " " ++ showPP e2 ++ " " ++ showPP e3 ++ ")"
-showPP (FnCall i e)   = "(" ++ i ++ " " ++ strDelim " " showPP e ++ ")"
+showPP (FnCall e1 e2) = "(" ++ show e1 ++ " " ++ strDelim " " showPP e2 ++ ")"
 showPP (Neg e)        = "(Neg " ++ showPP e ++ ")"
 showPP (Not e)        = "(Not " ++ showPP e ++ ")"
 showPP (IntOp o a b)  = "(" ++ show o ++ " " ++ showPP a ++ " " ++ showPP b ++ ")"
