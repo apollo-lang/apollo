@@ -167,15 +167,15 @@ typecheck env expr = case expr of
 
   -- TODO NOTE: had to work around fact that fn types aren't a single value here vs elsewhere
 
-  FnCall id args -> do
-    (TFunc tps tr) <- getVar env id
+  FnCall (Name name) args -> do
+    (TFunc tps tr) <- getVar env name
     if length tps /= length args
-    then throwError . Default $ "arg count mismatch for " ++ id
+    then throwError . Default $ "arg count mismatch for " ++ name
     else do
       ta <- mapM (check env) (zip tps args)
       if ta == tps
       then return tr
-      else throwError . Default $ "expected args: " ++ show tps ++ "; actual: " ++ show ta ++ " for " ++ id
+      else throwError . Default $ "expected args: " ++ show tps ++ "; actual: " ++ show ta ++ " for " ++ name
    where
      check e (param, arg) = if isTFunc param && isName arg
                             then getVar env (getName arg)
