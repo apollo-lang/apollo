@@ -240,30 +240,30 @@ one exception is lists, which are declared using brackets: `[...]`.
     `Atom` can be either a `Note`, a `Chord`, or a `Rest`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Atom = Note(`A5, \8)
-	c: Atom = Chord([`A5, `C#5, `E5], \4)
-	r: Atom = Rest(\4)
+	n: Atom = Note(A5, \8)
+	c: Atom = Chord([A5, C#5, E5], \4)
+	r: Atom = Rest(_, \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Note`: an instance of the Atom type consisting of a `Pitch` and a
    `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	n: Atom = Note(`A5, \4)
+	n: Atom = Note(A5, \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Chord`: an instance of the `Atom` type consisting of a list of `Pitch`es
     and a `Duration`. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	c: Atom = Chord([`A5, `C#5, `E5], \4)
+	c: Atom = Chord([A5, C#5, E5], \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Rest`: an instance of the `Atom` type consisting of `Duration`. A `Rest`
     indicates a space in which no notes are played. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	r: Atom = Rest(\4)
+	r: Atom = Rest(_, \4)
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Rhythm`: a list of `Duration`s. For example:
@@ -276,7 +276,7 @@ one exception is lists, which are declared using brackets: `[...]`.
    separate but simultaneously-occurring lines of music. For example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	p: Part = Part([Note(`A5, 1), Note(`C#5, 2)])
+	p: Part = Part([Note(A5, 1), Note(C#5, 2)])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Music`: the `Music` data type is initialized with a list containing all
@@ -285,12 +285,12 @@ one exception is lists, which are declared using brackets: `[...]`.
    example:
 
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	aMajor: Atom = Chord([`A5, `C#5, `E5], \4)
-	bMinor: Atom = Chord([`B5, `D#5, `F#5], \4)
-	eMajor: Atom = Chord([`E5, `G#5, `B5], \4)
+	aMajor: Atom = Chord([A5, C#5, E5], \4)
+	bMinor: Atom = Chord([B5, D#5, F#5], \4)
+	eMajor: Atom = Chord([E5, G#5, B5], \4)
 
 	back: Part = Part([aMajor, bMinor, eMajor])
-	lead: Part = Part([Note(`A5, \4), Note(`F#5, \4), Note(`E4, \4)])
+	lead: Part = Part([Note(A5, \4), Note(F#5, \4), Note(E4, \4)])
 
 	song: Music = Music([lead, back])
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -491,7 +491,7 @@ Note that declarations cannot exist on their own; they require a definition.
 Functions in Apollo can be passed as parameters to other functions. Example:
         
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-twice: (f: (n: Int) -> Int, x: Int) = f(f(x))
+twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The twice function takes a function f and applies it twice to the argument x.
