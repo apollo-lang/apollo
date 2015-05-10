@@ -62,7 +62,7 @@ atomToTrack (AtomChord c) = chordToTrack c
 chordToTrack :: Chord -> [[(Ticks, Message)]]
 chordToTrack (Chord pitches (Duration d)) = chords
   where
-    chords = [ckvtToTrack 0 p 60 d  | (Pitch p) <- pitches] -- ++ [(0, TrackEnd)]
+    chords = [ckvtToTrack 0 p 80 d  | (Pitch p) <- pitches] -- ++ [(0, TrackEnd)]
 
 -- Takes Note and outputs a Track with the note
 noteToTrack :: Note -> [(Ticks, Message)]
