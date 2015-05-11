@@ -37,9 +37,6 @@ main = getArgs >>= \args ->
 
 -- Parse and evaluate a program ---------------------------------------------
 
-loadPrelude :: Env Type -> Env Expr -> IO String
-loadPrelude typeEnv env = runIOThrows $ toAst typeEnv prelude >>= execAst env
-
 interpret :: String -> String -> IO ()
 interpret ofile src = do
   env <- nullEnv
@@ -52,6 +49,9 @@ interpret ofile src = do
                    execAst e >>= \r ->
                    handleExport e ofile "main" >>
                    return r
+
+loadPrelude :: Env Type -> Env Expr -> IO String
+loadPrelude typeEnv env = runIOThrows $ toAst typeEnv prelude >>= execAst env
 
 handleExport :: Env Expr -> String -> String -> IOThrowsError ()
 handleExport env filename mainName = do
