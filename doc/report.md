@@ -93,10 +93,10 @@ Hello World (Compile and Run your first program)
 Let's look at a very basic program in Apollo, namely one that creates a MIDI file containing a single note.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = [[(C5, \\4 )]]
+main: Music = [[(C5, \4 )]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type `Music` that contains what will eventually be written to our MIDI file. `Music` is in fact just a list of lists of `Atom`s. An `Atom`, in turn, is simply a note, a chord or a rest (here a single note `( C5, \\4 )`), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
+Looking at this program a little more carefully, we see that it essentially initializes main, a special variable of type `Music` that contains what will eventually be written to our MIDI file. `Music` is in fact just a list of lists of `Atom`s. An `Atom`, in turn, is simply a note, a chord or a rest (here a single note `( C5, \4 )`), where the first element corresponds to the pitch C5 and the second one to the duration, here 1/4th of a beat. We could just use integers to initialize a note, but the macros presented here provide a more readable and intuitive notation. We will go more in detail about the different types available in Apollo in the following section.
 
 You can put this source code in a file, say hello.ap. Assuming that you are in a UNIX environment, you would enter the following command:
 
@@ -175,7 +175,7 @@ But a pitch can't be heard without a duration, so we need to define what a durat
 A `Duration` quantifies the length of a note, chord or rest in time. It can be defined using a multiple of the smallest time division (1/64th of a beat) or a fraction of a whole note (defined in the context of a 4/4 time signature by default).
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-short: Duration = \\4  -- a quarter note (fraction notation)
+short: Duration = \4  -- a quarter note (fraction notation)
 long:  Duration = 64  -- a whole note   (multiple notation)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -191,14 +191,14 @@ n2: Atom = (mi, long)
 We could've alternatively done:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-n1: Atom = (G4, \\4)
+n1: Atom = (G4, \4)
 n2: Atom = (Eb4, 64)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Or if we wanted to construct our pitch using an integer:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-n1: Atom = (55, \\4)
+n1: Atom = (55, \4)
 n2: Atom = (51, 64)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -240,8 +240,8 @@ And finally, we can use a list of `[Atom]`s to make `Music`!
 sol: Pitch = G4              -- c in the fourth octave
 mib: Pitch = Eb4             -- e flat in the fourth octave
 
-short: Duration = \\4          -- a quarter note
-long: Duration = \\1           -- a whole note
+short: Duration = \4          -- a quarter note
+long: Duration = \1           -- a whole note
 
 n1: Atom = (sol, short)
 n2: Atom = (mib, long)
@@ -262,9 +262,9 @@ mi: Pitch = E4
 fa: Pitch = F4
 sol: Pitch = G4
 
-n1: Atom = (do, \\4)
-n2: Atom = (re, \\4)
-n3: Atom = (mi, \\4)
+n1: Atom = (do, \4)
+n2: Atom = (re, \4)
+n3: Atom = (mi, \4)
 
 c1: Atom = ([do, mi, sol], 64)
 
@@ -370,7 +370,7 @@ This will begin the Apollo interpreter, thereby converting Apollo source code in
 To input source code into the Apollo compiler via stdin, use `-` as the only argument:
 
 ~~~
-$ echo "main: Music = [[ (C5, \\4 ) ]]" | apollo -
+$ echo "main: Music = [[ (C5, \4 ) ]]" | apollo -
 ~~~
 
 To specify a different name or location for the output MIDI file, use the `-o` flag:
@@ -601,13 +601,13 @@ These are some examples:
 Using this notation, one can declare a Duration in the following way:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-d: Duration = \\4
+d: Duration = \4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This notation can be described by the regular expression
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\\[0-9]+\.?
+\[0-9]+\.?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that for `Duration` and `Pitch`, initialization to a number outside of the
@@ -635,9 +635,9 @@ a: [Int] = [1, 2, 3]
     These are some examples:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-note: Atom = (A5, \\\8)               -- An A5 note (eighth note duration)
-chord: Atom = ([A5, C#6, E6], \\2)   -- An A major chord (half note duration)
-rest: Atom = (_, \\4)                -- A Rest (quarter note duration)
+note: Atom = (A5, \\8)               -- An A5 note (eighth note duration)
+chord: Atom = ([A5, C#6, E6], \2)   -- An A major chord (half note duration)
+rest: Atom = (_, \4)                -- A Rest (quarter note duration)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  * `Music`: a list of lists of `Atom`s. Each list of `Atom`s in a `Music` value
@@ -645,12 +645,12 @@ rest: Atom = (_, \\4)                -- A Rest (quarter note duration)
    instance.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-aMajor: Atom = ([A5, C#5, E5], \\4)
-bMinor: Atom = ([B5, D#5, F#5], \\4)
-eMajor: Atom = ([E5, G#5, B5], \\4)
+aMajor: Atom = ([A5, C#5, E5], \4)
+bMinor: Atom = ([B5, D#5, F#5], \4)
+eMajor: Atom = ([E5, G#5, B5], \4)
 
 back: [Atom] = [aMajor, bMinor, eMajor]
-lead: [Atom] = [(A5, \\4), (F#5, \\4), (E4, \\4)]
+lead: [Atom] = [(A5, \4), (F#5, \4), (E4, \4)]
 
 song: Music = [lead, back]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1049,7 +1049,7 @@ The lifetime of an Apollo program begins in the main value, which is of type
 Music and is required for a program to compile. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-main: Music = [[(A5, \\4)]]
+main: Music = [[(A5, \4)]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This program will compile to a MIDI file containing a single note -- an A in the
@@ -1069,7 +1069,7 @@ previous program in the following way:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #tempo 160
 
-main: Music = [[(A5, \\4)]]
+main: Music = [[(A5, \4)]]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The new program will compile to file with a 160 beats per minute tempo.
@@ -1287,13 +1287,13 @@ your judgement. Some examples:
 
 ```haskell
 bar :: IO ()
-bar = forM_ [1, 2, 3] $ \\n -> do
+bar = forM_ [1, 2, 3] $ \n -> do
       putStrLn "Here comes a number!"
       print n
 
 foo :: IO ()
-foo = alloca 10 $ \\a ->
-      alloca 20 $ \\b ->
+foo = alloca 10 $ \a ->
+      alloca 20 $ \b ->
       cFunction a b
 ```
 
@@ -1323,7 +1323,7 @@ foo = if ...
       then ...
       else ...
 
-foo2 = bar $ \\qux -> if predicate qux
+foo2 = bar $ \qux -> if predicate qux
                      then doSomethingSilly
                      else someOtherCode
 ```
@@ -1957,7 +1957,7 @@ A special consideration was made for recursive functions such that they could ob
 The type-check phase does not alter the AST it is given nor does it communicate directly with the `eval` function that follows it. Instead, the original AST is passed to the next phase after type-checking. This can be seen in the line of code below, taken from the Check module:
 
 ```haskell
-liftThrows (parse src) >>= \\ast -> mapM_ (typecheck env) ast >> return ast
+liftThrows (parse src) >>= \ast -> mapM_ (typecheck env) ast >> return ast
 ```
 
 Source is parsed and then the resultant `ast` is passed on using the bind (`>>=`) operator. However, `typecheck` is used with a special case of the bind operator, `>>`, which ignores the returned value of the preceding action (but responds to monadic actions like termination of the action pipeline on error appropriately).
@@ -2108,23 +2108,23 @@ The interpreter itself is written in Haskell and targeted to GHC 7.8.3. [Cabal][
 
 ## Makefile commands
 
-## `make config`
+### `make config`
 
 Installs all dependencies using the Cabal config. Cabal is a Haskell package-manager and build system. We used a Cabal sandbox to avoid any conflicts with existing Haskell packages and to install any missing or outdated packages. The sandbox essentially builds all packages in isolation much like Python’s `virtualenv`. This makes compiling the source code on different systems much simpler not only for the user, but also for ourselves during development.
 
-## `make`
+### `make`
 
 Compiles the source code using `cabal build`. All the dependencies and their acceptable version ranges are stored in a file called "apollo.cabal." This also includes all the information needed to compile the Apollo interpreter such as dependencies, build tools, the compiler flags, and other metadata.
 
-## `make test`
+### `make test`
 
 Runs the integration test-suite. This target depends on the executable. If called with an outdated build of `apollo` --- or is missing it entirely --- the executable will be compiled first.
 
-## `make install`
+### `make install`
 
 This will copy the `apollo` executable into /usr/local/bin.
 
-## `make uninstall`
+### `make uninstall`
 
 This will remove the apollo executable from /usr/local/bin.
 
