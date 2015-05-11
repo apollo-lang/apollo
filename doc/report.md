@@ -621,6 +621,12 @@ a token separator.
  * `{-` introduces a mutli-line comment.
  * `-}` terminates a multi-line comment.
 
+### Macros
+
+At the parsing stage, expressions of the form `a ? b`, where `a` and `b` are
+`Int`s, are replaced by a pseudo-random number between `a` (inclusive) and `b`
+(exclusive). This can be used, among other things, to compose chance music.
+
 ### Character Set
 
 Apollo officially supports the ASCII character set. Because Haskell supports
@@ -1268,6 +1274,100 @@ functional programming for music composition.
 Every time an Apollo program is run, the prelude is loaded into the runtime
 environment.
 
+Apollo Grammar
+--------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Program     : ""
+            | Statements
+
+Statements  : Statement
+            | Statement Statements
+
+Statement   : Definition
+            | Expression
+
+Definitions : Definition
+            | Definition Definitions
+
+Definition  : ID ':' Type '=' Expression
+            | ID ':' '(' Params ')' '->' Type '=' Expression
+            | TEMPO Expression
+
+Type        : TYPE
+            | '[' Type ']'
+
+Param       : ID ':' Type
+            | ID ':' '(' AnonParams ')' '->' Type
+
+Params      : Param
+            | Param ',' Params
+
+AnonParam   : Type
+
+AnonParams  : AnonParam
+            | AnonParam ',' AnonParams
+
+Expressions : Expression
+            | Expression ',' Expressions
+
+Expression  : Primitive
+            | Derived
+            | Lambda
+            | FnCall
+            | Conditional
+            | Block
+            | UnOp
+            | BinOp
+            | '(' Expression ')'
+            | ID
+            | Macro
+
+Primitive   : NUM
+            | BOOL
+            | PITCH
+            | DUR
+            | '_'
+
+Derived     : '(' Expression ',' Expression ')'
+            | '(' '_' ',' Expression ')'
+            | '[' Expressions ']'
+            | '[' ']'
+
+Lambda      : '\\' Params '->' Type ':' Expression
+
+FnCall      :  ID '(' Expressions ')'
+            | '(' Lambda ')' '(' Expressions ')'
+
+Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
+            | CASE '(' Expression ')' Expression Conditional
+
+UnOp        : '-' Expression  %prec NEG
+            | '!' Expression
+            | 'h@' Expression
+            | 't@' Expression
+
+BinOp       : Expression '+'  Expression
+            | Expression '-'  Expression
+            | Expression '*'  Expression
+            | Expression '/'  Expression
+            | Expression '%'  Expression
+            | Expression '==' Expression
+            | Expression '!=' Expression
+            | Expression '<'  Expression
+            | Expression '>'  Expression
+            | Expression '<=' Expression
+            | Expression '>=' Expression
+            | Expression '&&' Expression
+            | Expression '||' Expression
+            | Expression '::' Expression
+
+Macro       : NUM '?' NUM
+
+Block       : '{' Expression '}'
+            | '{' Expression WHERE Definitions '}'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 \pagebreak
 
 Project plan and organization
@@ -1595,13 +1695,14 @@ For a summary of the git log, please see Appendix C.
 
 \pagebreak
 
-# Language Design
+Language Design
+===============
 
 **Javier Llaca**
 
 ## Language Evolution
 
-Our purpose with Apollo was fairly well-defined at the onset of the project --
+Our purpose with Apollo was fairly well-defined at the onset of the project ---
 we wanted it to be a convenient tool for functionally composing music. Apollo
 was to be very simple and minimal, having only a small number of features with
 which the user could build more complex programs. We purposely delayed making
