@@ -174,13 +174,12 @@ typecheck env expr = case expr of
   FnCall (Name name) args -> do
     (TFunc tps tr) <- getVar env name
     if length tps /= length args
-    then throwError . Default $ "arg count mismatch for " ++ name
+    then throwError (TypeArgCount name (length tps) (length args))
     else do
       ta <- mapM (check env) (zip tps args)
       if ta == tps
       then return tr
-      else throwError . Default $ "expected args: " ++ show tps ++
-                                  "; actual: " ++ show ta ++ " for " ++ name
+      else throwError (TypeArgMismatch name tps ta)
    where
      check _ (param, arg) = if isTFunc param && isName arg
                             then getVar env (getName arg)

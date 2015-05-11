@@ -3849,11 +3849,11 @@ I learned a lot as the project manager of the team. Our team is very diverse in 
 
 ### Souren Papazian
 
-It is natural for not all members to know and understand all the code in the project, since it is often more efficient for each person to work on their part independently. This can cause problems later when piecing together the different parts but with enough communication in the team along with code documentation these issues can be avoided. It is very important for members to update one another on what they implemented and also read one each others code for code review. This way everyone's on the same page and many opinions are considered when making a design decision.
+It is natural for members to know and understand every single line of code in the project, since it is often more efficient for each person to work on their part independently. This can cause problems later when piecing together the different parts but with enough communication in the team along with code documentation these issues can be avoided. It is very important for members to update one another on what they implemented and also read each others code for code review. This way everyone's on the same page and many opinions are considered when making a design decision.
 
 Having tests as soon as possible is extremely important. The sooner your teammates have tests, the sooner they will catch bugs. Stacking bugs can get very messy in the long run.
 
-Another thing I learned is that if you're writing code that will use someone else's code, you shouldn't wait until they are done to before writing your part. "I can't really write my part because it requires your part" is a really easy excuse to make, but in reality you could just write your part assuming that your teammates part is already complete and then simple piece them together when both of you are done. This avoids pressure on other teammates and makes the team much more efficient.
+Another thing I learned is that if you're writing code that will use someone else's code, you shouldn't wait until they are done to start writing your part. "I can't really write my part because it requires your part" is a really easy excuse to make. In reality you could just write your part assuming that your teammate's part is already complete and then simply piece them together when both of you are done. This avoids pressure on other teammates and makes the team much more efficient.
 
 ## Advice for future teams
 
@@ -3877,6 +3877,8 @@ Thank you
 =========
 
 Thank you first and foremost to Professor Aho. You have been a wonderful instructor in so many regards --- thorough in explanation, humorous and distinct in character, and above all kind and compassionate towards your students.
+
+Thank you to Livi, our TA. We hope you enjoy our language and forgive us the long final report.
 
 Another thank you goes to our mothers. It's Mother's Day today after all.
 
