@@ -58,7 +58,7 @@ import Lex
     '}'         { TokenRBrace }
     '_'         { TokenUScore }
 
-%nonassoc '=' '->'
+%nonassoc '='
 %left '||'
 %left '&&'
 %left '==' '!=' '<' '>' '<=' '>='
@@ -124,6 +124,7 @@ Primitive   : NUM                           { VInt $1 }
             | BOOL                          { VBool $1 }
             | PITCH                         { VPitch $ parsePitch $1 }
             | DUR                           { VDuration $ parseDuration $1 }
+            | '_'                           { Nil }
 
 Derived     : '(' Expression
               ',' Expression ')'            { VAtom $2 $4 }
