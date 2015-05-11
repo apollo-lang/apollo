@@ -197,6 +197,8 @@ sol: Pitch = 55
 mib: Pitch = 51
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\pagebreak
+
 Here is a table of integer to pitch mapping:
 
 |oct.| C   | C#/Db | D   | D#/Eb | E   | F   | F#/Gb | G   | G#/Ab | A   | A#/Bb | B   |
@@ -771,6 +773,8 @@ lead: [Atom] = [(A5, \4), (F#5, \4), (E4, \4)]
 song: Music = [lead, back]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\pagebreak
+
 Operators
 ---------
 
@@ -872,6 +876,8 @@ Evaluates to a new list created by prepending `a` to `list`. For example:
 1 :: [2,3,4]                -- Evaluates to [1,2,3,4]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+\pagebreak
+
 ### Operator Precedence and Associativity
 
 | Operator | Description           | Precedence | Associativity | Type          |
@@ -920,7 +926,7 @@ Definitions have no value, that is, they do not return anything. Therefore,
 nested definitions are invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int = (x: Int = 4)     -- invalid
+y: Int = (x: Int = 4)       -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Because names are immutable in Apollo, any name must be defined in the same
@@ -928,7 +934,7 @@ line that it is declared. Declaring a name without a value is not allowed, and
 so the following is invalid:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-y: Int                  -- invalid
+y: Int                      -- invalid
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Type coercion
@@ -1044,7 +1050,7 @@ Apollo supports typed lambda expressions as anonymous functions. Consider the
 following example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-(\x: Int -> Int: x)(3)              -- Evaluates to 3
+(\x: Int -> Int: x)(3)                     -- Evaluates to 3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The lambda expression on the left maps an Int to itself. Calling it on 3,
@@ -1585,13 +1591,13 @@ For a detailed breakdown of responsibilities see the corresponding section in Tr
 Project log
 -----------
 
-For a summary of the git log, please see Appendix B.
+For a summary of the git log, please see Appendix C.
 
 \pagebreak
 
 # Language Design
 
-*Javier Llaca*
+**Javier Llaca**
 
 ## Language Evolution
 
@@ -1734,6 +1740,8 @@ Again, recursive functions necessitated special consideration. In order to imple
  3. cloning that environment (creating a copy at a new memory reference),
  4. and then replacing the value for that function in the symbol table with one
     containing a reference to the cloned environment.
+
+\pagebreak
 
 This can be seen in the following lines, taken from "src/Eval.hs" in Appendix A.
 
