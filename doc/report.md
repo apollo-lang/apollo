@@ -1,3 +1,12 @@
+% Apollo Language Reference Manual
+% **Team 8**
+  **System Architect:** Benjamin Matthew Kogan (bmk2130)
+  **Language & Tools Guru:** Javier Llaca (jl3960)
+  **Project Manager:** Reza Nayebi (rn2324)
+  **Tester & Validator:** Roberto Jose De Amorim (rja2139)
+  **System Integrator:** Souren Sarkis Papazian (ssp2155)
+% May 10, 2015
+
 \pagebreak
 
 ![](./img/lrm-logo.png)
@@ -71,9 +80,6 @@ main: Music = [partA]
 This example is very representative of the kind of programs that can be written in Apollo. First the global tempo is defined as `160` (BPM) using the global `#tempo`, which can only be defined once in a program. What follows is the implementation of the well-known `fib` function (returning the nth Fibonacci number) in Apollo. The function is simple but demonstrates the simplicity and readability of programs in Apollo. Next the function `fibSeq` is used to create a list by mapping the `fibonacci` function over `sequence(0,n)` (`[0,1,...,n-1]`) and stores the result as a list of pitches using the `mapII` function with a lambda expression to transpose these pitches by 20 semi-tones. Next a uniform rhythm of eigth notes is created using the `uniform` function. The list of pitches and our rhythm are zipped to form two lists of atoms (which are notes, chords or rests). Finally, `main` (a reserved word for a name that points to the music that is to be created) is defined as a list containing our notes. The result of executing the above code will be a MIDI file containing our music, namely the (transposed) first 20 numbers in the Fibonacci sequence, repeated 20 times. 
 
 We thus see the power provided by functional programming for music creation in Apollo. The ability to easily define functions to interact with musical types in an intuitive way makes Apollo easy to learn and understand. Despite its simplicity, Apollo can also produce a rich set of musical experiences and can therefore be used both by music-loving programmers and by musicians fascinated by the power of algorithms.
-
-
-
 
 \pagebreak
 
@@ -418,7 +424,7 @@ apollo> mapII(\x: Int -> Int: x * x, myList)
 [0,1,4,9,16,25,36,49,64,81]
 ~~~
 
-To see a list of all bound names and their types, include the prelude, use the `:browse` command:
+To see a list of all bound names and their types, including the prelude, use the `:browse` command:
 
 ~~~
 apollo> :browse
@@ -461,7 +467,6 @@ Music in `myMusic` exported to _repl.mid
 The `:quit` command exits the repl.
 
 \pagebreak
-
 
 Apollo Language Reference Manual
 ================================
@@ -1223,49 +1228,47 @@ functional programming for music composition.
 Every time an Apollo program is run, the prelude is loaded into the runtime
 environment.
 
+\pagebreak
 
-# Project plan and organization
+Project plan and organization
+=============================
 
 **Reza Nayebi**
 
 A lot of our initial meetings consisted in deciding what features to include in our language. In particular, we tried our best to make the language as simple and easy to use as possible. We wanted a musical language that does away with complicated and overly technical details to allow users to have fun and let their curiosity roam free. Our meetings in the month of February thus concentrated on coming up with data types and a syntax for our language that would answer these needs.
 
-
 ## Project management
 
-## Planning 
+### Planning 
 
 Our team meetings happened every week, usually on Friday for two hours. The first meetings were dedicated to specifying requirements and taking important design decisions. Later in the semester, we met more regularly to the different parts of the language. We used GitHub for the language white paper, tutorial and reference manual as well as other documents such as the stylesheet so they would be easily accessible to everyone during the development process. We set up on online Google chat so we could freely discuss problems, features left to implement and assign remaining tasks. 
 
 
-## Specification 
+### Specification 
+
 We took a fairly long time to clarify what our language would look like. Having to write the reference manual and tutorial helped immensely as it forced us to come up with a consistent way to combine our many different ideas. The weeks following the submission of the reference manual allowed us to refine our vision and decide on the necessary changes to make. The language was ultimately made both simpler to use and provided with more powerful elements such as lambda expressions or type coercion. Thus, although the specification in the original reference manual was used as a guide throughout the development process, our concern was always convenience and ease of use of our language.
 
 
-## Development 
+### Development 
 
 To be able to effectively work on this large project, we used Git for distributed version control and set up a repository on GitHub. Every team member was assigned a feature to work on either at our team meetings, through our online chat or using GitHub. We also used GitHub to create issues, signaling either bugs in the language, features left to implement, documentation to be added or design questions. Each team member making changes to the language worked on his own branch. Once they were satisfied and after running the unit tests, they would create a pull request. In addition to the continuous integration testing suite that runs for every pull request, other team members would have to review the code, and point out any problems with it. 
 
-
-## Testing
+### Testing
 
 As said above, we used both local unit tests and continuous integration tests on GitHub with Travis CI. The former allowed us to verify that new features or fixes did not break the language and that everything worked as expected. A test would be added for every new feature in the language. Features to be implemented would be added in a special folder for future testing, allowing us to plan ahead and have a reference while implementing them. Travis CI was used for continuous integration and allowed us to detect any problem when trying to merge branches into master.  
 
-
-## Style guide
+Style guide
+-----------
 
 When something isn't covered by this guide you should stay consistent with the
 code in the other modules. Fork of https://github.com/tibbe/haskell-style-guide
 
-### Formatting
-
-
-#### Line Length
+### Line Length
 
 Maximum line length is *90 characters*. Occasional exceptions are okay for
 readability (see Error.hs) --- use your judgement.
 
-#### Indentation
+### Indentation
 
 Tabs are illegal. Use spaces for indenting. Indent your code blocks with *2
 spaces*. Indent the `where` keyword two spaces from the parent block and write
@@ -1287,7 +1290,7 @@ filter p (x:xs)
   | otherwise = filter p xs
 ```
 
-#### Blank Lines
+### Blank Lines
 
 One blank line between top-level definitions. No blank lines between type
 signatures and function definitions. Add one blank line between
@@ -1295,14 +1298,14 @@ functions in a type class instance declaration, cases of a `case` statement, or
 pattern-matched function cases if the functions bodies are large and. Use your
 judgement.
 
-#### Whitespace
+### Whitespace
 
 Surround binary operators with a single space on either side. Use
 your better judgement for the insertion of spaces around arithmetic
 operators but always be consistent about whitespace on either side of
 a binary operator. Don't insert a space after a lambda.
 
-#### Data Declarations
+### Data Declarations
 
 Align the constructors in a data type definition. Example:
 
@@ -1329,7 +1332,7 @@ data Person = Person
   } deriving (Eq, Show)
 ```
 
-#### List Declarations
+### List Declarations
 
 Align the elements in the list. Example:
 
@@ -1351,11 +1354,11 @@ directions = [ North
              ]
 ```
 
-#### Pragmas
+### Pragmas
 
 Put pragmas in the first line of their source file.
 
-#### Hanging Lambdas
+### Hanging Lambdas
 
 You may or may not indent the code following a "hanging" lambda. Use
 your judgement. Some examples:
@@ -1372,7 +1375,7 @@ foo = alloca 10 $ \a ->
       cFunction a b
 ```
 
-#### Export Lists
+### Export Lists
 
 Format export lists as follows:
 
@@ -1385,7 +1388,7 @@ module Data.Set (
 ) where
 ```
 
-#### If-then-else clauses
+### If-then-else clauses
 
 Generally, guards and pattern matches should be preferred over if-then-else
 clauses, where possible. Short cases should usually be put on a single line
@@ -1403,7 +1406,7 @@ foo2 = bar $ \qux -> if predicate qux
                      else someOtherCode
 ```
 
-#### Case expressions
+### Case expressions
 
 The alternatives in a case expression can be indented using either of
 the two following styles:
@@ -1426,7 +1429,6 @@ Align the `->` arrows when it helps readability.
 
 ### Imports
 
-
 Imports should be grouped in the following order:
 
 1. standard library imports
@@ -1439,15 +1441,12 @@ Always use explicit import lists or `qualified` imports for standard and third
 party libraries but not for local libraries. This makes the code more robust
 against changes in these libraries. Exception: The Prelude.
 
-### Comments
-
-
-#### Punctuation
+### Comment punctuation
 
 Write proper sentences; start with a capital letter and use proper
 punctuation.
 
-#### Top-Level Definitions
+### Top-Level Definitions
 
 Every top-level definitions should have a type-signature, but comments are not
 strictly necessary. A brief comment may be added if deemed necessary:
@@ -1458,7 +1457,7 @@ clone :: MonadIO m => IORef a -> m (IORef a)
 clone e = liftIO (readIORef e >>= newIORef)
 ```
 
-#### End-of-Line Comments
+### End-of-Line Comments
 
 Separate end-of-line comments from the code using 2 spaces. Align
 comments for data type definitions. Some examples:
@@ -1476,7 +1475,6 @@ foo n = salt * 32 + 9
 
 ### Naming
 
-
 Use camel case (e.g. `functionName`) when naming functions and upper
 camel case (e.g. `DataType`) when naming data types.
 
@@ -1484,14 +1482,13 @@ For readability reasons, don't capitalize all letters when using an
 abbreviation. For example, write `HttpServer` instead of
 `HTTPServer`. Exception: Two letter abbreviations, e.g. `IO`.
 
-#### Modules
+### Modules
 
 Use singular when naming modules e.g. use `Data.Map` and
 `Data.ByteString.Internal` instead of `Data.Maps` and
 `Data.ByteString.Internals`.
 
 ### Misc
-
 
 #### Point-free style ####
 
@@ -1519,8 +1516,8 @@ extractValue (Right val) = val
 extractValue (Left _)    = error $ "Bug: extractValue called with Left"
 ```
 
-
-## Timeline
+Timeline
+--------
 
 ![](./img/activity.png)
 
@@ -1535,10 +1532,9 @@ extractValue (Left _)    = error $ "Bug: extractValue called with Left"
 * May 8: Type coercion implemented
 * May 10: Final report
 
+Roles and responsibilities
+--------------------------
 
-
-
-## Roles and responsibilities 
 * Roberto Jose de Amorim - Tester & Validator
 * Benjamin Matthew Kogan - System Architect
 * Javier Llaca - Language & Tools Guru
@@ -1547,8 +1543,8 @@ extractValue (Left _)    = error $ "Bug: extractValue called with Left"
 
 For a detailed breakdown of responsibilities see the corresponding section in Translation architecture
 
-
-## Project log
+Project log
+-----------
 
 ```
 b11e94f - Reza Nayebi, 58 minutes ago : Update tutorial.md
@@ -2128,9 +2124,10 @@ a0ef956 - Ben Kogan, 3 months ago : Update whitepaper introduction
 f4f5603 - Javier Llaca, 3 months ago : Add README
 ```
 
+\pagebreak
 
-# Translator architecture
-
+Translator architecture
+=======================
 
 **Ben Kogan**
 
@@ -2312,9 +2309,12 @@ Utilities for type and data construction in Apollo expressions
    build-process, and set up Cabal build-process, configuration file, and
    sandboxing.
 
+\pagebreak
 
-# Development and run-time environment
+Development and run-time environment
+====================================
 
+**Souren Papazian**
 
 ## Development Environment
 
@@ -2494,14 +2494,14 @@ Apollo includes a standard library called the prelude. The prelude is implemente
 
 Before interpreting a program, Apollo interprets the contents of the prelude through the evaluation stage and discards the results. This populates the type environment and expression environment with the prelude's types and function definitions, respectively. These environments are then used in interpreting user code and so the prelude's contents are made available to the user.
 
-# Conclusions
+\pagebreak
 
-### Team
+Conclusions
+===========
 
+## Team members 
 
-### Team members 
-
-#### Roberto Jose De Amorim  
+### Roberto Jose De Amorim  
 
 I learned a lot as the tester in my first significant group programming project
 in my masters course at Columbia University. 
@@ -2516,8 +2516,7 @@ in my masters course at Columbia University.
 4. Code must be thoroughly commented, not only for your teammates, but for 
    yourself a few weeks down the line.
 
-
-#### Ben Kogan
+### Ben Kogan
 
 I learned more than a significant amount about translators during this process. This in turn has helped me better understand programming languages --- both in theory and in implementation. Before this course, compilers were a black box: intimidating, mysterious, and near-magical among system tools. I now not only understand the fundamental concepts behind translators but have helped implement what I consider a fairly interesting toy language.
 
@@ -2527,14 +2526,14 @@ I got extremely lucky with my team. We picked together by chance but proved to b
 
 As far as practical takeaways, you can never start early enough. That said, starting does not necessarily mean writing code. I wish I had a better understanding of functional compilers before beginning. The further we progressed, the more I regrets I accumulated with regard to my earlier architectural decisions. But a semester goes all too quickly --- sometimes one needs to finish what one has and leave a more refined concept to version two.
 
-#### Javier Llaca
+### Javier Llaca
 
 
-#### Reza Nayebi
+### Reza Nayebi
 
 I learned a lot as the project manager of the team. Our team is very diverse in a lot of ways (age, ethnicity…)  and while this has some great advantages, it also requires special attention in order ensure mutual understanding and healthy group dynamics. I also learned that, while debate and exchange of ideas is great, decisions must be eventually taken in order to be able to deliver in time. That often means that the project manager must take the final decision. However, one always needs to be mindful and listen to all the ideas before deciding upon anything. Another important lesson I learned was that a manager must understand what every group member is working on in order understand what stage the project is in and have a clear view of what is left to implement. This means doing a lot of research to understand the compiler at a high level and potentially being involved in several parts of the project in order to provide assistance and help in the development. Finally, coming together and working as a group is a great way to get things done and get to know one another better.
 
-#### Souren Papazian 
+### Souren Papazian 
 
 It is natural for not all members to know and understand all the code in the project, since it is often more efficient for each person to work on their part independently. This can cause problems later when piecing together the different parts but with enough communication in the team along with code documentation these issues can be avoided. It is very important for members to update one another on what they implemented and also read one each others code for code review. This way everyone’s on the same page and many opinions are considered when making a design decision.
 
@@ -2542,7 +2541,7 @@ Having tests as soon as possible is extremely important. The sooner your teammat
 
 Another thing I learned is that if you’re writing code that will use someone else's code, you shouldn’t wait until they are done to before writing your part. “I can’t really write my part because it requires your part” is a really easy excuse to make, but in reality you could just write your part assuming that your teammates part is already complete and then simple piece them together when both of you are done. This avoids pressure on other teammates and makes the team much more efficient.
 
-### Advice for future teams
+## Advice for future teams
 
 By now it is probably obvious that tests and version control are vital to your team’s success. Using Travis CI with GitHub was a great help. It was definitely a boon to see green or red before every merge. Sometimes you mess up and forget to check the tests. To err is human --- that’s why they made continuous integration.
 
@@ -2554,6 +2553,6 @@ The more you understand the high-level ideas behind translator architecture and 
 
 Start small and refine the basic principles behind your language. It’s easier --- and more fun --- to grow your language than to reduce it.
 
-### Advice for instructor
+## Advice for instructor
 
 We may be biased in this regard, but we were all very appreciative of the lambda calculus lectures. We wish functional programming concepts were even more deeply integrated into PLT. Our final interpreter proved to be somewhat of a hybrid in that it used a mutable symbol table and multi-argument functions. We were intrigued to read that Haskell’s own GHC is mostly symbol-table free, relying instead on AST traversals. Similarly, we were excited to later discover example languages that hewed much more closely to the lambda calculus, implementing multiple-argument functions via currying. We wish some discussion of purely functional compilers had been present early in the course so that we might have known to try a similar tack early-on.
