@@ -13,7 +13,7 @@ PDFS=$(SRC:.md=.pdf)
 all:	$(PDFS)
 
 %.pdf: %.md
-	pandoc --from=markdown --latex-engine=pdflatex $(FLAGS) --output=$@ $<
+	pandoc --from=markdown --toc-depth=2 --latex-engine=pdflatex $(FLAGS) --output=$@ $<
 
 .PHONY: all
 

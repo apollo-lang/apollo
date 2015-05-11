@@ -169,5 +169,5 @@ replUsage = do
   putStrLn   ""
     where
       showVersion = init (concatMap ((++ ".") . show) version)
-      version = [0,0,0,0] :: [Int]
+      version = [0,0,1,0] :: [Int]
 
