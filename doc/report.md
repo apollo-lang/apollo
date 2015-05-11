@@ -2567,6 +2567,8 @@ Thank you
 
 Thank you first and foremost to Professor Aho. You have been a wonderful instructor in so many regards --- thorough in explanation, humorous and distinct in character, and above all kind and compassionate towards your students.
 
+Thank you to Livi, our TA. We hope you enjoy our language and forgive us the long final report.
+
 Another thank you goes to our mothers. It's Mother's Day today after all.
 
 Finally, we owe a big thank you to Roti Roll. Without your timely deliveries, spicy aloo fries, and goat rolls, we would all still be counting shrimp.
