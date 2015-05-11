@@ -2140,9 +2140,9 @@ As far as practical takeaways, you can never start early enough. That said, star
 Working on Apollo was very rewarding. Designing and building a compiler seemed
 like an incredibly daunting task at the beginning of the semester. However,
 working incrementally allowed me to understand the complex system that we were
-building and in turn make smarter design decisions. Finishing early version of
-the lexer and parser gave me enough time to make changes and polish the
-front-end as much as possible.
+building and helped me make smarter design decisions. Finishing early versions
+of the lexer and parser gave me enough time to polish the front-end as much as
+possible.
 
 Working with Haskell was a blast. Although I had played around with it
 before PLT, using Haskell to build Apollo proved to be an exciting challenge
@@ -2151,17 +2151,17 @@ language design and forced me to think very closely about how I program in
 general.
 
 I was extremely happy with our team. Although we had several debates on
-important decision for the language, we ended up getting along really well by
-the end of the semester. Working together was really fun and time flew by
+important decisions about the language, we ended up getting along really well by
+the end of the semester. Working with them was really fun and time flew by
 during late-night coding sessions. Before PLT, I had mostly worked on software
-projects individually, so learning to work collaboratively is probably one of
-the biggest takeaways that I'll get from this class.
+projects individually, so learning to work collaboratively will probably be one
+of the biggest takeaways that I'll get from this class.
 
 Perhaps the most exciting part of this project was seeing Apollo in action once
 all the parts of our project started to come together. The experience of
 writing our first Apollo programs and listening to the cool music that could be
 written with it was super exciting. I think I speak for all of us when I say
-that there are few things as empowering as writing music with a tool that was
+that there are few things more empowering than writing music with a tool that we
 built from the ground up in only a couple of months.
 
 ### Reza Nayebi
