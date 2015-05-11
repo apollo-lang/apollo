@@ -385,6 +385,81 @@ To get more information on Apollo’s options, use the `--help` flag:
 $ apollo --help
 ~~~
 
+
+Using the REPL
+--------------
+
+One of the easiest ways to experiment with Apollo is by using the read-evaluate-print loop. Fire it up as follows:
+
+~~~
+$ apollo --repl
+Apollo repl, version 0.0.0.0: https://github.com/apollo-lang/apollo
+
+Commands:
+  :browse            See all current bindings and their types
+  :export <name>     Export a name of type Music to `_repl.mid`
+  :quit              Exit the repl
+
+apollo>
+~~~
+
+At the `apollo>` prompt, you can enter an expression and it will be evaluated immediately:
+
+~~~
+apollo> 1 + 1
+2
+~~~
+
+You can also define names and use functions from the prelude:
+
+~~~
+apollo> myList: [Int] = sequence(0,10)
+apollo> mapII(\x: Int -> Int: x * x, myList)
+[0,1,4,9,16,25,36,49,64,81]
+~~~
+
+To see a list of all bound names and their types, include the prelude, use the `:browse` command:
+
+~~~
+apollo> :browse
+concatMapI : ([Int], (Int) -> Int, Int) -> [Int]
+intercalateP : ([Pitch], [Pitch]) -> [Pitch]
+intercalateI : ([Int], [Int]) -> [Int]
+reverseP : ([Pitch]) -> [Pitch]
+reverseI : ([Int]) -> [Int]
+initP : ([Pitch]) -> [Pitch]
+initI : ([Int]) -> [Int]
+lastP : ([Pitch]) -> Pitch
+lastI : ([Int]) -> Int
+uniform : (Duration, Int) -> [Duration]
+replicateP : ([Pitch], Int) -> [Pitch]
+replicateI : ([Int], Int) -> [Int]
+zip : ([Pitch], [Duration]) -> [Atom]
+sequence : (Int, Int) -> [Int]
+sumI : ([Int]) -> Int
+foldrII : ((Int, Int) -> Int, Int, [Int]) -> Int
+filterI : ((Int) -> Bool, [Int]) -> [Int]
+concatP : ([Pitch], [Pitch]) -> [Pitch]
+concatI : ([Int], [Int]) -> [Int]
+lengthP : ([Pitch]) -> Int
+lengthB : ([Bool]) -> Int
+lengthI : ([Int]) -> Int
+mapIB : ((Int) -> Bool, [Int]) -> [Bool]
+mapID : ((Int) -> Duration, [Int]) -> [Duration]
+mapIP : ((Int) -> Pitch, [Int]) -> [Pitch]
+mapII : ((Int) -> Int, [Int]) -> [Int]
+~~~
+
+The export command allows you to export the contents of a Music-typed name to a file named "\_repl.midi":
+
+~~~
+apollo> myMusic: Music = [[ (A4, \4) ]]
+apollo> :export myMusic
+Music in `myMusic` exported to _repl.mid
+~~~
+
+The `:quit` command exits the repl.
+
 \pagebreak
 
 
@@ -2419,4 +2494,66 @@ Apollo includes a standard library called the prelude. The prelude is implemente
 
 Before interpreting a program, Apollo interprets the contents of the prelude through the evaluation stage and discards the results. This populates the type environment and expression environment with the prelude's types and function definitions, respectively. These environments are then used in interpreting user code and so the prelude's contents are made available to the user.
 
+# Conclusions
 
+### Team
+
+
+### Team members 
+
+#### Roberto Jose De Amorim  
+
+I learned a lot as the tester in my first significant group programming project
+in my masters course at Columbia University. 
+
+1. Creating test suites is crucial. They allow users to detect bugs early, and 
+   when an update breaks lots of things, the developer can iterate on fixes and 
+   testing until the code gets back to a consistent state.
+2. Small changes can break the entire language. Or break a small corner case. 
+   Therefore, tests must be comprehensive and as exhaustive as possible.
+3. Branch the code often. Test the branch, and only then merge it with master. 
+   That guarantees master is always at an usable state.
+4. Code must be thoroughly commented, not only for your teammates, but for 
+   yourself a few weeks down the line.
+
+
+#### Ben Kogan
+
+I learned more than a significant amount about translators during this process. This in turn has helped me better understand programming languages --- both in theory and in implementation. Before this course, compilers were a black box: intimidating, mysterious, and near-magical among system tools. I now not only understand the fundamental concepts behind translators but have helped implement what I consider a fairly interesting toy language.
+
+Writing a pure functional compiler in a language I didn’t know four months ago has been no small feat, at least personally. I think I invested equal time working towards productivity and comprehension in Haskell as I did in learning to write a compiler. (I also spent very little time on other classes or sleeping, but that’s probably expected behavior.) Haskell proved to be formidable in many regards --- it forced me to understand what I was trying to create much more thoroughly and I think the results were more concise and perhaps even more elegant. Implementing functional staples like recursion and closures was similarly challenging but rewarding. When we reached the stage where we could write our own standard library in Apollo, the team’s excitement was palpable.
+
+I got extremely lucky with my team. We picked together by chance but proved to be remarkably compatible for a programming group, let alone one that began as total strangers. I’m grateful that they put up with me to the end.
+
+As far as practical takeaways, you can never start early enough. That said, starting does not necessarily mean writing code. I wish I had a better understanding of functional compilers before beginning. The further we progressed, the more I regrets I accumulated with regard to my earlier architectural decisions. But a semester goes all too quickly --- sometimes one needs to finish what one has and leave a more refined concept to version two.
+
+#### Javier Llaca
+
+
+#### Reza Nayebi
+
+I learned a lot as the project manager of the team. Our team is very diverse in a lot of ways (age, ethnicity…)  and while this has some great advantages, it also requires special attention in order ensure mutual understanding and healthy group dynamics. I also learned that, while debate and exchange of ideas is great, decisions must be eventually taken in order to be able to deliver in time. That often means that the project manager must take the final decision. However, one always needs to be mindful and listen to all the ideas before deciding upon anything. Another important lesson I learned was that a manager must understand what every group member is working on in order understand what stage the project is in and have a clear view of what is left to implement. This means doing a lot of research to understand the compiler at a high level and potentially being involved in several parts of the project in order to provide assistance and help in the development. Finally, coming together and working as a group is a great way to get things done and get to know one another better.
+
+#### Souren Papazian 
+
+It is natural for not all members to know and understand all the code in the project, since it is often more efficient for each person to work on their part independently. This can cause problems later when piecing together the different parts but with enough communication in the team along with code documentation these issues can be avoided. It is very important for members to update one another on what they implemented and also read one each others code for code review. This way everyone’s on the same page and many opinions are considered when making a design decision.
+
+Having tests as soon as possible is extremely important. The sooner your teammates have tests, the sooner they will catch bugs. Stacking bugs can get very messy in the long run.
+
+Another thing I learned is that if you’re writing code that will use someone else's code, you shouldn’t wait until they are done to before writing your part. “I can’t really write my part because it requires your part” is a really easy excuse to make, but in reality you could just write your part assuming that your teammates part is already complete and then simple piece them together when both of you are done. This avoids pressure on other teammates and makes the team much more efficient.
+
+### Advice for future teams
+
+By now it is probably obvious that tests and version control are vital to your team’s success. Using Travis CI with GitHub was a great help. It was definitely a boon to see green or red before every merge. Sometimes you mess up and forget to check the tests. To err is human --- that’s why they made continuous integration.
+
+That said, we created only integration tests without any native Haskell unit tests. We didn’t miss them. Thanks for this go entirely to Haskell’s type system. We found that writing our code in Haskell, though difficult, made it almost impossible to create a runtime error. Dynamic languages may prove fast to prototype in, but we definitely didn’t regret choosing a static and purely functional one.
+
+With regard to Haskell, working in such a unique language was a massive challenge but we don’t regret it. If there’s a language you’ve been waiting to learn, now may be the time to try. The fun of learning functional programming kept long work sessions interesting.
+
+The more you understand the high-level ideas behind translator architecture and design, the better your own translator will turn out. It isn’t a bad idea to make a toy compiler for a Lisp or something similarly simple before starting on your own project.
+
+Start small and refine the basic principles behind your language. It’s easier --- and more fun --- to grow your language than to reduce it.
+
+### Advice for instructor
+
+We may be biased in this regard, but we were all very appreciative of the lambda calculus lectures. We wish functional programming concepts were even more deeply integrated into PLT. Our final interpreter proved to be somewhat of a hybrid in that it used a mutable symbol table and multi-argument functions. We were intrigued to read that Haskell’s own GHC is mostly symbol-table free, relying instead on AST traversals. Similarly, we were excited to later discover example languages that hewed much more closely to the lambda calculus, implementing multiple-argument functions via currying. We wish some discussion of purely functional compilers had been present early in the course so that we might have known to try a similar tack early-on.
