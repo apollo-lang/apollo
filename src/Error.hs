@@ -21,6 +21,8 @@ data ApolloError
   | TypeDMismatch Type Type
   | TypeUMismatch String Type
   | TypeRMismatch String Type Type
+  | TypeArgCount String Int Int
+  | TypeArgMismatch String [Type] [Type]
   | TypeExcept String
   | UnboundVar String String
   | RedefVar String
@@ -38,11 +40,16 @@ instance Show ApolloError where
   show (TypeDMismatch a b)     = "Type error: definition of " ++ show a ++ ", but assigned to " ++ show b
   show (TypeRMismatch f a b)   = "Type error: `" ++ f ++ "` defined with return-type of " ++ show a ++ ", but actual return-type is " ++ show b
   show (TypeExcept msg)        = "Type error: " ++ show msg
+  show (TypeArgCount f a b)    = "Type error: for `" ++ f ++ "` expected " ++ show a ++ " arguments; received " ++ show b
+  show (TypeArgMismatch f a b) = "Type error: for `" ++ f ++ "` expected aguments of type (" ++ showArgs a ++ "); received (" ++ showArgs b ++ ")"
   show (UnboundVar action var) = action ++ " an unbound variable: " ++ var
   show (RedefVar var)          = "Multiple declaration: redefining variable " ++ var
   show (ParseErr val)          = "Parse error: unexpected " ++ val
   show (DivByZero)             = "Zero-division error: division or modulo by zero"
   show (Default msg)           = msg
+
+showArgs :: [Type] -> String
+showArgs = init . init . concatMap ((++", ") . show)
 
 trapError :: (MonadError e m, Show e) => m String -> m String
 trapError action = catchError action (return . show)

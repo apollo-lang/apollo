@@ -34,7 +34,7 @@ Rationale
 
 There are a number of extant music programming languages such as [RTcmix][] and [SuperCollider][]. Apollo shares with these languages an interest in providing an abstraction for music creation to the programmer. Apollo differs from these in the depth and the intent of its abstractions. Virtually all common music programming languages provide a direct interface to sonic manipulation on the level of notes and frequencies. This allows the programmer to *act* as a musician by writing code.
 
-Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifics of musical articulation are eschewed. In the place of deep --- but complex --- sonic articulation, the programmer should be able to interact with familiar data-values and combine them by assigning them to a `main` variable that will be translated into music. Apollo thus takes a more experimental approach where the programmer is able to *become* a musician through the act of programming. 
+Apollo, in contrast, abstracts sonic details in favor of simplicity. The specifics of musical articulation are eschewed. In the place of deep --- but complex --- sonic articulation, the programmer should be able to interact with familiar data-values and combine them by assigning them to a `main` variable that will be translated into music. Apollo thus takes a more experimental approach where the programmer is able to *become* a musician through the act of programming.
 
 [RTcmix]: http://rtcmix.org
 [SuperCollider]: http://supercollider.sourceforge.net
@@ -60,8 +60,8 @@ The algorithm for producing a number in the Fibonacci sequence given its index p
 ```
 #tempo 160
 
-fibonacci: (n: Int) -> Int = 
-    case (n <= 1) 1 
+fibonacci: (n: Int) -> Int =
+    case (n <= 1) 1
     otherwise     fibonacci(n - 1) + fibonacci(n - 2)
 
 fibSeq: (n: Int) -> [Int] = mapII(fibonacci, sequence(0, n))
@@ -77,7 +77,7 @@ partA: [Atom] = zip(notesA, rhythm)
 main: Music = [partA]
 ```
 
-This example is very representative of the kind of programs that can be written in Apollo. First the global tempo is defined as `160` (BPM) using the global `#tempo`, which can only be defined once in a program. What follows is the implementation of the well-known `fib` function (returning the nth Fibonacci number) in Apollo. The function is simple but demonstrates the simplicity and readability of programs in Apollo. Next the function `fibSeq` is used to create a list by mapping the `fibonacci` function over `sequence(0,n)` (`[0,1,...,n-1]`) and stores the result as a list of pitches using the `mapII` function with a lambda expression to transpose these pitches by 20 semi-tones. Next a uniform rhythm of eigth notes is created using the `uniform` function. The list of pitches and our rhythm are zipped to form two lists of atoms (which are notes, chords or rests). Finally, `main` (a reserved word for a name that points to the music that is to be created) is defined as a list containing our notes. The result of executing the above code will be a MIDI file containing our music, namely the (transposed) first 20 numbers in the Fibonacci sequence, repeated 20 times. 
+This example is very representative of the kind of programs that can be written in Apollo. First the global tempo is defined as `160` (BPM) using the global `#tempo`, which can only be defined once in a program. What follows is the implementation of the well-known `fib` function (returning the nth Fibonacci number) in Apollo. The function is simple but demonstrates the simplicity and readability of programs in Apollo. Next the function `fibSeq` is used to create a list by mapping the `fibonacci` function over `sequence(0,n)` (`[0,1,...,n-1]`) and stores the result as a list of pitches using the `mapII` function with a lambda expression to transpose these pitches by 20 semi-tones. Next a uniform rhythm of eigth notes is created using the `uniform` function. The list of pitches and our rhythm are zipped to form two lists of atoms (which are notes, chords or rests). Finally, `main` (a reserved word for a name that points to the music that is to be created) is defined as a list containing our notes. The result of executing the above code will be a MIDI file containing our music, namely the (transposed) first 20 numbers in the Fibonacci sequence, repeated 20 times.
 
 We thus see the power provided by functional programming for music creation in Apollo. The ability to easily define functions to interact with musical types in an intuitive way makes Apollo easy to learn and understand. Despite its simplicity, Apollo can also produce a rich set of musical experiences and can therefore be used both by music-loving programmers and by musicians fascinated by the power of algorithms.
 
@@ -369,7 +369,7 @@ To compile a valid Apollo source code file (for example, main.ap), simply run th
 $ apollo main.ap
 ~~~
 
-*Note that the above assumed that the `apollo` executable is in the user’s `$PATH` environment variable*
+*Note that the above assumed that the `apollo` executable is in the user's `$PATH` environment variable*
 
 This will begin the Apollo interpreter, thereby converting Apollo source code into MIDI. If the program is free of runtime errors, terminates in a finite amount of time, and assigns `Music` to the variable `main` then a MIDI will be created. By default, this file will be named main.mid. The output file can then be played through any MIDI player.
 
@@ -385,7 +385,7 @@ To specify a different name or location for the output MIDI file, use the `-o` f
 $ apollo main.ap -o symphony.mid
 ~~~
 
-To get more information on Apollo’s options, use the `--help` flag:
+To get more information on Apollo's options, use the `--help` flag:
 
 ~~~
 $ apollo --help
@@ -456,7 +456,7 @@ mapIP : ((Int) -> Pitch, [Int]) -> [Pitch]
 mapII : ((Int) -> Int, [Int]) -> [Int]
 ~~~
 
-The export command allows you to export the contents of a Music-typed name to a file named "\_repl.midi":
+The export command allows you to export the contents of a Music-typed name to a file named "\_repl.mid":
 
 ~~~
 apollo> myMusic: Music = [[ (A4, \4) ]]
@@ -560,7 +560,7 @@ See Section 4 for more information on operators.
 
 ## Separators
 
-Symbols that separate tokens: 
+Symbols that separate tokens:
 
  * `=`
  * `->`
@@ -715,7 +715,7 @@ a: [Int] = [1, 2, 3]
     These are some examples:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-note: Atom = (A5, \\8)               -- An A5 note (eighth note duration)
+note: Atom = (A5, \8)               -- An A5 note (eighth note duration)
 chord: Atom = ([A5, C#6, E6], \2)   -- An A major chord (half note duration)
 rest: Atom = (_, \4)                -- A Rest (quarter note duration)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -737,8 +737,6 @@ song: Music = [lead, back]
 
 Operators
 ---------
-
-## Operators on Primitive Data Types
 
 ## Arithmetic Operators
 
@@ -782,7 +780,7 @@ Evaluates to `True` if `a` is not equal to `b`.
 
 ### `a < b`
 
-Evaluates to `True` if `a` is less than `b`. 
+Evaluates to `True` if `a` is less than `b`.
 
 ### `a > b`
 
@@ -823,7 +821,7 @@ Evaluates to `True` if `list` is empty and to `False` otherwise.
 
 ### `h@list`
 
-Evaluates to the head, or first element, of `list`. 
+Evaluates to the head, or first element, of `list`.
 
 ### `t@list`
 
@@ -953,7 +951,7 @@ Functions take one or more types and return another type. Like functions in
 mathematics, they map elements in one or more sets to an element in another
 set. Consider the following function that takes an integer x and returns its
 square.
-    
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 square: (x: Int) -> Int = x * x
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -974,7 +972,7 @@ This is a declarative implementation of factorial. In other words, instead of
 specifying how to compute, it specifies what should be computed. The functions
 reads as "The factorial of 0 is 1, otherwise it is n times the factorial of n -
 1."
- 
+
 Recursive functions can be used to simulate looping. Consider the following
 function, which adds an `Int` `x` to an `Int` `n`:
 
@@ -986,7 +984,7 @@ addX: (n: Int, x: Int) = case (x == 0) n
 ## Higher-Order Functions
 
 Functions in Apollo can be passed as parameters to other functions. Example:
-        
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1058,7 +1056,7 @@ The value of a block is the value of the expression it contains.
 Consider the following two versions of a function that computes the surface
 area of a cylinder:
 
-### One - using a block:
+### One --- using a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = {
@@ -1069,7 +1067,7 @@ cylinderArea: (r: Int, h: Int) -> Int = {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Two - without a block:
+### Two --- without a block:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cylinderArea: (r: Int, h: Int) -> Int = (2 * pi * r * h) + 2 * (pi * r * r)
@@ -1114,9 +1112,9 @@ foo: Int = case (1 > 2) 1
            otherwise    5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here foo is an integer whose value is determined by a case statement. The first
+Here `foo` is an integer whose value is determined by a case statement. The first
 two case statements evaluate to `False` and their return value is ignored. The
-third statement is the first one to evaluate to `True` and foo is therefore
+third statement is the first one to evaluate to `True` and `foo` is therefore
 bound to the value `3`.
 
 Program Structure
@@ -1235,33 +1233,35 @@ Project plan and organization
 
 **Reza Nayebi**
 
-A lot of our initial meetings consisted in deciding what features to include in our language. In particular, we tried our best to make the language as simple and easy to use as possible. We wanted a musical language that does away with complicated and overly technical details to allow users to have fun and let their curiosity roam free. Our meetings in the month of February thus concentrated on coming up with data types and a syntax for our language that would answer these needs.
+Many of our initial meetings were dedicated to deciding what features to include in our language. In particular, we tried our best to make the language as simple and easy to use as possible. We wanted a musical language that does away with complicated and overly technical details to allow users to have fun and let their curiosity roam free. Our meetings in the month of February thus concentrated on coming up with data types and a syntax for our language that would answer these needs.
 
 ## Project management
 
-### Planning 
+### Planning
 
-Our team meetings happened every week, usually on Friday for two hours. The first meetings were dedicated to specifying requirements and taking important design decisions. Later in the semester, we met more regularly to the different parts of the language. We used GitHub for the language white paper, tutorial and reference manual as well as other documents such as the stylesheet so they would be easily accessible to everyone during the development process. We set up on online Google chat so we could freely discuss problems, features left to implement and assign remaining tasks. 
-
-
-### Specification 
-
-We took a fairly long time to clarify what our language would look like. Having to write the reference manual and tutorial helped immensely as it forced us to come up with a consistent way to combine our many different ideas. The weeks following the submission of the reference manual allowed us to refine our vision and decide on the necessary changes to make. The language was ultimately made both simpler to use and provided with more powerful elements such as lambda expressions or type coercion. Thus, although the specification in the original reference manual was used as a guide throughout the development process, our concern was always convenience and ease of use of our language.
+Our team met weekly, usually on Friday for two hours. The first meetings were dedicated to specifying requirements and tackling important design decisions. Later in the semester, we met more regularly to the different parts of the language. We used GitHub for the language white paper, tutorial and reference manual as well as other documents such as the stylesheet so they would be easily accessible to everyone during the development process. We set up an online Google chat so we could freely discuss problems, features left to implement and assign remaining tasks.
 
 
-### Development 
+### Specification
 
-To be able to effectively work on this large project, we used Git for distributed version control and set up a repository on GitHub. Every team member was assigned a feature to work on either at our team meetings, through our online chat or using GitHub. We also used GitHub to create issues, signaling either bugs in the language, features left to implement, documentation to be added or design questions. Each team member making changes to the language worked on his own branch. Once they were satisfied and after running the unit tests, they would create a pull request. In addition to the continuous integration testing suite that runs for every pull request, other team members would have to review the code, and point out any problems with it. 
+We took a fairly long time to clarify what our language would look like. Having to write the reference manual and tutorial helped immensely as it forced us to come up with a consistent way to combine our many different ideas. The weeks following the submission of the reference manual allowed us to refine our vision and decide on the necessary changes to make. The language was ultimately made both simpler to use and provided with more powerful elements such as lambda expressions and type coercion. Thus, although the specification in the original reference manual was used as a guide throughout the development process, our concern was always convenience and ease of use of our language.
+
+
+### Development
+
+To be able to effectively work on a project of this scale, we used Git for distributed version control and set up a repository on GitHub. Each team member was assigned a feature to work on either at our team meetings, through our online chat or using GitHub. We also used GitHub to create issues, signaling either bugs in the language, features left to implement, documentation to be added or design questions. Each team member worked on his own branch. Once they were satisfied and after running the unit tests, they would create a pull request. In addition to the continuous integration testing suite that runs for every pull request, other team members would have to review the code and point out any problems with it.
 
 ### Testing
 
-As said above, we used both local unit tests and continuous integration tests on GitHub with Travis CI. The former allowed us to verify that new features or fixes did not break the language and that everything worked as expected. A test would be added for every new feature in the language. Features to be implemented would be added in a special folder for future testing, allowing us to plan ahead and have a reference while implementing them. Travis CI was used for continuous integration and allowed us to detect any problem when trying to merge branches into master.  
+As said above, we used both local unit tests and continuous integration tests on GitHub with Travis CI. The former allowed us to verify that new features or fixes did not break the language and that everything worked as expected. A test would be added for every new feature in the language. Features to be implemented would be added in a special folder for future testing, allowing us to plan ahead and have a reference while implementing them. Travis CI was used for continuous integration and allowed us to detect any problem when trying to merge branches into master.
 
-Style guide
------------
+Style guide used in development
+-------------------------------
 
 When something isn't covered by this guide you should stay consistent with the
-code in the other modules. Fork of https://github.com/tibbe/haskell-style-guide
+code in the other modules.[^fork]
+
+[^fork]: Forked from https://github.com/tibbe/haskell-style-guide
 
 ### Line Length
 
@@ -1516,6 +1516,8 @@ extractValue (Right val) = val
 extractValue (Left _)    = error $ "Bug: extractValue called with Left"
 ```
 
+\pagebreak
+
 Timeline
 --------
 
@@ -1523,7 +1525,7 @@ Timeline
 
 * February 25: Language white paper
 * March 25: LRM and tutorial
-* March 27: Compiler front-end working 
+* March 27: Compiler front-end working
 * March 30: Basic evaluation and AST set up
 * April 12: Back-end (MIDI generation) implemented, REPL working
 * April 19: Continuous Integration testing with Travis
@@ -1535,13 +1537,13 @@ Timeline
 Roles and responsibilities
 --------------------------
 
-* Roberto Jose de Amorim - Tester & Validator
-* Benjamin Matthew Kogan - System Architect
-* Javier Llaca - Language & Tools Guru
-* Reza Nayebi - Project Manager
-* Souren Sarkis Papazian - System Integrator
+* Roberto Jose de Amorim --- Tester & Validator
+* Benjamin Matthew Kogan --- System Architect
+* Javier Llaca --- Language & Tools Guru
+* Reza Nayebi --- Project Manager
+* Souren Sarkis Papazian --- System Integrator
 
-For a detailed breakdown of responsibilities see the corresponding section in Translation architecture
+For a detailed breakdown of responsibilities see the corresponding section in Translation Architecture.
 
 Project log
 -----------
@@ -2133,15 +2135,15 @@ Translator architecture
 
 ![](./img/block.png)
 
-Note that in the explanation below, the term "expression" is used to refer to both definitions and value-returning expressions in Apollo unless otherwise specified.
+*Note that in the explanation below, the term "expression" is used to refer to both definitions and value-returning expressions in Apollo unless otherwise specified.*
 
 ## Overview ##
 
 The diagram shown above describes the process of interpreting a single source expression --- possibly containing nested expressions --- in Apollo.
 
-In the repl interface, the process above is followed exactly since one top-level expression is evaluated per each input and the result, if any, is returned.
+In the REPL interface, the process above is followed exactly. One top-level expression is evaluated per each input and the result, if any, is returned.
 
-The process for source read from a file or through `stdin` is slightly different: an entire source program containing 0 or more expressions is read by the interpreter and proceeds through the lexing and parsing phases. This produces a sequence of ASTs representing expressions over which the `typecheck` function is mapped in order. After this stage, the `eval` function is mapped over the ASTs to produce a sequence of results for all top-level non-definition expressions.
+The process for reading source from a file or through `stdin` is slightly different. An entire source program containing zero or more expressions is read by the interpreter and proceeds through the lexing and parsing phases. This produces a sequence of ASTs representing expressions over which the `typecheck` function is mapped in order. After this stage, the `eval` function is mapped over the ASTs to produce a sequence of results for all top-level non-definition expressions.
 
 These phases are described in detail below.
 
@@ -2169,9 +2171,9 @@ The Parse module is compiled by [`happy`][happy] into a generated Haskell module
 
 The type-checker module Check exports a single function, `typecheck`, which accepts a type checking environment and a single expression representing an AST and returns the type of that AST. The type-checking environment is implemented as a table of id-to-type mappings with controlled mutability via the IORef monad. Because of this additional monad, the result of `typecheck` must be contained within a monad transformer, IOThrowsError, which combines error and IO moands. The details of this implementation can be viewed by looking at {TODO appendix ref}.
 
-The type-checking function makes a recursive depth-first traversal of the given AST and begins evaluating type compatibility bottom-up. The operands of polymorphic operators like `+` are checked for compatibility and return the resultant type, literals like `Int` and `Bool` return their appropriate types, and so on. When definitions are encountered, the type of the right-hand-side is checked for compatibility with the declared type and then stored in the symbol table under the appropriate name. If a type mismatch is found, a type mismatch is triggered.
+The type-checking function makes a recursive depth-first traversal of the given AST and begins evaluating type compatibility bottom-up. For example, if the `+` operator is encountered, its operands are checked for compatibility and the appropriate type for the operation is returned. Literals like `Int` and `Bool` return their appropriate types, and so on. When definitions are encountered, the type of the right-hand-side is checked for compatibility with the declared type and then stored in the symbol table under the appropriate name. If a type mismatch is found, a type mismatch error is triggered.
 
-A special consideration was made for recursive functions such that they could obtain their own declared type. This was done by first adding the declared type to the type environment and then checking the actual type of the function.
+A special consideration was made for recursive functions so they can obtain their own declared type. This was done by first adding the declared type to the type environment and then checking the actual type of the function. Checking the type before adding the declaration would fail since the function's type would not be found in the symbol table when its recursive call is typechecked.
 
 The type-check phase does not alter the AST it is given nor does it communicate directly with the `eval` function that follows it. Instead, the original AST is passed to the next phase after type-checking. This can be seen in the line of code below, taken from the Check module:
 
@@ -2216,7 +2218,7 @@ Static type-checking on an AST.
 
  - Ben: wrote initial type-checker, type-checking for functions, definitions,
    and operations on non-musical types.
- - Reza: added coersion and type-checking for atoms, head & tail operations.
+ - Reza: added coercion and type-checking for atoms, head & tail operations.
 
 ## Env.hs
 
@@ -2237,15 +2239,15 @@ Evaluation of an AST.
  - Ben: wrote initial evaluator, evaluation of functions and various non-musical
    operators.
  - Javier: added evaluation of typed lambdas.
- - Reza: evaluation for atoms, list operators, type-coersion for musical types.
+ - Reza: added evaluation for atoms, list operators, type-coercion for musical types.
 
 ## Expr.hs
 
 Representation of Apollo expressions as an algebraic datatype.
 
- - Javier: wrote initial implementation, added constructors for lambdas
- - Reza: added constructors for list operations
- - Ben: added constructors for functions with closures
+ - Javier: wrote initial implementation, added constructors for lambdas.
+ - Reza: added constructors for list operations.
+ - Ben: added constructors for functions with closures.
 
 ## Parse.hs
 
@@ -2268,7 +2270,7 @@ Standard library (prelude) for Apollo implemented in Apollo.
 
 ## Main.hs
 
-Functions for integrating and running Apollo source in an interpreted and repl environment.
+Functions for integrating and running Apollo source in an interpreted and REPL environment.
 
  - Ben: wrote module.
  - Reza: added export of `main` to midi.
@@ -2332,7 +2334,7 @@ The interpreter itself is written in Haskell and targeted to GHC 7.8.3. [Cabal][
 
 ### `make config`
 
-Installs all dependencies using the Cabal config. Cabal is a Haskell package-manager and build system. We used a Cabal sandbox to avoid any conflicts with existing Haskell packages and to install any missing or outdated packages. The sandbox essentially builds all packages in isolation much like Python’s `virtualenv`. This makes compiling the source code on different systems much simpler not only for the user, but also for ourselves during development.
+Installs all dependencies using the Cabal config. Cabal is a Haskell package-manager and build system. We used a Cabal sandbox to avoid any conflicts with existing Haskell packages and to install any missing or outdated packages. The sandbox essentially builds all packages in isolation much like Python's `virtualenv`. This makes compiling the source code on different systems much simpler not only for the user, but also for ourselves during development.
 
 ### `make`
 
@@ -2451,7 +2453,8 @@ If there are any global packages already installed on the user's machine, cabal 
 If you run into the following error message when you run `make config`:
 
 ```
-cabal: The following packages are likely to be broken by the reinstalls: <packages omitted>
+cabal: The following packages are likely to be broken by
+the reinstalls: <packages omitted>
 ```
 
 you may have globally-installed packages that conflict with Apollo's dependencies. Unregister the indicated global packages with the following command:
@@ -2487,7 +2490,7 @@ You can pass a valid Apollo file into the interpreter with `apollo filename.ap`.
 Since Apollo is implemented in Haskell as an interpreter, no intermediate source code is generated and all the memory allocation is dealt with by Haskell.
 
 The midi file must be run with any external program. Apollo does not provide a midi player.
- 
+
 ## Prelude
 
 Apollo includes a standard library called the prelude. The prelude is implemented in native Apollo code.
@@ -2496,63 +2499,1388 @@ Before interpreting a program, Apollo interprets the contents of the prelude thr
 
 \pagebreak
 
+# Testing
+
+**Roberto Jose de Amorim**
+
+Testing for Apollo was performed using a set of handwritten code snippets that
+represent the breadth of language constructs available to the user. The 
+snippets tested expected behaviour from the language - both when dealing with
+valid code and invalid constructs, in the latter case the tests verified if the 
+correct error message was produced.
+
+The main purpose of these tests is to guarantee that no regressions happened
+between builds. By the nature of such complex projects as Apollo, it is likely
+that a change in one part of the code affects another, seemingly unrelated,
+part of it. The tests immediately identify bugs when changes are made. This way
+the programmer will be aware of what they broke and can address it early on,
+rather than later.
+
+To provide the programmer with quick testing as soon as a new features is
+implemented, test snippets were generated ahead of time and stored in a
+different folder (/future). That way, as soon as the functionality was
+ready, the programmer could copy the test into the tests folder and run the
+script to validate it.
+
+## Test script
+
+To automate testing all code snippets a shell (bash) script was developed. It works by selecting the test files (*.ap and *.aps), running their contents against Apollo and comparing the Apollo output against the expected output, stored in answer files (*.ans and *.ast).
+The differences in file extensions represent different working modes for the
+script. *.ap files are tested as a single source file that is processed by
+Apollo in its entirety. *.aps files are processed line by line - each line is
+echoed and piped into Apollo, and the Apollo output is compared against the
+respective line in the answers file. *.ans files are files containing the
+expected Apollo output for each test, and *.ast files contain the Annotated
+Syntax Trees output by apollo --ast parameter (which was mostly used for
+debugging).
+
+Tools such as diff (to compare apollo output and expected output) and Awk (to
+extract specific lines from the answers files) are also leveraged within the
+script.
+
+The output consists of a color-coded list of all tests, where the ones that
+passed are printed in green, script warning are printed in yellow and tests
+that failed are printed in red. Tests that failed also print the output
+generated by Apollo and the expected output. This last information can be
+suppressed using the -q command line switch.
+
+To automate testing on continuous integration services (Travis CI) the test
+script keeps information about errors: if a single error happened, the script
+exits with an error code (1) instead of a code showing successful operation (0)
+
+The following screen capture displays a typical script output:
+
+#### This is the script file run.sh:
+
+``` bash
+#!/usr/bin/env bash
+
+os=$(uname -s)
+indent="  "
+quiet=0
+exit_status=0
+compile_error=0
+
+# Several functions to print strings with colors
+green() {
+  printf "${indent}\033[0;32m%s\033[0m %s\n" "$1" "$2"
+}
+
+yellow() {
+  printf "${indent}\033[0;33m%s\033[0m %s\n" "$1" "$2"
+}
+
+red() {
+  printf "${indent}\033[0;31m%s\033[0m %s\n" "$1" "$2"
+}
+
+error () {
+  {
+    printf "${indent}%s\n" "$@"
+  } >&2
+}
+
+# Simple help interface
+usage() {
+  echo
+  echo "${indent}Description: run all integration tests"
+  echo
+  echo "${indent}Usage: run.sh [-qh]"
+  echo
+  echo "${indent}Options:"
+  echo
+  echo "${indent}  -q, --quiet           suppress error messages"
+  echo "${indent}  -h, --help            output help and usage"
+  echo
+}
+
+# Eval for normal AP files: redirects the file into apollo
+evaluate() {
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
+
+  ../apollo $2 < "$1" 2> /dev/null
+
+  # if Apollo exits with 1 something severe happened!
+  if test $? -eq 1; then
+    echo "<compilation error>"
+  fi
+}
+
+# Eval for APS: it echos the line to be tested and pipes it into apollo
+evalAPS() {
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
+
+  echo "$1" | ../apollo - $2 2> /dev/null
+
+  if test $? -eq 1; then
+    echo "<compilation error>"
+  fi
+}
+
+# Function that compares the apollo result against the expected result
+compare() {
+  diff -Bw <(echo "${1}") <(echo "${2}")
+}
+
+printr() {
+  while read -r line; do
+      red "  $line"
+  done <<< "$1"
+}
+
+# The main function that deals with checking files and treating them 
+# according to their extensions:
+# .ap: normal Apollo source file
+# .aps: source file where each input line must be tested separately
+# .ans: normal answer file (file containing the expected answer)
+# .ast: file containing a program's AST instead of the normal answer
+check() {
+  if test "$os" == "Darwin"; then
+    local pass=""
+    local warn=""
+    local fail=""
+  else
+    local pass="PASS "
+    local warn="WARN "
+    local fail="FAIL "
+  fi
+
+  local test=${1}
+  local ast=0
+  local aps=0
+  if [[ $test == *".aps" ]]; then
+    local answ=${test/.aps/.ans}
+    local name=${1/.aps/}
+    if test ! -e "$answ"; then
+      # If in .ast mode (.ast answer file) compare the source against its AST
+      local answ=${test/.aps/.ast}
+      local ast=1
+    fi
+    # Flag sets .aps mode
+    local aps=1
+  else
+    local answ=${test/.ap/.ans}
+    local name=${1/.ap/}
+    if test ! -e "$answ"; then
+      local answ=${test/.ap/.ast}
+      local ast=1
+    fi
+  fi
+
+  if test ! -e "$answ"; then
+    yellow "$warn $name" "(no answer file)"
+    return 0
+  fi
+
+  if test $aps -eq 1; then
+    # In .aps mode, each line is read and interpreted individually.
+    local lineno=0
+    while read -r line; do
+      if test -z "$line"; then
+        # If a line in the test file is empty, it is ignored (as 
+        # well as the respective line in the ans file)
+        let lineno=lineno+1
+        continue
+      fi
+      # Keep track of line numbers to extract them from the answer file
+      let lineno=lineno+1
+
+      if test "$ast" -eq 1; then
+        local interp=$(evalAPS "$line" --ast)
+      else
+        local interp=$(evalAPS "$line")
+      fi
+
+      # awk helps us grab the appropriate line from the ans file
+      local answer=$(awk "NR==$lineno" "$answ") 
+      local result=$(compare "$interp" "$answer")
+      if test -n "$result"; then
+      # If line generates an error, test stops and no further lines are tested
+        break
+      fi
+    done < "$test"
+  else
+    # Much simpler testing when we deal with the whole source file
+    if test "$ast" -eq 1; then
+      local interp=$(evaluate $test --ast)
+    else
+      local interp=$(evaluate $test -)
+    fi
+
+    local answer=$(cat $answ)
+    local result=$(compare "$interp" "$answer")
+  fi
+
+  local divider=$(printf '~%.0s' {1..68})
+
+  if test -n "$result"; then
+    red "$fail $name" "($test $answ)"
+    if test $quiet -eq 0; then
+    # If the script is run with -q (quiet) the error message is not printed
+      red
+      if test $aps -eq 1; then
+        # If running in aps mode, print the line where the error happened
+        red "  Error in line: $lineno"
+      fi
+      red "  $divider"
+      printr "$result"
+      red "  $divider"
+      red
+    fi
+    return 1
+  else
+    green "$pass $name" "($test $answ)"
+    return 0
+  fi
+}
+
+handle_flags() {
+  case "$1" in
+    -q|--quiet)
+      quiet=1
+      ;;
+
+    -h|--help)
+      usage
+      exit 0
+      ;;
+
+    *)
+      if test ! -z "$1"; then
+        error "Unknown option: $1"
+        exit 1
+      fi
+      ;;
+  esac
+}
+
+# cd to test directory if not already there
+change_dir_if_necessary() {
+  local cwd=$(basename $(pwd))
+  local test_dir="tests"
+
+  if test ! "$cwd" = "$test_dir"; then
+    cd "$test_dir"
+  fi
+}
+
+# Function that lists files with appropriate extensions in tests directory 
+# and sends them to be processed
+run_tests() {
+  local tests=$(ls *.ap *.aps)
+  echo
+
+  for test in $tests; do
+    check $test
+    if test $? -eq 1; then
+      # If exit status is != 0, store it so that later script exits in error
+      exit_status=1
+    fi
+  done
+
+  echo
+}
+
+main() {
+  handle_flags $@
+  change_dir_if_necessary
+  run_tests
+}
+
+main $@
+exit $exit_status
+```
+
+## Test files
+
+##### Testing binary operations: binop.aps
+
+```
+1 + 0
+3 - 1
+2 * 2
+2 * -2
+10 / 2
+10 % 7
+1 == 2
+1 != 2
+1 < 2
+1 > 2
+3 <= 4
+2 >= 2
+True && False
+True || False
+1 :: [2, 3, 4]
+
+```
+ 
+##### binop.ans:
+
+```
+1
+2
+4
+-4
+5
+3
+False
+True
+True
+False
+True
+True
+False
+True
+[1, 2, 3, 4]
+
+```
+
+##### Testing block operations: block.ap
+
+```
+f: (m: Int) -> Int = {
+    g(m, 4)
+    where
+        g: (x: Int, y: Int) -> Int = x + y
+}
+
+foo: Int = {
+    length * bar
+    where
+        length: Int = 5
+        bar: Int = 4
+}
+
+cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
+    sideArea + circleArea
+    where
+        sideArea: Int = b * h
+        circleArea: Int = {
+            2 * pi * r * r
+            where
+                pi: Int = 3
+        }
+}
+
+f(5)
+foo
+cylinderVolume(2, 3, 4)
+
+```
+
+##### block.ans:
+
+```
+9
+20
+36
+
+```
+
+##### Testing multi line and single line comments: comment.ap
+
+```
+{-  f: (m: Int) -> Int = {
+    g(m, 4)
+    where
+      g: (x: Int, y: Int) -> Int = x + y
+  }
+
+  foo: Int = {
+    length * bar
+    where
+      length: Int = 5
+      bar: Int = 4
+  }
+
+  cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
+    sideArea + circleArea
+    where
+      sideArea: Int = b * h
+      circleArea: Int = {
+        2 * pi * r * r
+        where
+          pi: Int = 3
+      }
+  } -}
+10 -- test
+--  f(5)
+--  foo
+--  cylinderVolume(2, 3, 4)
+
+```
+
+##### comment.ans:
+
+```
+10
+```
+
+##### Testing conditionals: cond.ap
+
+```
+case (False) 1 otherwise 2
+case (False) 1 case (True) 2 otherwise 3
+case (False) 1 case (False) 2 otherwise 3
+
+```
+
+##### cond.ans:
+
+```
+2
+2
+3
+
+```
+
+##### Testing division by zero: divbyzero.aps
+
+```
+4 / 0
+10 / (6 - 3 * 2)
+4 % 0
+
+```
+
+##### divbyzero.ans:
+
+```
+Zero-division error: division or modulo by zero
+Zero-division error: division or modulo by zero
+Zero-division error: division or modulo by zero
+
+```
+
+##### Testing first class functions: firstclass.ap
+
+```
+twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
+f: (n: Int) -> Int = n * n
+twice(f, 2)
+
+myMap: (f: (Int) -> Int, a: [Int]) -> [Int] = case (!a) [] otherwise f(h@a) :: myMap(f, t@a)
+square: (a: Int) -> Int = a * a
+myMap(square, [1,2,3,4,5])
+
+pow4: (x: Int) -> Int = twice(square, x)
+pow4(5)
+
+```
+
+##### firstclass.ans:
+
+```
+16
+[1,4,9,16,25]
+625
+
+```
+
+##### Testing functions: functions.ap
+
+```
+square: (x: Int) -> Int = x * x
+
+square(5)
+
+```
+
+##### functions.ans:
+
+```
+25
+
+```
+
+##### Testing lambdas: lambda.ap
+
+```
+-- | bound vars
+mapII(\x: Int -> Int: x * x, [1,2,3,4,5])
+
+-- | free & bound vars
+y: Int = 3
+mapII(\x: Int -> Int: x * y, [1,2,3,4,5])
+
+```
+
+##### lambda.ans:
+
+```
+[1,4,9,16,25]
+
+[3,6,9,12,15]
+
+```
+
+##### Testing lists: list.aps
+
+```
+t@[]
+h@[]
+[1,A4]
+[[1],[A4]]
+[[],[2]]
+h@[[1],[2],[3]]
+t@[[1],[2],[3]]
+[[2],[3]] == [[2],[3]]
+[] != []
+
+```
+
+##### list.ans:
+
+```
+Type error: [] is wrong operand type for unary `t@`
+Type error: [] is wrong operand type for unary `h@`
+[(1),(69)]
+Type error: "list is irregular"
+Type error: "list is irregular"
+[1]
+[[2],[3]]
+True
+False
+
+```
+
+##### Testing literals: literal.aps
+
+```
+A4
+\4
+(A4, \4)
+(69, \4)
+(A4, 16)
+(_, \4)
+
+```
+
+##### literal.ans:
+
+```
+(69)
+(16)
+(Atom (69) (16))
+(Atom (69) (16))
+(Atom (69) (16))
+(Atom Nil (16))
+
+```
+
+##### Testing Boolean logic: logic.aps
+
+```
+(1 < 2) || (1 > 2)
+(1 < 2) || ((1 > 2) && True)
+(1 == 1) && ! True
+True && ! False
+(3 <= 3) && (3 >= 4)
+True && (True || False)
+
+```
+
+##### logic.ans:
+
+```
+True
+True
+False
+True
+False
+True
+
+```
+
+##### Testing music parts: music.ap
+
+```
+do: Pitch = C4
+mi: Pitch = E4
+q: Duration = \4
+note: Atom = (do, q)
+rest: Atom = (_, q)
+chord: Atom = ([do, mi], q)
+top: [Atom] = [note, note]
+bot: [Atom] = [rest, chord]
+song: Music = [top, bot]
+
+```
+
+##### music.ans:
+
+```
+
+
+```
+
+##### Testing music operations: musicop.aps
+
+```
+A4 + 1
+A4 - 1
+A4 * 2
+A4 / 2
+A4 % 2
+A4 == 1
+A4 != 1
+A4 < 1
+A4 > 1
+A4 <= 1
+A4 >= 1
+
+A4 + True
+A4 - True
+A4 * True
+A4 / True
+A4 % True
+A4 == True
+A4 != True
+A4 < True
+A4 > True
+A4 <= True
+A4 >= True
+
+A4 + A4
+A4 - A4
+A4 * A4
+A4 / A4
+A4 % A4
+A4 == A4
+A4 != A3
+A4 < A5
+A4 > A3
+A4 <= A4
+A4 >= A4
+
+A4 + \4
+A4 - \4
+A4 * \4
+A4 / \4
+A4 % \4
+A4 == \4
+A4 != \4
+A4 < \4
+A4 > \4
+A4 <= \4
+A4 >= \4
+
+A4 + [1]
+A4 - [1]
+A4 * [1]
+A4 / [1]
+A4 % [1]
+A4 == [1]
+A4 != [1]
+A4 < [1]
+A4 > [1]
+A4 <= [1]
+A4 >= [1]
+
+
+\4 + 1
+\4 - 1
+\4 * 2
+\4 / 2
+\4 % 2
+\4 == 1
+\4 != 1
+\4 < 1
+\4 > 1
+\4 <= 1
+\4 >= 1
+
+\4 + True
+\4 - True
+\4 * True
+\4 / True
+\4 % True
+\4 == True
+\4 != True
+\4 < True
+\4 > True
+\4 <= True
+\4 >= True
+
+\4 + A4
+\4 - A4
+\4 * A4
+\4 / A4
+\4 % A4
+\4 == A4
+\4 != A4
+\4 < A4
+\4 > A4
+\4 <= A4
+\4 >= A4
+
+\4 + \4
+\2 - \4
+\4 * \4
+\4 / \4
+\4 % \4
+\4 == \4
+\4 != \3
+\4 < \3
+\4 > \8
+\4 <= \4
+\4 >= \4
+
+\4 + [1]
+\4 - [1]
+\4 * [1]
+\4 / [1]
+\4 % [1]
+\4 == [1]
+\4 != [1]
+\4 < [1]
+\4 > [1]
+\4 <= [1]
+\4 >= [1]
+
+```
+
+##### musicop.ans:
+
+```
+(70)
+(68)
+Type error: Pitch and Int are wrong operand types for `*`
+Type error: Pitch and Int are wrong operand types for `/`
+Type error: Pitch and Int are wrong operand types for `%`
+Type error: Pitch and Int are wrong operand types for `==`
+Type error: Pitch and Int are wrong operand types for `!=`
+Type error: Pitch and Int are wrong operand types for `<`
+Type error: Pitch and Int are wrong operand types for `>`
+Type error: Pitch and Int are wrong operand types for `<=`
+Type error: Pitch and Int are wrong operand types for `>=`
+
+Type error: Pitch and Bool are wrong operand types for `+`
+Type error: Pitch and Bool are wrong operand types for `-`
+Type error: Pitch and Bool are wrong operand types for `*`
+Type error: Pitch and Bool are wrong operand types for `/`
+Type error: Pitch and Bool are wrong operand types for `%`
+Type error: Pitch and Bool are wrong operand types for `==`
+Type error: Pitch and Bool are wrong operand types for `!=`
+Type error: Pitch and Bool are wrong operand types for `<`
+Type error: Pitch and Bool are wrong operand types for `>`
+Type error: Pitch and Bool are wrong operand types for `<=`
+Type error: Pitch and Bool are wrong operand types for `>=`
+
+Type error: Pitch and Pitch are wrong operand types for `+`
+Type error: Pitch and Pitch are wrong operand types for `-`
+Type error: Pitch and Pitch are wrong operand types for `*`
+Type error: Pitch and Pitch are wrong operand types for `/`
+Type error: Pitch and Pitch are wrong operand types for `%`
+True
+True
+True
+True
+True
+True
+
+Type error: Pitch and Duration are wrong operand types for `+`
+Type error: Pitch and Duration are wrong operand types for `-`
+Type error: Pitch and Duration are wrong operand types for `*`
+Type error: Pitch and Duration are wrong operand types for `/`
+Type error: Pitch and Duration are wrong operand types for `%`
+Type error: Pitch and Duration are wrong operand types for `==`
+Type error: Pitch and Duration are wrong operand types for `!=`
+Type error: Pitch and Duration are wrong operand types for `<`
+Type error: Pitch and Duration are wrong operand types for `>`
+Type error: Pitch and Duration are wrong operand types for `<=`
+Type error: Pitch and Duration are wrong operand types for `>=`
+
+Type error: Pitch and [Int] are wrong operand types for `+`
+Type error: Pitch and [Int] are wrong operand types for `-`
+Type error: Pitch and [Int] are wrong operand types for `*`
+Type error: Pitch and [Int] are wrong operand types for `/`
+Type error: Pitch and [Int] are wrong operand types for `%`
+Type error: Pitch and [Int] are wrong operand types for `==`
+Type error: Pitch and [Int] are wrong operand types for `!=`
+Type error: Pitch and [Int] are wrong operand types for `<`
+Type error: Pitch and [Int] are wrong operand types for `>`
+Type error: Pitch and [Int] are wrong operand types for `<=`
+Type error: Pitch and [Int] are wrong operand types for `>=`
+
+
+Type error: Duration and Int are wrong operand types for `+`
+Type error: Duration and Int are wrong operand types for `-`
+(32)
+(8)
+Type error: Duration and Int are wrong operand types for `%`
+Type error: Duration and Int are wrong operand types for `==`
+Type error: Duration and Int are wrong operand types for `!=`
+Type error: Duration and Int are wrong operand types for `<`
+Type error: Duration and Int are wrong operand types for `>`
+Type error: Duration and Int are wrong operand types for `<=`
+Type error: Duration and Int are wrong operand types for `>=`
+
+Type error: Duration and Bool are wrong operand types for `+`
+Type error: Duration and Bool are wrong operand types for `-`
+Type error: Duration and Bool are wrong operand types for `*`
+Type error: Duration and Bool are wrong operand types for `/`
+Type error: Duration and Bool are wrong operand types for `%`
+Type error: Duration and Bool are wrong operand types for `==`
+Type error: Duration and Bool are wrong operand types for `!=`
+Type error: Duration and Bool are wrong operand types for `<`
+Type error: Duration and Bool are wrong operand types for `>`
+Type error: Duration and Bool are wrong operand types for `<=`
+Type error: Duration and Bool are wrong operand types for `>=`
+
+Type error: Duration and Pitch are wrong operand types for `+`
+Type error: Duration and Pitch are wrong operand types for `-`
+Type error: Duration and Pitch are wrong operand types for `*`
+Type error: Duration and Pitch are wrong operand types for `/`
+Type error: Duration and Pitch are wrong operand types for `%`
+Type error: Duration and Pitch are wrong operand types for `==`
+Type error: Duration and Pitch are wrong operand types for `!=`
+Type error: Duration and Pitch are wrong operand types for `<`
+Type error: Duration and Pitch are wrong operand types for `>`
+Type error: Duration and Pitch are wrong operand types for `<=`
+Type error: Duration and Pitch are wrong operand types for `>=`
+
+(32)
+(16)
+Type error: Duration and Duration are wrong operand types for `*`
+Type error: Duration and Duration are wrong operand types for `/`
+Type error: Duration and Duration are wrong operand types for `%`
+True
+True
+True
+True
+True
+True
+
+Type error: Duration and [Int] are wrong operand types for `+`
+Type error: Duration and [Int] are wrong operand types for `-`
+Type error: Duration and [Int] are wrong operand types for `*`
+Type error: Duration and [Int] are wrong operand types for `/`
+Type error: Duration and [Int] are wrong operand types for `%`
+Type error: Duration and [Int] are wrong operand types for `==`
+Type error: Duration and [Int] are wrong operand types for `!=`
+Type error: Duration and [Int] are wrong operand types for `<`
+Type error: Duration and [Int] are wrong operand types for `>`
+Type error: Duration and [Int] are wrong operand types for `<=`
+Type error: Duration and [Int] are wrong operand types for `>=`
+
+```
+
+##### Testing type checking in operatios: optypecheck.aps
+
+```
+1 + False
+[1,2,1]
+[1, True]
+[[1], [1]]
+[[1], [True]]
+{1}
+case (True) 1 otherwise 42
+case (1) 1 otherwise 2
+case (True) 1 otherwise False
+!(True)
+!(1 + 3)
+-(True)
+True && False
+(True && False) || 1
+1 == 1
+1 != 1
+a: Int = True
+
+```
+
+##### optypecheck.ans:
+
+```
+Type error: Int and Bool are wrong operand types for `+`
+[1,2,1]
+Type error: "list is irregular"
+[[1],[1]]
+Type error: "list is irregular"
+1
+1
+Type error: "If: bool-cond not bool"
+Type error: "If: case mismatch"
+False
+Type error: Int is wrong operand type for unary `!`
+Type error: Bool is wrong operand type for unary `-`
+False
+Type error: Bool and Int are wrong operand types for `||`
+True
+False
+Type error: definition of Int, but assigned to Bool
+
+```
+
+##### Testing pitch modifications: pitchmod.aps
+
+```
+C9 + 7
+C9 + 8
+A4 - 70
+{b where b: Pitch = -1}
+
+```
+
+##### pitchmod.ans:
+
+```
+(127)
+(0)
+(127)
+(127)
+
+```
+
+##### Testing operator precedence: precedence.aps
+
+```
+1 + 2
+-(1 + 1)
+4 - 3 + 1
+4 - (3 + 1)
+6 / 3 * 2
+6 / (3 * 2)
+16 / 3 + 5 * 2
+16 / (3 + 5) * 2
+16 / ((3 + 5) * 2)
+16 % 4 + 2
+
+```
+
+##### precedence.ans:
+
+```
+3
+-2
+2
+0
+4
+1
+15
+4
+1
+2
+
+```
+
+##### Testing prelude functions: prelude.ap
+
+```
+filterI(\x: Int -> Bool: x > 10, [5,10,50,100,150,200])
+foldrII(\x: Int, y: Int -> Int: x + y, 0, [1,2,3,4,5,6,7,8,9,10])
+sumI([1,2,3,4,5,6,7,8,9,10])
+mapIB(\x: Int -> Bool: x == 20, [1,20, 3,4,5, 20])
+sequence(1, 20)
+lengthI(sequence(0,10))
+lastI([1,2,3])
+intercalateI([1,3,5], [2,4,6])
+
+```
+
+##### prelude.ans:
+
+```
+[50,100,150,200]
+55
+55
+[False,True,False,False,False,True]
+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+10
+3
+[1,2,3,4,5,6]
+
+```
+
+##### Testing recursive functions: recursion.ap
+
+```
+fib: (n: Int) -> Int = case (n <= 1) n otherwise fib(n - 1) + fib(n - 2)
+fib(10)
+
+factorial: (n: Int) -> Int = 
+    case (n == 0) 1 otherwise n * factorial(n - 1)
+factorial(6)
+
+```
+
+##### recursion.ans:
+
+```
+55
+720
+
+```
+
+##### Testing redefining variables: redefine.ap
+
+```
+a: Int = 3
+a: Int = 4
+
+```
+
+##### redefine.ans:
+
+```
+Multiple declaration: redefining variable a
+
+```
+
+##### Testing scoping: scope.ap
+
+```
+a: Int = 1
+f: (a: Int) -> Int = a
+f(2)
+
+b: Int = 1
+[{ b where b: Int = 10}, b]
+
+{ { a where a: Int = 1 } where a: Int = 2 }
+
+c: Int = 22
+{ c + d where d: Int = 20 }
+
+```
+
+##### scope.ans:
+
+```
+2
+[10, 1]
+1
+42
+
+```
+
+##### Testing scoping errors: scope_err.aps
+
+```
+{ 1 where a: Int = 2 } a
+{ 1 where a: Int = A4 }
+{ 1 where a: Int = 2 a: Int = 2}
+
+```
+
+##### scope_err.ans:
+
+```
+Getting an unbound variable: a
+Type error: definition of Int, but assigned to Pitch
+Multiple declaration: redefining variable a
+
+```
+
+##### Testing syntax AST: syntax.ap
+
+```
+case (!(False && True)) 3 + 1 otherwise 0
+
+```
+
+##### syntax.ast:
+
+```
+[(If (Not (&& False True)) (+ 3 1) 0)]
+
+```
+
+##### Testing type checking: typecheck.aps
+
+```
+a: Int = 1
+a: Int = True
+a: Int = A4
+a: Int = \4
+a: Int = (A4, \4)
+a: Int = [1]
+a: Int = [[(A4,\4)]]
+
+a: Bool = 1
+a: Bool = True
+a: Bool = A4
+a: Bool = \4
+a: Bool = (A4, \4)
+a: Bool = [1]
+a: Bool = [[(A4,\4)]]
+
+a: Pitch = 1
+a: Pitch = True
+a: Pitch = A4
+a: Pitch = \4
+a: Pitch = (A4, \4)
+a: Pitch = [1]
+a: Pitch = [[(A4,\4)]]
+
+
+a: Duration = True
+a: Duration = A4
+a: Duration = \4
+a: Duration = (A4, \4)
+a: Duration = [1]
+a: Duration = [[(A4,\4)]]
+
+a: Atom = 1
+a: Atom = True
+a: Atom = A4
+a: Atom = \4
+a: Atom = (A4, \4)
+a: Atom = [1]
+a: Atom = [[(A4,\4)]]
+
+a: Music = 1
+a: Music = True
+a: Music = A4
+a: Music = \4
+a: Music = (A4, \4)
+a: Music = [1]
+a: Music = [[(A4,\4)]]
+
+#tempo 1
+#tempo True
+#tempo A4
+#tempo \4
+#tempo (A4, \4)
+#tempo [1]
+#tempo [[(A4,\4)]]
+
+a: [Int] = 1
+a: [Int] = True
+a: [Int] = A4
+a: [Int] = \4
+a: [Int] = (A4, \4)
+a: [Int] = [1]
+a: [Int] = [[(A4,\4)]]
+
+```
+
+##### typecheck.ans:
+
+```
+
+Type error: definition of Int, but assigned to Bool
+Type error: definition of Int, but assigned to Pitch
+Type error: definition of Int, but assigned to Duration
+Type error: definition of Int, but assigned to Atom
+Type error: definition of Int, but assigned to [Int]
+Type error: definition of Int, but assigned to [[Atom]]
+
+Type error: definition of Bool, but assigned to Int
+
+Type error: definition of Bool, but assigned to Pitch
+Type error: definition of Bool, but assigned to Duration
+Type error: definition of Bool, but assigned to Atom
+Type error: definition of Bool, but assigned to [Int]
+Type error: definition of Bool, but assigned to [[Atom]]
+
+
+Type error: definition of Pitch, but assigned to Bool
+
+Type error: definition of Pitch, but assigned to Duration
+Type error: definition of Pitch, but assigned to Atom
+Type error: definition of Pitch, but assigned to [Int]
+Type error: definition of Pitch, but assigned to [[Atom]]
+
+Type error: definition of Duration, but assigned to Int
+Type error: definition of Duration, but assigned to Bool
+Type error: definition of Duration, but assigned to Pitch
+
+Type error: definition of Duration, but assigned to Atom
+Type error: definition of Duration, but assigned to [Int]
+Type error: definition of Duration, but assigned to [[Atom]]
+
+Type error: definition of Atom, but assigned to Int
+Type error: definition of Atom, but assigned to Bool
+Type error: definition of Atom, but assigned to Pitch
+Type error: definition of Atom, but assigned to Duration
+
+Type error: definition of Atom, but assigned to [Int]
+Type error: definition of Atom, but assigned to [[Atom]]
+
+Type error: definition of Music, but assigned to Int
+Type error: definition of Music, but assigned to Bool
+Type error: definition of Music, but assigned to Pitch
+Type error: definition of Music, but assigned to Duration
+Type error: definition of Music, but assigned to Atom
+Type error: definition of Music, but assigned to [Int]
+
+
+
+Type error: definition of Int, but assigned to Bool
+Type error: definition of Int, but assigned to Pitch
+Type error: definition of Int, but assigned to Duration
+Type error: definition of Int, but assigned to Atom
+Type error: definition of Int, but assigned to [Int]
+Type error: definition of Int, but assigned to [[Atom]]
+
+Type error: definition of [Int], but assigned to Int
+Type error: definition of [Int], but assigned to Bool
+Type error: definition of [Int], but assigned to Pitch
+Type error: definition of [Int], but assigned to Duration
+Type error: definition of [Int], but assigned to Atom
+
+Type error: definition of [Int], but assigned to [[Atom]]
+```
+
+##### Testing type checking in functions: typecheckfunc.aps
+
+```
+f: (n: Int) -> Int = { a where a: Pitch = A4 }
+f: (n: Pitch) -> Int = { a where a: Int = 4 } f(4)
+f: (n: Int) -> Int = { a where a: Int = True }
+
+```
+
+##### typecheckfunc.ans:
+
+```
+Type error: `f` defined with return-type of Int, but actual return-type is (Int) -> Int
+expected args: [Pitch]; actual: [Int] for f 
+Type error: definition of Int, but assigned to Bool
+
+```
+
+##### Testing cc variables: unbound.ap
+
+```
+a: Int = 1
+a
+b
+
+```
+
+##### unbound.ans:
+
+```
+Getting an unbound variable: b
+
+```
+
+##### Testing unary operations: unop.aps
+
+```
+-2
+!False
+h@[1,2,3]
+t@[1,2,3]
+
+```
+
+##### unop.ast:
+
+```
+-2
+True
+1
+[2,3]
+
+```
+
+##### Testing variable manipulation: vars.ap
+
+```
+a: Int = 1
+a
+a + 3
+b: Bool = False
+b
+b || True
+b && True
+c: Int = a + 5
+c
+[a, c - 4]
+
+```
+
+##### vars.ast:
+
+```
+1
+4
+False
+True
+False
+6
+[1,2]
+
+```
+
+
+
 Conclusions
 ===========
 
-## Team members 
+## Team members
 
-### Roberto Jose De Amorim  
+### Roberto Jose De Amorim
 
 I learned a lot as the tester in my first significant group programming project
-in my masters course at Columbia University. 
+in my masters course at Columbia University.
 
-1. Creating test suites is crucial. They allow users to detect bugs early, and 
-   when an update breaks lots of things, the developer can iterate on fixes and 
+1. Creating test suites is crucial. They allow users to detect bugs early, and
+   when an update breaks lots of things, the developer can iterate on fixes and
    testing until the code gets back to a consistent state.
-2. Small changes can break the entire language. Or break a small corner case. 
+2. Small changes can break the entire language. Or break a small corner case.
    Therefore, tests must be comprehensive and as exhaustive as possible.
-3. Branch the code often. Test the branch, and only then merge it with master. 
+3. Branch the code often. Test the branch, and only then merge it with master.
    That guarantees master is always at an usable state.
-4. Code must be thoroughly commented, not only for your teammates, but for 
+4. Code must be thoroughly commented, not only for your teammates, but for
    yourself a few weeks down the line.
 
 ### Ben Kogan
 
 I learned more than a significant amount about translators during this process. This in turn has helped me better understand programming languages --- both in theory and in implementation. Before this course, compilers were a black box: intimidating, mysterious, and near-magical among system tools. I now not only understand the fundamental concepts behind translators but have helped implement what I consider a fairly interesting toy language.
 
-Writing a pure functional compiler in a language I didn’t know four months ago has been no small feat, at least personally. I think I invested equal time working towards productivity and comprehension in Haskell as I did in learning to write a compiler. (I also spent very little time on other classes or sleeping, but that’s probably expected behavior.) Haskell proved to be formidable in many regards --- it forced me to understand what I was trying to create much more thoroughly and I think the results were more concise and perhaps even more elegant. Implementing functional staples like recursion and closures was similarly challenging but rewarding. When we reached the stage where we could write our own standard library in Apollo, the team’s excitement was palpable.
+Writing a pure functional compiler in a language I didn't know four months ago has been no small feat, at least personally. I think I invested equal time working towards productivity and comprehension in Haskell as I did in learning to write a compiler. (I also spent very little time on other classes or sleeping, but that's probably expected behavior.) Haskell proved to be formidable in many regards --- it forced me to understand what I was trying to create much more thoroughly and I think the results were more concise and perhaps even more elegant. Implementing functional staples like recursion and closures was similarly challenging and rewarding. When we reached the stage where we could write our own standard library in Apollo, the team's excitement was palpable.
 
-I got extremely lucky with my team. We picked together by chance but proved to be remarkably compatible for a programming group, let alone one that began as total strangers. I’m grateful that they put up with me to the end.
+I got extremely lucky with my team. We picked together by chance but proved to be remarkably compatible for a programming group, let alone one that began as total strangers. I'm grateful that they put up with me to the end.
 
-As far as practical takeaways, you can never start early enough. That said, starting does not necessarily mean writing code. I wish I had a better understanding of functional compilers before beginning. The further we progressed, the more I regrets I accumulated with regard to my earlier architectural decisions. But a semester goes all too quickly --- sometimes one needs to finish what one has and leave a more refined concept to version two.
+As far as practical takeaways, you can never start early enough. That said, starting does not necessarily mean writing code. I wish I had a better understanding of functional compilers before beginning. The further we progressed, the more I regrets I accumulated with regard to my earlier architectural decisions. But a semester goes all too quickly --- sometimes one needs to finish what one has and leave a more refined concept for version two.
 
 ### Javier Llaca
 
 
 ### Reza Nayebi
 
-I learned a lot as the project manager of the team. Our team is very diverse in a lot of ways (age, ethnicity…)  and while this has some great advantages, it also requires special attention in order ensure mutual understanding and healthy group dynamics. I also learned that, while debate and exchange of ideas is great, decisions must be eventually taken in order to be able to deliver in time. That often means that the project manager must take the final decision. However, one always needs to be mindful and listen to all the ideas before deciding upon anything. Another important lesson I learned was that a manager must understand what every group member is working on in order understand what stage the project is in and have a clear view of what is left to implement. This means doing a lot of research to understand the compiler at a high level and potentially being involved in several parts of the project in order to provide assistance and help in the development. Finally, coming together and working as a group is a great way to get things done and get to know one another better.
+I learned a lot as the project manager of the team. Our team is very diverse in a lot of ways (age, ethnicity...) and while this has some great advantages, it also requires special attention in order to ensure mutual understanding and healthy group dynamics. I also learned that, while debate and exchange of ideas is great, decisions must be eventually taken in order to be able to deliver in time. That often means that the project manager must come in to take the final decision, particularly when the issue at hand is only a detail. However, one always needs to be mindful and listen to all the ideas before deciding upon anything. Another important lesson I learned was that a manager must understand what every group member is working on to have a sense of what stage the project is in and have a clear view of what is left to implement. This means doing a lot of research to understand the interpreter at a high level and potentially being involved in several parts of the project in order to provide assistance and help for the development. Finally, I found that coming together and working as a group is a great way to get things done and get to know one another better.
 
-### Souren Papazian 
+### Souren Papazian
 
-It is natural for not all members to know and understand all the code in the project, since it is often more efficient for each person to work on their part independently. This can cause problems later when piecing together the different parts but with enough communication in the team along with code documentation these issues can be avoided. It is very important for members to update one another on what they implemented and also read one each others code for code review. This way everyone’s on the same page and many opinions are considered when making a design decision.
+It is natural for members to know and understand every single line of code in the project, since it is often more efficient for each person to work on their part independently. This can cause problems later when piecing together the different parts but with enough communication in the team along with code documentation these issues can be avoided. It is very important for members to update one another on what they implemented and also read each others code for code review. This way everyone's on the same page and many opinions are considered when making a design decision.
 
 Having tests as soon as possible is extremely important. The sooner your teammates have tests, the sooner they will catch bugs. Stacking bugs can get very messy in the long run.
 
-Another thing I learned is that if you’re writing code that will use someone else's code, you shouldn’t wait until they are done to before writing your part. “I can’t really write my part because it requires your part” is a really easy excuse to make, but in reality you could just write your part assuming that your teammates part is already complete and then simple piece them together when both of you are done. This avoids pressure on other teammates and makes the team much more efficient.
+Another thing I learned is that if you're writing code that will use someone else's code, you shouldn't wait until they are done to start writing your part. "I can't really write my part because it requires your part" is a really easy excuse to make. In reality you could just write your part assuming that your teammate's part is already complete and then simply piece them together when both of you are done. This avoids pressure on other teammates and makes the team much more efficient.
 
 ## Advice for future teams
 
-By now it is probably obvious that tests and version control are vital to your team’s success. Using Travis CI with GitHub was a great help. It was definitely a boon to see green or red before every merge. Sometimes you mess up and forget to check the tests. To err is human --- that’s why they made continuous integration.
+By now it is probably obvious that tests and version control are vital to your team's success. Using Travis CI with GitHub was a great help. It was definitely a boon to see green or red before every merge. Sometimes you mess up and forget to check the tests. To err is human --- that's why they made continuous integration.
 
-That said, we created only integration tests without any native Haskell unit tests. We didn’t miss them. Thanks for this go entirely to Haskell’s type system. We found that writing our code in Haskell, though difficult, made it almost impossible to create a runtime error. Dynamic languages may prove fast to prototype in, but we definitely didn’t regret choosing a static and purely functional one.
+That said, we created only integration tests without any native Haskell unit tests. We didn't miss them. Thanks for this go entirely to Haskell's type system. We found that writing our code in Haskell, though difficult, made it almost impossible to create a runtime error. Dynamic languages may prove fast to prototype in, but we definitely didn't regret choosing a static and purely functional one.
 
-With regard to Haskell, working in such a unique language was a massive challenge but we don’t regret it. If there’s a language you’ve been waiting to learn, now may be the time to try. The fun of learning functional programming kept long work sessions interesting.
+With regard to Haskell, working in such a unique language was a massive challenge but we don't regret it. If there's a language you've been waiting to learn, now may be the time to try. The fun of learning functional programming kept long work sessions interesting.
 
-The more you understand the high-level ideas behind translator architecture and design, the better your own translator will turn out. It isn’t a bad idea to make a toy compiler for a Lisp or something similarly simple before starting on your own project.
+The more you understand the high-level ideas behind translator architecture and design, the better your own translator will turn out. It isn't a bad idea to make a toy compiler for a Lisp or something similarly simple before starting on your own project.
 
-Start small and refine the basic principles behind your language. It’s easier --- and more fun --- to grow your language than to reduce it.
+Start small and refine the basic principles behind your language. It's easier --- and more fun --- to grow your language than to reduce it.
 
 ## Advice for instructor
 
-We may be biased in this regard, but we were all very appreciative of the lambda calculus lectures. We wish functional programming concepts were even more deeply integrated into PLT. Our final interpreter proved to be somewhat of a hybrid in that it used a mutable symbol table and multi-argument functions. We were intrigued to read that Haskell’s own GHC is mostly symbol-table free, relying instead on AST traversals. Similarly, we were excited to later discover example languages that hewed much more closely to the lambda calculus, implementing multiple-argument functions via currying. We wish some discussion of purely functional compilers had been present early in the course so that we might have known to try a similar tack early-on.
+We may be biased in this regard, but we were all very appreciative of the lambda calculus lectures. We wish functional programming concepts were even more deeply integrated into PLT. Our final interpreter proved to be somewhat of a hybrid in that it used a mutable symbol table and multi-argument functions. We were intrigued to read that Haskell's own GHC is mostly symbol-table free, relying instead on AST traversals. Similarly, we were excited to later discover example languages that hewed much more closely to the lambda calculus, implementing multiple-argument functions via currying. We wish some discussion of purely functional compilers had been present early in the course so that we might have known to try a similar tack early-on.
+
+\pagebreak
+
+Thank you
+=========
+
+Thank you first and foremost to Professor Aho. You have been a wonderful instructor in so many regards --- thorough in explanation, humorous and distinct in character, and above all kind and compassionate towards your students.
+
+Thank you to Livi, our TA. We hope you enjoy our language and forgive us the long final report.
+
+Another thank you goes to our mothers. It's Mother's Day today after all.
+
+Finally, we owe a big thank you to Roti Roll. Without your timely deliveries, spicy aloo fries, and goat rolls, we would all still be counting shrimp.
+
