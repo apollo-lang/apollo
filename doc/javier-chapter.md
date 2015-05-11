@@ -19,7 +19,7 @@ and aesthetics.
 Perhaps the syntactic feature that changed the most was the declaration of
 derived data types. When writing the first version of the language reference
 manual, we decided to use Java-like constructors for these. Throughout the
-course of the semester, however, this syntax was heavily simplied into a form
+course of the semester, however, this syntax was heavily simplified into a form
 which we found to be very expressive.
 
 ### Features
@@ -31,7 +31,7 @@ extensively. It later became evident that doing either would contradict the
 purpose of a purely functional language.
 
 Our type system also underwent several transformations as we tried to get rid
-of unncessary layers of complexity. The `Atom` data type, for instance,
+of unnecessary layers of complexity. The `Atom` data type, for instance,
 ended up encapsulating notes, chords, and rests altogether. We found this to be
 a feature very elegantly tied to Apollo's broader purpose of making music
 composition minimal and formal.
@@ -45,7 +45,7 @@ constant throughout.
 
 We originally intended to develop Apollo as a compiled language that was translated
 from Apollo to Haskell and then from Haskell to MIDI. As we drafted initial
-versions of the frontend, we wanted a quick and convenient way to test our
+versions of the front-end, we wanted a quick and convenient way to test our
 results. We ended up writing a REPL (Read-Evaluate-Print-Loop) for Apollo. This
 effectively removed the intermediate Apollo to Haskell translation removing
 another layer of complexity. Keeping things simple was always one of our main
@@ -61,7 +61,7 @@ integrated beautifully with Haskell's elegant type system.
 
 ## Reference Manual and Compiler
 
-We stated working on the compiler frontend slightly before completing the first
+We started working on the compiler front-end slightly before completing the first
 draft of our reference manual. However, we tried not to adhere too closely to
 the initial reference manual; we changed the language pretty liberally
 throughout the course of the semester. This flexibility was great for crafting
