@@ -1558,6 +1558,7 @@ Timeline
 --------
 
 ![](./img/activity.png)
+*Git commit history*
 
 * February 25: Language white paper
 * March 25: LRM and tutorial
@@ -1588,6 +1589,81 @@ For a summary of the git log, please see Appendix B.
 
 \pagebreak
 
+# Language Design
+
+*Javier Llaca*
+
+## Language Evolution
+
+Our purpose with Apollo was fairly well-defined at the onset of the project --
+we wanted it to be a convenient tool for functionally composing music. Apollo
+was to be very simple and minimal, having only a small number of features with
+which the user could build more complex programs. We purposely delayed making
+very specific decisions in order to allow ourselves sufficient space for
+molding and refactoring the language at later stages.
+
+### Syntax
+
+We wanted Apollo to be statically typed, and this made us consider different
+patterns for the syntax of the language. In the end, we found the syntax of
+languages like Scala and Swift to strike a good balance between expressivity
+and aesthetics.
+
+Perhaps the syntactic feature that changed the most was the declaration of
+derived data types. When writing the first version of the language reference
+manual, we decided to use Java-like constructors for these. Throughout the
+course of the semester, however, this syntax was heavily simplified into a form
+which we found to be very expressive.
+
+### Features
+
+At the beginning of the semester, we considered building Apollo around a `play`
+function, which would play a note or chord at any point in the program. This
+involved making use of either a global mutable list or dealing with IO
+extensively. It later became evident that doing either would contradict the
+purpose of a purely functional language.
+
+Our type system also underwent several transformations as we tried to get rid
+of unnecessary layers of complexity. The `Atom` data type, for instance,
+ended up encapsulating notes, chords, and rests altogether. We found this to be
+a feature very elegantly tied to Apollo's broader purpose of making music
+composition minimal and formal.
+
+Towards the end of the project, we added more features (e.g., typed lambda
+expressions, closures, unnamed higher-order functions, etc.). Core features of
+the language like primitive data types and arithmetic operators remained
+constant throughout.
+
+## Compiler Tools and Components
+
+We originally intended to develop Apollo as a compiled language that was translated
+from Apollo to Haskell and then from Haskell to MIDI. As we drafted initial
+versions of the front-end, we wanted a quick and convenient way to test our
+results. We ended up writing a REPL (Read-Evaluate-Print-Loop) for Apollo. This
+effectively removed the intermediate Apollo to Haskell translation removing
+another layer of complexity. Keeping things simple was always one of our main
+objectives.
+
+Haskell, the implementation language, was the most crucial tool for building
+Apollo. The constraints that Haskell imposes really forced us to think about
+the design patterns we were using and made us refactor anything that would not
+be highly modular and modifiable. Haskell modules, like HCodecs for working
+with MIDI, were crucial for writing the backend of the compiler. Alex and
+Happy, the Haskell equivalents of Lex and Yacc, were also very fun to use and
+integrated beautifully with Haskell's elegant type system.
+
+## Reference Manual and Compiler
+
+We started working on the compiler front-end slightly before completing the first
+draft of our reference manual. However, we tried not to adhere too closely to
+the initial reference manual; we changed the language pretty liberally
+throughout the course of the semester. This flexibility was great for crafting
+Apollo into something that we liked. Granted, we had to heavily update the
+reference manual after having a semi-final version of Apollo up and running.
+
+
+\pagebreak
+
 Translator architecture
 =======================
 
@@ -1595,7 +1671,9 @@ Translator architecture
 
 ![](./img/block.png)
 
-*Note that in the explanation below, the term "expression" is used to refer to both definitions and value-returning expressions in Apollo unless otherwise specified.*
+*Apollo interpreter block architecture*
+
+Note that in the explanation below, the term "expression" is used to refer to both definitions and value-returning expressions in Apollo unless otherwise specified.
 
 ## Overview ##
 
@@ -1984,17 +2062,20 @@ script to validate it.
 
 ## Test script
 
-To automate testing all code snippets a shell (bash) script was developed. It works by selecting the test files (*.ap and *.aps), running their contents against Apollo and comparing the Apollo output against the expected output, stored in answer files (*.ans and *.ast).
-The differences in file extensions represent different working modes for the
-script. *.ap files are tested as a single source file that is processed by
-Apollo in its entirety. *.aps files are processed line by line - each line is
+To automate testing all code snippets a shell (bash) script was developed. It
+works by selecting the test files (`*.ap` and `*.aps`), running their contents
+against Apollo and comparing the Apollo output against the expected output,
+stored in answer files (`*.ans` and `*.ast`).  The differences in file
+extensions represent different working modes for the script. `*.ap` files are
+tested as a single source file that is processed by Apollo in its entirety.
+`*.aps` files are processed line by line - each line is
 echoed and piped into Apollo, and the Apollo output is compared against the
-respective line in the answers file. *.ans files are files containing the
-expected Apollo output for each test, and *.ast files contain the Annotated
-Syntax Trees output by apollo --ast parameter (which was mostly used for
+respective line in the answers file. `*.ans` files are files containing the
+expected Apollo output for each test, and `*.ast` files contain the Annotated
+Syntax Trees output by `apollo --ast` parameter (which was mostly used for
 debugging).
 
-Tools such as diff (to compare apollo output and expected output) and Awk (to
+Tools such as `diff` (to compare `apollo` output and expected output) and `Awk` (to
 extract specific lines from the answers files) are also leveraged within the
 script.
 
@@ -2002,1271 +2083,19 @@ The output consists of a color-coded list of all tests, where the ones that
 passed are printed in green, script warning are printed in yellow and tests
 that failed are printed in red. Tests that failed also print the output
 generated by Apollo and the expected output. This last information can be
-suppressed using the -q command line switch.
+suppressed using the `-q` command line switch.
 
 To automate testing on continuous integration services (Travis CI) the test
 script keeps information about errors: if a single error happened, the script
 exits with an error code (1) instead of a code showing successful operation (0)
 
-The following screen capture displays a typical script output:
+Typical output of a test-run is shown below:
 
-#### This is the script file run.sh:
+![](./img/test.png)
 
-``` bash
-#!/usr/bin/env bash
+A failing test will show a `diff`:
 
-os=$(uname -s)
-indent="  "
-quiet=0
-exit_status=0
-compile_error=0
-
-# Several functions to print strings with colors
-green() {
-  printf "${indent}\033[0;32m%s\033[0m %s\n" "$1" "$2"
-}
-
-yellow() {
-  printf "${indent}\033[0;33m%s\033[0m %s\n" "$1" "$2"
-}
-
-red() {
-  printf "${indent}\033[0;31m%s\033[0m %s\n" "$1" "$2"
-}
-
-error () {
-  {
-    printf "${indent}%s\n" "$@"
-  } >&2
-}
-
-# Simple help interface
-usage() {
-  echo
-  echo "${indent}Description: run all integration tests"
-  echo
-  echo "${indent}Usage: run.sh [-qh]"
-  echo
-  echo "${indent}Options:"
-  echo
-  echo "${indent}  -q, --quiet           suppress error messages"
-  echo "${indent}  -h, --help            output help and usage"
-  echo
-}
-
-# Eval for normal AP files: redirects the file into apollo
-evaluate() {
-  # Stop execution exceeding 10 seconds to prevent infinite loops
-  ulimit -t 10
-
-  ../apollo $2 < "$1" 2> /dev/null
-
-  # if Apollo exits with 1 something severe happened!
-  if test $? -eq 1; then
-    echo "<compilation error>"
-  fi
-}
-
-# Eval for APS: it echos the line to be tested and pipes it into apollo
-evalAPS() {
-  # Stop execution exceeding 10 seconds to prevent infinite loops
-  ulimit -t 10
-
-  echo "$1" | ../apollo - $2 2> /dev/null
-
-  if test $? -eq 1; then
-    echo "<compilation error>"
-  fi
-}
-
-# Function that compares the apollo result against the expected result
-compare() {
-  diff -Bw <(echo "${1}") <(echo "${2}")
-}
-
-printr() {
-  while read -r line; do
-      red "  $line"
-  done <<< "$1"
-}
-
-# The main function that deals with checking files and treating them
-# according to their extensions:
-# .ap: normal Apollo source file
-# .aps: source file where each input line must be tested separately
-# .ans: normal answer file (file containing the expected answer)
-# .ast: file containing a program's AST instead of the normal answer
-check() {
-  if test "$os" == "Darwin"; then
-    local pass=""
-    local warn=""
-    local fail=""
-  else
-    local pass="PASS "
-    local warn="WARN "
-    local fail="FAIL "
-  fi
-
-  local test=${1}
-  local ast=0
-  local aps=0
-  if [[ $test == *".aps" ]]; then
-    local answ=${test/.aps/.ans}
-    local name=${1/.aps/}
-    if test ! -e "$answ"; then
-      # If in .ast mode (.ast answer file) compare the source against its AST
-      local answ=${test/.aps/.ast}
-      local ast=1
-    fi
-    # Flag sets .aps mode
-    local aps=1
-  else
-    local answ=${test/.ap/.ans}
-    local name=${1/.ap/}
-    if test ! -e "$answ"; then
-      local answ=${test/.ap/.ast}
-      local ast=1
-    fi
-  fi
-
-  if test ! -e "$answ"; then
-    yellow "$warn $name" "(no answer file)"
-    return 0
-  fi
-
-  if test $aps -eq 1; then
-    # In .aps mode, each line is read and interpreted individually.
-    local lineno=0
-    while read -r line; do
-      if test -z "$line"; then
-        # If a line in the test file is empty, it is ignored (as
-        # well as the respective line in the ans file)
-        let lineno=lineno+1
-        continue
-      fi
-      # Keep track of line numbers to extract them from the answer file
-      let lineno=lineno+1
-
-      if test "$ast" -eq 1; then
-        local interp=$(evalAPS "$line" --ast)
-      else
-        local interp=$(evalAPS "$line")
-      fi
-
-      # awk helps us grab the appropriate line from the ans file
-      local answer=$(awk "NR==$lineno" "$answ")
-      local result=$(compare "$interp" "$answer")
-      if test -n "$result"; then
-      # If line generates an error, test stops and no further lines are tested
-        break
-      fi
-    done < "$test"
-  else
-    # Much simpler testing when we deal with the whole source file
-    if test "$ast" -eq 1; then
-      local interp=$(evaluate $test --ast)
-    else
-      local interp=$(evaluate $test -)
-    fi
-
-    local answer=$(cat $answ)
-    local result=$(compare "$interp" "$answer")
-  fi
-
-  local divider=$(printf '~%.0s' {1..68})
-
-  if test -n "$result"; then
-    red "$fail $name" "($test $answ)"
-    if test $quiet -eq 0; then
-    # If the script is run with -q (quiet) the error message is not printed
-      red
-      if test $aps -eq 1; then
-        # If running in aps mode, print the line where the error happened
-        red "  Error in line: $lineno"
-      fi
-      red "  $divider"
-      printr "$result"
-      red "  $divider"
-      red
-    fi
-    return 1
-  else
-    green "$pass $name" "($test $answ)"
-    return 0
-  fi
-}
-
-handle_flags() {
-  case "$1" in
-    -q|--quiet)
-      quiet=1
-      ;;
-
-    -h|--help)
-      usage
-      exit 0
-      ;;
-
-    *)
-      if test ! -z "$1"; then
-        error "Unknown option: $1"
-        exit 1
-      fi
-      ;;
-  esac
-}
-
-# cd to test directory if not already there
-change_dir_if_necessary() {
-  local cwd=$(basename $(pwd))
-  local test_dir="tests"
-
-  if test ! "$cwd" = "$test_dir"; then
-    cd "$test_dir"
-  fi
-}
-
-# Function that lists files with appropriate extensions in tests directory
-# and sends them to be processed
-run_tests() {
-  local tests=$(ls *.ap *.aps)
-  echo
-
-  for test in $tests; do
-    check $test
-    if test $? -eq 1; then
-      # If exit status is != 0, store it so that later script exits in error
-      exit_status=1
-    fi
-  done
-
-  echo
-}
-
-main() {
-  handle_flags $@
-  change_dir_if_necessary
-  run_tests
-}
-
-main $@
-exit $exit_status
-```
-
-## Test files
-
-##### Testing binary operations: binop.aps
-
-```
-1 + 0
-3 - 1
-2 * 2
-2 * -2
-10 / 2
-10 % 7
-1 == 2
-1 != 2
-1 < 2
-1 > 2
-3 <= 4
-2 >= 2
-True && False
-True || False
-1 :: [2, 3, 4]
-
-```
-
-##### binop.ans:
-
-```
-1
-2
-4
--4
-5
-3
-False
-True
-True
-False
-True
-True
-False
-True
-[1, 2, 3, 4]
-
-```
-
-##### Testing block operations: block.ap
-
-```
-f: (m: Int) -> Int = {
-    g(m, 4)
-    where
-        g: (x: Int, y: Int) -> Int = x + y
-}
-
-foo: Int = {
-    length * bar
-    where
-        length: Int = 5
-        bar: Int = 4
-}
-
-cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
-    sideArea + circleArea
-    where
-        sideArea: Int = b * h
-        circleArea: Int = {
-            2 * pi * r * r
-            where
-                pi: Int = 3
-        }
-}
-
-f(5)
-foo
-cylinderVolume(2, 3, 4)
-
-```
-
-##### block.ans:
-
-```
-9
-20
-36
-
-```
-
-##### Testing multi line and single line comments: comment.ap
-
-```
-{-  f: (m: Int) -> Int = {
-    g(m, 4)
-    where
-      g: (x: Int, y: Int) -> Int = x + y
-  }
-
-  foo: Int = {
-    length * bar
-    where
-      length: Int = 5
-      bar: Int = 4
-  }
-
-  cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
-    sideArea + circleArea
-    where
-      sideArea: Int = b * h
-      circleArea: Int = {
-        2 * pi * r * r
-        where
-          pi: Int = 3
-      }
-  } -}
-10 -- test
---  f(5)
---  foo
---  cylinderVolume(2, 3, 4)
-
-```
-
-##### comment.ans:
-
-```
-10
-```
-
-##### Testing conditionals: cond.ap
-
-```
-case (False) 1 otherwise 2
-case (False) 1 case (True) 2 otherwise 3
-case (False) 1 case (False) 2 otherwise 3
-
-```
-
-##### cond.ans:
-
-```
-2
-2
-3
-
-```
-
-##### Testing division by zero: divbyzero.aps
-
-```
-4 / 0
-10 / (6 - 3 * 2)
-4 % 0
-
-```
-
-##### divbyzero.ans:
-
-```
-Zero-division error: division or modulo by zero
-Zero-division error: division or modulo by zero
-Zero-division error: division or modulo by zero
-
-```
-
-##### Testing first class functions: firstclass.ap
-
-```
-twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
-f: (n: Int) -> Int = n * n
-twice(f, 2)
-
-myMap: (f: (Int) -> Int, a: [Int]) -> [Int] = case (!a) [] otherwise f(h@a) :: myMap(f, t@a)
-square: (a: Int) -> Int = a * a
-myMap(square, [1,2,3,4,5])
-
-pow4: (x: Int) -> Int = twice(square, x)
-pow4(5)
-
-```
-
-##### firstclass.ans:
-
-```
-16
-[1,4,9,16,25]
-625
-
-```
-
-##### Testing functions: functions.ap
-
-```
-square: (x: Int) -> Int = x * x
-
-square(5)
-
-```
-
-##### functions.ans:
-
-```
-25
-
-```
-
-##### Testing lambdas: lambda.ap
-
-```
--- | bound vars
-mapII(\x: Int -> Int: x * x, [1,2,3,4,5])
-
--- | free & bound vars
-y: Int = 3
-mapII(\x: Int -> Int: x * y, [1,2,3,4,5])
-
-```
-
-##### lambda.ans:
-
-```
-[1,4,9,16,25]
-
-[3,6,9,12,15]
-
-```
-
-##### Testing lists: list.aps
-
-```
-t@[]
-h@[]
-[1,A4]
-[[1],[A4]]
-[[],[2]]
-h@[[1],[2],[3]]
-t@[[1],[2],[3]]
-[[2],[3]] == [[2],[3]]
-[] != []
-
-```
-
-##### list.ans:
-
-```
-Type error: [] is wrong operand type for unary `t@`
-Type error: [] is wrong operand type for unary `h@`
-[(1),(69)]
-Type error: "list is irregular"
-Type error: "list is irregular"
-[1]
-[[2],[3]]
-True
-False
-
-```
-
-##### Testing literals: literal.aps
-
-```
-A4
-\4
-(A4, \4)
-(69, \4)
-(A4, 16)
-(_, \4)
-
-```
-
-##### literal.ans:
-
-```
-(69)
-(16)
-(Atom (69) (16))
-(Atom (69) (16))
-(Atom (69) (16))
-(Atom Nil (16))
-
-```
-
-##### Testing Boolean logic: logic.aps
-
-```
-(1 < 2) || (1 > 2)
-(1 < 2) || ((1 > 2) && True)
-(1 == 1) && ! True
-True && ! False
-(3 <= 3) && (3 >= 4)
-True && (True || False)
-
-```
-
-##### logic.ans:
-
-```
-True
-True
-False
-True
-False
-True
-
-```
-
-##### Testing music parts: music.ap
-
-```
-do: Pitch = C4
-mi: Pitch = E4
-q: Duration = \4
-note: Atom = (do, q)
-rest: Atom = (_, q)
-chord: Atom = ([do, mi], q)
-top: [Atom] = [note, note]
-bot: [Atom] = [rest, chord]
-song: Music = [top, bot]
-
-```
-
-##### music.ans:
-
-```
-
-
-```
-
-##### Testing music operations: musicop.aps
-
-```
-A4 + 1
-A4 - 1
-A4 * 2
-A4 / 2
-A4 % 2
-A4 == 1
-A4 != 1
-A4 < 1
-A4 > 1
-A4 <= 1
-A4 >= 1
-
-A4 + True
-A4 - True
-A4 * True
-A4 / True
-A4 % True
-A4 == True
-A4 != True
-A4 < True
-A4 > True
-A4 <= True
-A4 >= True
-
-A4 + A4
-A4 - A4
-A4 * A4
-A4 / A4
-A4 % A4
-A4 == A4
-A4 != A3
-A4 < A5
-A4 > A3
-A4 <= A4
-A4 >= A4
-
-A4 + \4
-A4 - \4
-A4 * \4
-A4 / \4
-A4 % \4
-A4 == \4
-A4 != \4
-A4 < \4
-A4 > \4
-A4 <= \4
-A4 >= \4
-
-A4 + [1]
-A4 - [1]
-A4 * [1]
-A4 / [1]
-A4 % [1]
-A4 == [1]
-A4 != [1]
-A4 < [1]
-A4 > [1]
-A4 <= [1]
-A4 >= [1]
-
-
-\4 + 1
-\4 - 1
-\4 * 2
-\4 / 2
-\4 % 2
-\4 == 1
-\4 != 1
-\4 < 1
-\4 > 1
-\4 <= 1
-\4 >= 1
-
-\4 + True
-\4 - True
-\4 * True
-\4 / True
-\4 % True
-\4 == True
-\4 != True
-\4 < True
-\4 > True
-\4 <= True
-\4 >= True
-
-\4 + A4
-\4 - A4
-\4 * A4
-\4 / A4
-\4 % A4
-\4 == A4
-\4 != A4
-\4 < A4
-\4 > A4
-\4 <= A4
-\4 >= A4
-
-\4 + \4
-\2 - \4
-\4 * \4
-\4 / \4
-\4 % \4
-\4 == \4
-\4 != \3
-\4 < \3
-\4 > \8
-\4 <= \4
-\4 >= \4
-
-\4 + [1]
-\4 - [1]
-\4 * [1]
-\4 / [1]
-\4 % [1]
-\4 == [1]
-\4 != [1]
-\4 < [1]
-\4 > [1]
-\4 <= [1]
-\4 >= [1]
-
-```
-
-##### musicop.ans:
-
-```
-(70)
-(68)
-Type error: Pitch and Int are wrong operand types for `*`
-Type error: Pitch and Int are wrong operand types for `/`
-Type error: Pitch and Int are wrong operand types for `%`
-Type error: Pitch and Int are wrong operand types for `==`
-Type error: Pitch and Int are wrong operand types for `!=`
-Type error: Pitch and Int are wrong operand types for `<`
-Type error: Pitch and Int are wrong operand types for `>`
-Type error: Pitch and Int are wrong operand types for `<=`
-Type error: Pitch and Int are wrong operand types for `>=`
-
-Type error: Pitch and Bool are wrong operand types for `+`
-Type error: Pitch and Bool are wrong operand types for `-`
-Type error: Pitch and Bool are wrong operand types for `*`
-Type error: Pitch and Bool are wrong operand types for `/`
-Type error: Pitch and Bool are wrong operand types for `%`
-Type error: Pitch and Bool are wrong operand types for `==`
-Type error: Pitch and Bool are wrong operand types for `!=`
-Type error: Pitch and Bool are wrong operand types for `<`
-Type error: Pitch and Bool are wrong operand types for `>`
-Type error: Pitch and Bool are wrong operand types for `<=`
-Type error: Pitch and Bool are wrong operand types for `>=`
-
-Type error: Pitch and Pitch are wrong operand types for `+`
-Type error: Pitch and Pitch are wrong operand types for `-`
-Type error: Pitch and Pitch are wrong operand types for `*`
-Type error: Pitch and Pitch are wrong operand types for `/`
-Type error: Pitch and Pitch are wrong operand types for `%`
-True
-True
-True
-True
-True
-True
-
-Type error: Pitch and Duration are wrong operand types for `+`
-Type error: Pitch and Duration are wrong operand types for `-`
-Type error: Pitch and Duration are wrong operand types for `*`
-Type error: Pitch and Duration are wrong operand types for `/`
-Type error: Pitch and Duration are wrong operand types for `%`
-Type error: Pitch and Duration are wrong operand types for `==`
-Type error: Pitch and Duration are wrong operand types for `!=`
-Type error: Pitch and Duration are wrong operand types for `<`
-Type error: Pitch and Duration are wrong operand types for `>`
-Type error: Pitch and Duration are wrong operand types for `<=`
-Type error: Pitch and Duration are wrong operand types for `>=`
-
-Type error: Pitch and [Int] are wrong operand types for `+`
-Type error: Pitch and [Int] are wrong operand types for `-`
-Type error: Pitch and [Int] are wrong operand types for `*`
-Type error: Pitch and [Int] are wrong operand types for `/`
-Type error: Pitch and [Int] are wrong operand types for `%`
-Type error: Pitch and [Int] are wrong operand types for `==`
-Type error: Pitch and [Int] are wrong operand types for `!=`
-Type error: Pitch and [Int] are wrong operand types for `<`
-Type error: Pitch and [Int] are wrong operand types for `>`
-Type error: Pitch and [Int] are wrong operand types for `<=`
-Type error: Pitch and [Int] are wrong operand types for `>=`
-
-
-Type error: Duration and Int are wrong operand types for `+`
-Type error: Duration and Int are wrong operand types for `-`
-(32)
-(8)
-Type error: Duration and Int are wrong operand types for `%`
-Type error: Duration and Int are wrong operand types for `==`
-Type error: Duration and Int are wrong operand types for `!=`
-Type error: Duration and Int are wrong operand types for `<`
-Type error: Duration and Int are wrong operand types for `>`
-Type error: Duration and Int are wrong operand types for `<=`
-Type error: Duration and Int are wrong operand types for `>=`
-
-Type error: Duration and Bool are wrong operand types for `+`
-Type error: Duration and Bool are wrong operand types for `-`
-Type error: Duration and Bool are wrong operand types for `*`
-Type error: Duration and Bool are wrong operand types for `/`
-Type error: Duration and Bool are wrong operand types for `%`
-Type error: Duration and Bool are wrong operand types for `==`
-Type error: Duration and Bool are wrong operand types for `!=`
-Type error: Duration and Bool are wrong operand types for `<`
-Type error: Duration and Bool are wrong operand types for `>`
-Type error: Duration and Bool are wrong operand types for `<=`
-Type error: Duration and Bool are wrong operand types for `>=`
-
-Type error: Duration and Pitch are wrong operand types for `+`
-Type error: Duration and Pitch are wrong operand types for `-`
-Type error: Duration and Pitch are wrong operand types for `*`
-Type error: Duration and Pitch are wrong operand types for `/`
-Type error: Duration and Pitch are wrong operand types for `%`
-Type error: Duration and Pitch are wrong operand types for `==`
-Type error: Duration and Pitch are wrong operand types for `!=`
-Type error: Duration and Pitch are wrong operand types for `<`
-Type error: Duration and Pitch are wrong operand types for `>`
-Type error: Duration and Pitch are wrong operand types for `<=`
-Type error: Duration and Pitch are wrong operand types for `>=`
-
-(32)
-(16)
-Type error: Duration and Duration are wrong operand types for `*`
-Type error: Duration and Duration are wrong operand types for `/`
-Type error: Duration and Duration are wrong operand types for `%`
-True
-True
-True
-True
-True
-True
-
-Type error: Duration and [Int] are wrong operand types for `+`
-Type error: Duration and [Int] are wrong operand types for `-`
-Type error: Duration and [Int] are wrong operand types for `*`
-Type error: Duration and [Int] are wrong operand types for `/`
-Type error: Duration and [Int] are wrong operand types for `%`
-Type error: Duration and [Int] are wrong operand types for `==`
-Type error: Duration and [Int] are wrong operand types for `!=`
-Type error: Duration and [Int] are wrong operand types for `<`
-Type error: Duration and [Int] are wrong operand types for `>`
-Type error: Duration and [Int] are wrong operand types for `<=`
-Type error: Duration and [Int] are wrong operand types for `>=`
-
-```
-
-##### Testing type checking in operatios: optypecheck.aps
-
-```
-1 + False
-[1,2,1]
-[1, True]
-[[1], [1]]
-[[1], [True]]
-{1}
-case (True) 1 otherwise 42
-case (1) 1 otherwise 2
-case (True) 1 otherwise False
-!(True)
-!(1 + 3)
--(True)
-True && False
-(True && False) || 1
-1 == 1
-1 != 1
-a: Int = True
-
-```
-
-##### optypecheck.ans:
-
-```
-Type error: Int and Bool are wrong operand types for `+`
-[1,2,1]
-Type error: "list is irregular"
-[[1],[1]]
-Type error: "list is irregular"
-1
-1
-Type error: "If: bool-cond not bool"
-Type error: "If: case mismatch"
-False
-Type error: Int is wrong operand type for unary `!`
-Type error: Bool is wrong operand type for unary `-`
-False
-Type error: Bool and Int are wrong operand types for `||`
-True
-False
-Type error: definition of Int, but assigned to Bool
-
-```
-
-##### Testing pitch modifications: pitchmod.aps
-
-```
-C9 + 7
-C9 + 8
-A4 - 70
-{b where b: Pitch = -1}
-
-```
-
-##### pitchmod.ans:
-
-```
-(127)
-(0)
-(127)
-(127)
-
-```
-
-##### Testing operator precedence: precedence.aps
-
-```
-1 + 2
--(1 + 1)
-4 - 3 + 1
-4 - (3 + 1)
-6 / 3 * 2
-6 / (3 * 2)
-16 / 3 + 5 * 2
-16 / (3 + 5) * 2
-16 / ((3 + 5) * 2)
-16 % 4 + 2
-
-```
-
-##### precedence.ans:
-
-```
-3
--2
-2
-0
-4
-1
-15
-4
-1
-2
-
-```
-
-##### Testing prelude functions: prelude.ap
-
-```
-filterI(\x: Int -> Bool: x > 10, [5,10,50,100,150,200])
-foldrII(\x: Int, y: Int -> Int: x + y, 0, [1,2,3,4,5,6,7,8,9,10])
-sumI([1,2,3,4,5,6,7,8,9,10])
-mapIB(\x: Int -> Bool: x == 20, [1,20, 3,4,5, 20])
-sequence(1, 20)
-lengthI(sequence(0,10))
-lastI([1,2,3])
-intercalateI([1,3,5], [2,4,6])
-
-```
-
-##### prelude.ans:
-
-```
-[50,100,150,200]
-55
-55
-[False,True,False,False,False,True]
-[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
-10
-3
-[1,2,3,4,5,6]
-
-```
-
-##### Testing recursive functions: recursion.ap
-
-```
-fib: (n: Int) -> Int = case (n <= 1) n otherwise fib(n - 1) + fib(n - 2)
-fib(10)
-
-factorial: (n: Int) -> Int =
-    case (n == 0) 1 otherwise n * factorial(n - 1)
-factorial(6)
-
-```
-
-##### recursion.ans:
-
-```
-55
-720
-
-```
-
-##### Testing redefining variables: redefine.ap
-
-```
-a: Int = 3
-a: Int = 4
-
-```
-
-##### redefine.ans:
-
-```
-Multiple declaration: redefining variable a
-
-```
-
-##### Testing scoping: scope.ap
-
-```
-a: Int = 1
-f: (a: Int) -> Int = a
-f(2)
-
-b: Int = 1
-[{ b where b: Int = 10}, b]
-
-{ { a where a: Int = 1 } where a: Int = 2 }
-
-c: Int = 22
-{ c + d where d: Int = 20 }
-
-```
-
-##### scope.ans:
-
-```
-2
-[10, 1]
-1
-42
-
-```
-
-##### Testing scoping errors: scope_err.aps
-
-```
-{ 1 where a: Int = 2 } a
-{ 1 where a: Int = A4 }
-{ 1 where a: Int = 2 a: Int = 2}
-
-```
-
-##### scope_err.ans:
-
-```
-Getting an unbound variable: a
-Type error: definition of Int, but assigned to Pitch
-Multiple declaration: redefining variable a
-
-```
-
-##### Testing syntax AST: syntax.ap
-
-```
-case (!(False && True)) 3 + 1 otherwise 0
-
-```
-
-##### syntax.ast:
-
-```
-[(If (Not (&& False True)) (+ 3 1) 0)]
-
-```
-
-##### Testing type checking: typecheck.aps
-
-```
-a: Int = 1
-a: Int = True
-a: Int = A4
-a: Int = \4
-a: Int = (A4, \4)
-a: Int = [1]
-a: Int = [[(A4,\4)]]
-
-a: Bool = 1
-a: Bool = True
-a: Bool = A4
-a: Bool = \4
-a: Bool = (A4, \4)
-a: Bool = [1]
-a: Bool = [[(A4,\4)]]
-
-a: Pitch = 1
-a: Pitch = True
-a: Pitch = A4
-a: Pitch = \4
-a: Pitch = (A4, \4)
-a: Pitch = [1]
-a: Pitch = [[(A4,\4)]]
-
-
-a: Duration = True
-a: Duration = A4
-a: Duration = \4
-a: Duration = (A4, \4)
-a: Duration = [1]
-a: Duration = [[(A4,\4)]]
-
-a: Atom = 1
-a: Atom = True
-a: Atom = A4
-a: Atom = \4
-a: Atom = (A4, \4)
-a: Atom = [1]
-a: Atom = [[(A4,\4)]]
-
-a: Music = 1
-a: Music = True
-a: Music = A4
-a: Music = \4
-a: Music = (A4, \4)
-a: Music = [1]
-a: Music = [[(A4,\4)]]
-
-#tempo 1
-#tempo True
-#tempo A4
-#tempo \4
-#tempo (A4, \4)
-#tempo [1]
-#tempo [[(A4,\4)]]
-
-a: [Int] = 1
-a: [Int] = True
-a: [Int] = A4
-a: [Int] = \4
-a: [Int] = (A4, \4)
-a: [Int] = [1]
-a: [Int] = [[(A4,\4)]]
-
-```
-
-##### typecheck.ans:
-
-```
-
-Type error: definition of Int, but assigned to Bool
-Type error: definition of Int, but assigned to Pitch
-Type error: definition of Int, but assigned to Duration
-Type error: definition of Int, but assigned to Atom
-Type error: definition of Int, but assigned to [Int]
-Type error: definition of Int, but assigned to [[Atom]]
-
-Type error: definition of Bool, but assigned to Int
-
-Type error: definition of Bool, but assigned to Pitch
-Type error: definition of Bool, but assigned to Duration
-Type error: definition of Bool, but assigned to Atom
-Type error: definition of Bool, but assigned to [Int]
-Type error: definition of Bool, but assigned to [[Atom]]
-
-
-Type error: definition of Pitch, but assigned to Bool
-
-Type error: definition of Pitch, but assigned to Duration
-Type error: definition of Pitch, but assigned to Atom
-Type error: definition of Pitch, but assigned to [Int]
-Type error: definition of Pitch, but assigned to [[Atom]]
-
-Type error: definition of Duration, but assigned to Int
-Type error: definition of Duration, but assigned to Bool
-Type error: definition of Duration, but assigned to Pitch
-
-Type error: definition of Duration, but assigned to Atom
-Type error: definition of Duration, but assigned to [Int]
-Type error: definition of Duration, but assigned to [[Atom]]
-
-Type error: definition of Atom, but assigned to Int
-Type error: definition of Atom, but assigned to Bool
-Type error: definition of Atom, but assigned to Pitch
-Type error: definition of Atom, but assigned to Duration
-
-Type error: definition of Atom, but assigned to [Int]
-Type error: definition of Atom, but assigned to [[Atom]]
-
-Type error: definition of Music, but assigned to Int
-Type error: definition of Music, but assigned to Bool
-Type error: definition of Music, but assigned to Pitch
-Type error: definition of Music, but assigned to Duration
-Type error: definition of Music, but assigned to Atom
-Type error: definition of Music, but assigned to [Int]
-
-
-
-Type error: definition of Int, but assigned to Bool
-Type error: definition of Int, but assigned to Pitch
-Type error: definition of Int, but assigned to Duration
-Type error: definition of Int, but assigned to Atom
-Type error: definition of Int, but assigned to [Int]
-Type error: definition of Int, but assigned to [[Atom]]
-
-Type error: definition of [Int], but assigned to Int
-Type error: definition of [Int], but assigned to Bool
-Type error: definition of [Int], but assigned to Pitch
-Type error: definition of [Int], but assigned to Duration
-Type error: definition of [Int], but assigned to Atom
-
-Type error: definition of [Int], but assigned to [[Atom]]
-```
-
-##### Testing type checking in functions: typecheckfunc.aps
-
-```
-f: (n: Int) -> Int = { a where a: Pitch = A4 }
-f: (n: Pitch) -> Int = { a where a: Int = 4 } f(4)
-f: (n: Int) -> Int = { a where a: Int = True }
-
-```
-
-##### typecheckfunc.ans:
-
-```
-Type error: `f` defined with return-type of Int, but actual return-type is (Int) -> Int
-expected args: [Pitch]; actual: [Int] for f
-Type error: definition of Int, but assigned to Bool
-
-```
-
-##### Testing cc variables: unbound.ap
-
-```
-a: Int = 1
-a
-b
-
-```
-
-##### unbound.ans:
-
-```
-Getting an unbound variable: b
-
-```
-
-##### Testing unary operations: unop.aps
-
-```
--2
-!False
-h@[1,2,3]
-t@[1,2,3]
-
-```
-
-##### unop.ast:
-
-```
--2
-True
-1
-[2,3]
-
-```
-
-##### Testing variable manipulation: vars.ap
-
-```
-a: Int = 1
-a
-a + 3
-b: Bool = False
-b
-b || True
-b && True
-c: Int = a + 5
-c
-[a, c - 4]
-
-```
-
-##### vars.ast:
-
-```
-1
-4
-False
-True
-False
-6
-[1,2]
-
-```
+![](./img/testfail.png)
 
 Conclusions
 ===========
@@ -3300,6 +2129,32 @@ As far as practical takeaways, you can never start early enough. That said, star
 
 ### Javier Llaca
 
+Working on Apollo was very rewarding. Designing and building a compiler seemed
+like an incredibly daunting task at the beginning of the semester. However,
+working incrementally allowed me to understand the complex system that we were
+building and in turn make smarter design decisions. Finishing early version of
+the lexer and parser gave me enough time to make changes and polish the
+front-end as much as possible.
+
+Working with Haskell was a blast. Although I had played around with it
+before PLT, using Haskell to build Apollo proved to be an exciting challenge
+and an amazing learning experience. Haskell itself taught me a lot about
+language design and forced me to think very closely about how I program in
+general.
+
+I was extremely happy with our team. Although we had several debates on
+important decision for the language, we ended up getting along really well by
+the end of the semester. Working together was really fun and time flew by
+during late-night coding sessions. Before PLT, I had mostly worked on software
+projects individually, so learning to work collaboratively is probably one of
+the biggest takeaways that I'll get from this class.
+
+Perhaps the most exciting part of this project was seeing Apollo in action once
+all the parts of our project started to come together. The experience of
+writing our first Apollo programs and listening to the cool music that could be
+written with it was super exciting. I think I speak for all of us when I say
+that there are few things as empowering as writing music with a tool that was
+built from the ground up in only a couple of months.
 
 ### Reza Nayebi
 
@@ -5088,9 +3943,1273 @@ randomRange a b = head . randomRs (a, b) . mkStdGen $ 13128930232
 
 ```
 
+Appendix B: Test script and files
+=================================
+
+The following screen capture displays a typical script output:
+
+Test script
+-----------
+
+### Run.sh
+
+``` bash
+#!/usr/bin/env bash
+
+os=$(uname -s)
+indent="  "
+quiet=0
+exit_status=0
+compile_error=0
+
+# Several functions to print strings with colors
+green() {
+  printf "${indent}\033[0;32m%s\033[0m %s\n" "$1" "$2"
+}
+
+yellow() {
+  printf "${indent}\033[0;33m%s\033[0m %s\n" "$1" "$2"
+}
+
+red() {
+  printf "${indent}\033[0;31m%s\033[0m %s\n" "$1" "$2"
+}
+
+error () {
+  {
+    printf "${indent}%s\n" "$@"
+  } >&2
+}
+
+# Simple help interface
+usage() {
+  echo
+  echo "${indent}Description: run all integration tests"
+  echo
+  echo "${indent}Usage: run.sh [-qh]"
+  echo
+  echo "${indent}Options:"
+  echo
+  echo "${indent}  -q, --quiet           suppress error messages"
+  echo "${indent}  -h, --help            output help and usage"
+  echo
+}
+
+# Eval for normal AP files: redirects the file into apollo
+evaluate() {
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
+
+  ../apollo $2 < "$1" 2> /dev/null
+
+  # if Apollo exits with 1 something severe happened!
+  if test $? -eq 1; then
+    echo "<compilation error>"
+  fi
+}
+
+# Eval for APS: it echos the line to be tested and pipes it into apollo
+evalAPS() {
+  # Stop execution exceeding 10 seconds to prevent infinite loops
+  ulimit -t 10
+
+  echo "$1" | ../apollo - $2 2> /dev/null
+
+  if test $? -eq 1; then
+    echo "<compilation error>"
+  fi
+}
+
+# Function that compares the apollo result against the expected result
+compare() {
+  diff -Bw <(echo "${1}") <(echo "${2}")
+}
+
+printr() {
+  while read -r line; do
+      red "  $line"
+  done <<< "$1"
+}
+
+# The main function that deals with checking files and treating them
+# according to their extensions:
+# .ap: normal Apollo source file
+# .aps: source file where each input line must be tested separately
+# .ans: normal answer file (file containing the expected answer)
+# .ast: file containing a program's AST instead of the normal answer
+check() {
+  if test "$os" == "Darwin"; then
+    local pass=""
+    local warn=""
+    local fail=""
+  else
+    local pass="PASS "
+    local warn="WARN "
+    local fail="FAIL "
+  fi
+
+  local test=${1}
+  local ast=0
+  local aps=0
+  if [[ $test == *".aps" ]]; then
+    local answ=${test/.aps/.ans}
+    local name=${1/.aps/}
+    if test ! -e "$answ"; then
+      # If in .ast mode (.ast answer file) compare the source against its AST
+      local answ=${test/.aps/.ast}
+      local ast=1
+    fi
+    # Flag sets .aps mode
+    local aps=1
+  else
+    local answ=${test/.ap/.ans}
+    local name=${1/.ap/}
+    if test ! -e "$answ"; then
+      local answ=${test/.ap/.ast}
+      local ast=1
+    fi
+  fi
+
+  if test ! -e "$answ"; then
+    yellow "$warn $name" "(no answer file)"
+    return 0
+  fi
+
+  if test $aps -eq 1; then
+    # In .aps mode, each line is read and interpreted individually.
+    local lineno=0
+    while read -r line; do
+      if test -z "$line"; then
+        # If a line in the test file is empty, it is ignored (as
+        # well as the respective line in the ans file)
+        let lineno=lineno+1
+        continue
+      fi
+      # Keep track of line numbers to extract them from the answer file
+      let lineno=lineno+1
+
+      if test "$ast" -eq 1; then
+        local interp=$(evalAPS "$line" --ast)
+      else
+        local interp=$(evalAPS "$line")
+      fi
+
+      # awk helps us grab the appropriate line from the ans file
+      local answer=$(awk "NR==$lineno" "$answ")
+      local result=$(compare "$interp" "$answer")
+      if test -n "$result"; then
+      # If line generates an error, test stops and no further lines are tested
+        break
+      fi
+    done < "$test"
+  else
+    # Much simpler testing when we deal with the whole source file
+    if test "$ast" -eq 1; then
+      local interp=$(evaluate $test --ast)
+    else
+      local interp=$(evaluate $test -)
+    fi
+
+    local answer=$(cat $answ)
+    local result=$(compare "$interp" "$answer")
+  fi
+
+  local divider=$(printf '~%.0s' {1..68})
+
+  if test -n "$result"; then
+    red "$fail $name" "($test $answ)"
+    if test $quiet -eq 0; then
+    # If the script is run with -q (quiet) the error message is not printed
+      red
+      if test $aps -eq 1; then
+        # If running in aps mode, print the line where the error happened
+        red "  Error in line: $lineno"
+      fi
+      red "  $divider"
+      printr "$result"
+      red "  $divider"
+      red
+    fi
+    return 1
+  else
+    green "$pass $name" "($test $answ)"
+    return 0
+  fi
+}
+
+handle_flags() {
+  case "$1" in
+    -q|--quiet)
+      quiet=1
+      ;;
+
+    -h|--help)
+      usage
+      exit 0
+      ;;
+
+    *)
+      if test ! -z "$1"; then
+        error "Unknown option: $1"
+        exit 1
+      fi
+      ;;
+  esac
+}
+
+# cd to test directory if not already there
+change_dir_if_necessary() {
+  local cwd=$(basename $(pwd))
+  local test_dir="tests"
+
+  if test ! "$cwd" = "$test_dir"; then
+    cd "$test_dir"
+  fi
+}
+
+# Function that lists files with appropriate extensions in tests directory
+# and sends them to be processed
+run_tests() {
+  local tests=$(ls *.ap *.aps)
+  echo
+
+  for test in $tests; do
+    check $test
+    if test $? -eq 1; then
+      # If exit status is != 0, store it so that later script exits in error
+      exit_status=1
+    fi
+  done
+
+  echo
+}
+
+main() {
+  handle_flags $@
+  change_dir_if_necessary
+  run_tests
+}
+
+main $@
+exit $exit_status
+```
+
+## Test files
+
+### Testing binary operations: binop.aps
+
+```
+1 + 0
+3 - 1
+2 * 2
+2 * -2
+10 / 2
+10 % 7
+1 == 2
+1 != 2
+1 < 2
+1 > 2
+3 <= 4
+2 >= 2
+True && False
+True || False
+1 :: [2, 3, 4]
+
+```
+
+### binop.ans:
+
+```
+1
+2
+4
+-4
+5
+3
+False
+True
+True
+False
+True
+True
+False
+True
+[1, 2, 3, 4]
+
+```
+
+### Testing block operations: block.ap
+
+```
+f: (m: Int) -> Int = {
+    g(m, 4)
+    where
+        g: (x: Int, y: Int) -> Int = x + y
+}
+
+foo: Int = {
+    length * bar
+    where
+        length: Int = 5
+        bar: Int = 4
+}
+
+cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
+    sideArea + circleArea
+    where
+        sideArea: Int = b * h
+        circleArea: Int = {
+            2 * pi * r * r
+            where
+                pi: Int = 3
+        }
+}
+
+f(5)
+foo
+cylinderVolume(2, 3, 4)
+
+```
+
+### block.ans:
+
+```
+9
+20
+36
+
+```
+
+### Testing multi line and single line comments: comment.ap
+
+```
+{-  f: (m: Int) -> Int = {
+    g(m, 4)
+    where
+      g: (x: Int, y: Int) -> Int = x + y
+  }
+
+  foo: Int = {
+    length * bar
+    where
+      length: Int = 5
+      bar: Int = 4
+  }
+
+  cylinderVolume: (r: Int, b: Int, h: Int) -> Int = {
+    sideArea + circleArea
+    where
+      sideArea: Int = b * h
+      circleArea: Int = {
+        2 * pi * r * r
+        where
+          pi: Int = 3
+      }
+  } -}
+10 -- test
+--  f(5)
+--  foo
+--  cylinderVolume(2, 3, 4)
+
+```
+
+### comment.ans:
+
+```
+10
+```
+
+### Testing conditionals: cond.ap
+
+```
+case (False) 1 otherwise 2
+case (False) 1 case (True) 2 otherwise 3
+case (False) 1 case (False) 2 otherwise 3
+
+```
+
+### cond.ans:
+
+```
+2
+2
+3
+
+```
+
+### Testing division by zero: divbyzero.aps
+
+```
+4 / 0
+10 / (6 - 3 * 2)
+4 % 0
+
+```
+
+### divbyzero.ans:
+
+```
+Zero-division error: division or modulo by zero
+Zero-division error: division or modulo by zero
+Zero-division error: division or modulo by zero
+
+```
+
+### Testing first class functions: firstclass.ap
+
+```
+twice: (f: (Int) -> Int, x: Int) -> Int = f(f(x))
+f: (n: Int) -> Int = n * n
+twice(f, 2)
+
+myMap: (f: (Int) -> Int, a: [Int]) -> [Int] = case (!a) [] otherwise f(h@a) :: myMap(f, t@a)
+square: (a: Int) -> Int = a * a
+myMap(square, [1,2,3,4,5])
+
+pow4: (x: Int) -> Int = twice(square, x)
+pow4(5)
+
+```
+
+### firstclass.ans:
+
+```
+16
+[1,4,9,16,25]
+625
+
+```
+
+### Testing functions: functions.ap
+
+```
+square: (x: Int) -> Int = x * x
+
+square(5)
+
+```
+
+### functions.ans:
+
+```
+25
+
+```
+
+### Testing lambdas: lambda.ap
+
+```
+-- | bound vars
+mapII(\x: Int -> Int: x * x, [1,2,3,4,5])
+
+-- | free & bound vars
+y: Int = 3
+mapII(\x: Int -> Int: x * y, [1,2,3,4,5])
+
+```
+
+### lambda.ans:
+
+```
+[1,4,9,16,25]
+
+[3,6,9,12,15]
+
+```
+
+### Testing lists: list.aps
+
+```
+t@[]
+h@[]
+[1,A4]
+[[1],[A4]]
+[[],[2]]
+h@[[1],[2],[3]]
+t@[[1],[2],[3]]
+[[2],[3]] == [[2],[3]]
+[] != []
+
+```
+
+### list.ans:
+
+```
+Type error: [] is wrong operand type for unary `t@`
+Type error: [] is wrong operand type for unary `h@`
+[(1),(69)]
+Type error: "list is irregular"
+Type error: "list is irregular"
+[1]
+[[2],[3]]
+True
+False
+
+```
+
+### Testing literals: literal.aps
+
+```
+A4
+\4
+(A4, \4)
+(69, \4)
+(A4, 16)
+(_, \4)
+
+```
+
+### literal.ans:
+
+```
+(69)
+(16)
+(Atom (69) (16))
+(Atom (69) (16))
+(Atom (69) (16))
+(Atom Nil (16))
+
+```
+
+### Testing Boolean logic: logic.aps
+
+```
+(1 < 2) || (1 > 2)
+(1 < 2) || ((1 > 2) && True)
+(1 == 1) && ! True
+True && ! False
+(3 <= 3) && (3 >= 4)
+True && (True || False)
+
+```
+
+### logic.ans:
+
+```
+True
+True
+False
+True
+False
+True
+
+```
+
+### Testing music parts: music.ap
+
+```
+do: Pitch = C4
+mi: Pitch = E4
+q: Duration = \4
+note: Atom = (do, q)
+rest: Atom = (_, q)
+chord: Atom = ([do, mi], q)
+top: [Atom] = [note, note]
+bot: [Atom] = [rest, chord]
+song: Music = [top, bot]
+
+```
+
+### music.ans:
+
+```
+
+
+```
+
+### Testing music operations: musicop.aps
+
+```
+A4 + 1
+A4 - 1
+A4 * 2
+A4 / 2
+A4 % 2
+A4 == 1
+A4 != 1
+A4 < 1
+A4 > 1
+A4 <= 1
+A4 >= 1
+
+A4 + True
+A4 - True
+A4 * True
+A4 / True
+A4 % True
+A4 == True
+A4 != True
+A4 < True
+A4 > True
+A4 <= True
+A4 >= True
+
+A4 + A4
+A4 - A4
+A4 * A4
+A4 / A4
+A4 % A4
+A4 == A4
+A4 != A3
+A4 < A5
+A4 > A3
+A4 <= A4
+A4 >= A4
+
+A4 + \4
+A4 - \4
+A4 * \4
+A4 / \4
+A4 % \4
+A4 == \4
+A4 != \4
+A4 < \4
+A4 > \4
+A4 <= \4
+A4 >= \4
+
+A4 + [1]
+A4 - [1]
+A4 * [1]
+A4 / [1]
+A4 % [1]
+A4 == [1]
+A4 != [1]
+A4 < [1]
+A4 > [1]
+A4 <= [1]
+A4 >= [1]
+
+
+\4 + 1
+\4 - 1
+\4 * 2
+\4 / 2
+\4 % 2
+\4 == 1
+\4 != 1
+\4 < 1
+\4 > 1
+\4 <= 1
+\4 >= 1
+
+\4 + True
+\4 - True
+\4 * True
+\4 / True
+\4 % True
+\4 == True
+\4 != True
+\4 < True
+\4 > True
+\4 <= True
+\4 >= True
+
+\4 + A4
+\4 - A4
+\4 * A4
+\4 / A4
+\4 % A4
+\4 == A4
+\4 != A4
+\4 < A4
+\4 > A4
+\4 <= A4
+\4 >= A4
+
+\4 + \4
+\2 - \4
+\4 * \4
+\4 / \4
+\4 % \4
+\4 == \4
+\4 != \3
+\4 < \3
+\4 > \8
+\4 <= \4
+\4 >= \4
+
+\4 + [1]
+\4 - [1]
+\4 * [1]
+\4 / [1]
+\4 % [1]
+\4 == [1]
+\4 != [1]
+\4 < [1]
+\4 > [1]
+\4 <= [1]
+\4 >= [1]
+
+```
+
+### musicop.ans:
+
+```
+(70)
+(68)
+Type error: Pitch and Int are wrong operand types for `*`
+Type error: Pitch and Int are wrong operand types for `/`
+Type error: Pitch and Int are wrong operand types for `%`
+Type error: Pitch and Int are wrong operand types for `==`
+Type error: Pitch and Int are wrong operand types for `!=`
+Type error: Pitch and Int are wrong operand types for `<`
+Type error: Pitch and Int are wrong operand types for `>`
+Type error: Pitch and Int are wrong operand types for `<=`
+Type error: Pitch and Int are wrong operand types for `>=`
+
+Type error: Pitch and Bool are wrong operand types for `+`
+Type error: Pitch and Bool are wrong operand types for `-`
+Type error: Pitch and Bool are wrong operand types for `*`
+Type error: Pitch and Bool are wrong operand types for `/`
+Type error: Pitch and Bool are wrong operand types for `%`
+Type error: Pitch and Bool are wrong operand types for `==`
+Type error: Pitch and Bool are wrong operand types for `!=`
+Type error: Pitch and Bool are wrong operand types for `<`
+Type error: Pitch and Bool are wrong operand types for `>`
+Type error: Pitch and Bool are wrong operand types for `<=`
+Type error: Pitch and Bool are wrong operand types for `>=`
+
+Type error: Pitch and Pitch are wrong operand types for `+`
+Type error: Pitch and Pitch are wrong operand types for `-`
+Type error: Pitch and Pitch are wrong operand types for `*`
+Type error: Pitch and Pitch are wrong operand types for `/`
+Type error: Pitch and Pitch are wrong operand types for `%`
+True
+True
+True
+True
+True
+True
+
+Type error: Pitch and Duration are wrong operand types for `+`
+Type error: Pitch and Duration are wrong operand types for `-`
+Type error: Pitch and Duration are wrong operand types for `*`
+Type error: Pitch and Duration are wrong operand types for `/`
+Type error: Pitch and Duration are wrong operand types for `%`
+Type error: Pitch and Duration are wrong operand types for `==`
+Type error: Pitch and Duration are wrong operand types for `!=`
+Type error: Pitch and Duration are wrong operand types for `<`
+Type error: Pitch and Duration are wrong operand types for `>`
+Type error: Pitch and Duration are wrong operand types for `<=`
+Type error: Pitch and Duration are wrong operand types for `>=`
+
+Type error: Pitch and [Int] are wrong operand types for `+`
+Type error: Pitch and [Int] are wrong operand types for `-`
+Type error: Pitch and [Int] are wrong operand types for `*`
+Type error: Pitch and [Int] are wrong operand types for `/`
+Type error: Pitch and [Int] are wrong operand types for `%`
+Type error: Pitch and [Int] are wrong operand types for `==`
+Type error: Pitch and [Int] are wrong operand types for `!=`
+Type error: Pitch and [Int] are wrong operand types for `<`
+Type error: Pitch and [Int] are wrong operand types for `>`
+Type error: Pitch and [Int] are wrong operand types for `<=`
+Type error: Pitch and [Int] are wrong operand types for `>=`
+
+
+Type error: Duration and Int are wrong operand types for `+`
+Type error: Duration and Int are wrong operand types for `-`
+(32)
+(8)
+Type error: Duration and Int are wrong operand types for `%`
+Type error: Duration and Int are wrong operand types for `==`
+Type error: Duration and Int are wrong operand types for `!=`
+Type error: Duration and Int are wrong operand types for `<`
+Type error: Duration and Int are wrong operand types for `>`
+Type error: Duration and Int are wrong operand types for `<=`
+Type error: Duration and Int are wrong operand types for `>=`
+
+Type error: Duration and Bool are wrong operand types for `+`
+Type error: Duration and Bool are wrong operand types for `-`
+Type error: Duration and Bool are wrong operand types for `*`
+Type error: Duration and Bool are wrong operand types for `/`
+Type error: Duration and Bool are wrong operand types for `%`
+Type error: Duration and Bool are wrong operand types for `==`
+Type error: Duration and Bool are wrong operand types for `!=`
+Type error: Duration and Bool are wrong operand types for `<`
+Type error: Duration and Bool are wrong operand types for `>`
+Type error: Duration and Bool are wrong operand types for `<=`
+Type error: Duration and Bool are wrong operand types for `>=`
+
+Type error: Duration and Pitch are wrong operand types for `+`
+Type error: Duration and Pitch are wrong operand types for `-`
+Type error: Duration and Pitch are wrong operand types for `*`
+Type error: Duration and Pitch are wrong operand types for `/`
+Type error: Duration and Pitch are wrong operand types for `%`
+Type error: Duration and Pitch are wrong operand types for `==`
+Type error: Duration and Pitch are wrong operand types for `!=`
+Type error: Duration and Pitch are wrong operand types for `<`
+Type error: Duration and Pitch are wrong operand types for `>`
+Type error: Duration and Pitch are wrong operand types for `<=`
+Type error: Duration and Pitch are wrong operand types for `>=`
+
+(32)
+(16)
+Type error: Duration and Duration are wrong operand types for `*`
+Type error: Duration and Duration are wrong operand types for `/`
+Type error: Duration and Duration are wrong operand types for `%`
+True
+True
+True
+True
+True
+True
+
+Type error: Duration and [Int] are wrong operand types for `+`
+Type error: Duration and [Int] are wrong operand types for `-`
+Type error: Duration and [Int] are wrong operand types for `*`
+Type error: Duration and [Int] are wrong operand types for `/`
+Type error: Duration and [Int] are wrong operand types for `%`
+Type error: Duration and [Int] are wrong operand types for `==`
+Type error: Duration and [Int] are wrong operand types for `!=`
+Type error: Duration and [Int] are wrong operand types for `<`
+Type error: Duration and [Int] are wrong operand types for `>`
+Type error: Duration and [Int] are wrong operand types for `<=`
+Type error: Duration and [Int] are wrong operand types for `>=`
+
+```
+
+### Testing type checking in operatios: optypecheck.aps
+
+```
+1 + False
+[1,2,1]
+[1, True]
+[[1], [1]]
+[[1], [True]]
+{1}
+case (True) 1 otherwise 42
+case (1) 1 otherwise 2
+case (True) 1 otherwise False
+!(True)
+!(1 + 3)
+-(True)
+True && False
+(True && False) || 1
+1 == 1
+1 != 1
+a: Int = True
+
+```
+
+### optypecheck.ans:
+
+```
+Type error: Int and Bool are wrong operand types for `+`
+[1,2,1]
+Type error: "list is irregular"
+[[1],[1]]
+Type error: "list is irregular"
+1
+1
+Type error: "If: bool-cond not bool"
+Type error: "If: case mismatch"
+False
+Type error: Int is wrong operand type for unary `!`
+Type error: Bool is wrong operand type for unary `-`
+False
+Type error: Bool and Int are wrong operand types for `||`
+True
+False
+Type error: definition of Int, but assigned to Bool
+
+```
+
+### Testing pitch modifications: pitchmod.aps
+
+```
+C9 + 7
+C9 + 8
+A4 - 70
+{b where b: Pitch = -1}
+
+```
+
+### pitchmod.ans:
+
+```
+(127)
+(0)
+(127)
+(127)
+
+```
+
+### Testing operator precedence: precedence.aps
+
+```
+1 + 2
+-(1 + 1)
+4 - 3 + 1
+4 - (3 + 1)
+6 / 3 * 2
+6 / (3 * 2)
+16 / 3 + 5 * 2
+16 / (3 + 5) * 2
+16 / ((3 + 5) * 2)
+16 % 4 + 2
+
+```
+
+### precedence.ans:
+
+```
+3
+-2
+2
+0
+4
+1
+15
+4
+1
+2
+
+```
+
+### Testing prelude functions: prelude.ap
+
+```
+filterI(\x: Int -> Bool: x > 10, [5,10,50,100,150,200])
+foldrII(\x: Int, y: Int -> Int: x + y, 0, [1,2,3,4,5,6,7,8,9,10])
+sumI([1,2,3,4,5,6,7,8,9,10])
+mapIB(\x: Int -> Bool: x == 20, [1,20, 3,4,5, 20])
+sequence(1, 20)
+lengthI(sequence(0,10))
+lastI([1,2,3])
+intercalateI([1,3,5], [2,4,6])
+
+```
+
+### prelude.ans:
+
+```
+[50,100,150,200]
+55
+55
+[False,True,False,False,False,True]
+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+10
+3
+[1,2,3,4,5,6]
+
+```
+
+### Testing recursive functions: recursion.ap
+
+```
+fib: (n: Int) -> Int = case (n <= 1) n otherwise fib(n - 1) + fib(n - 2)
+fib(10)
+
+factorial: (n: Int) -> Int =
+    case (n == 0) 1 otherwise n * factorial(n - 1)
+factorial(6)
+
+```
+
+### recursion.ans:
+
+```
+55
+720
+
+```
+
+### Testing redefining variables: redefine.ap
+
+```
+a: Int = 3
+a: Int = 4
+
+```
+
+### redefine.ans:
+
+```
+Multiple declaration: redefining variable a
+
+```
+
+### Testing scoping: scope.ap
+
+```
+a: Int = 1
+f: (a: Int) -> Int = a
+f(2)
+
+b: Int = 1
+[{ b where b: Int = 10}, b]
+
+{ { a where a: Int = 1 } where a: Int = 2 }
+
+c: Int = 22
+{ c + d where d: Int = 20 }
+
+```
+
+### scope.ans:
+
+```
+2
+[10, 1]
+1
+42
+
+```
+
+### Testing scoping errors: scope_err.aps
+
+```
+{ 1 where a: Int = 2 } a
+{ 1 where a: Int = A4 }
+{ 1 where a: Int = 2 a: Int = 2}
+
+```
+
+### scope_err.ans:
+
+```
+Getting an unbound variable: a
+Type error: definition of Int, but assigned to Pitch
+Multiple declaration: redefining variable a
+
+```
+
+### Testing syntax AST: syntax.ap
+
+```
+case (!(False && True)) 3 + 1 otherwise 0
+
+```
+
+### syntax.ast:
+
+```
+[(If (Not (&& False True)) (+ 3 1) 0)]
+
+```
+
+### Testing type checking: typecheck.aps
+
+```
+a: Int = 1
+a: Int = True
+a: Int = A4
+a: Int = \4
+a: Int = (A4, \4)
+a: Int = [1]
+a: Int = [[(A4,\4)]]
+
+a: Bool = 1
+a: Bool = True
+a: Bool = A4
+a: Bool = \4
+a: Bool = (A4, \4)
+a: Bool = [1]
+a: Bool = [[(A4,\4)]]
+
+a: Pitch = 1
+a: Pitch = True
+a: Pitch = A4
+a: Pitch = \4
+a: Pitch = (A4, \4)
+a: Pitch = [1]
+a: Pitch = [[(A4,\4)]]
+
+
+a: Duration = True
+a: Duration = A4
+a: Duration = \4
+a: Duration = (A4, \4)
+a: Duration = [1]
+a: Duration = [[(A4,\4)]]
+
+a: Atom = 1
+a: Atom = True
+a: Atom = A4
+a: Atom = \4
+a: Atom = (A4, \4)
+a: Atom = [1]
+a: Atom = [[(A4,\4)]]
+
+a: Music = 1
+a: Music = True
+a: Music = A4
+a: Music = \4
+a: Music = (A4, \4)
+a: Music = [1]
+a: Music = [[(A4,\4)]]
+
+#tempo 1
+#tempo True
+#tempo A4
+#tempo \4
+#tempo (A4, \4)
+#tempo [1]
+#tempo [[(A4,\4)]]
+
+a: [Int] = 1
+a: [Int] = True
+a: [Int] = A4
+a: [Int] = \4
+a: [Int] = (A4, \4)
+a: [Int] = [1]
+a: [Int] = [[(A4,\4)]]
+
+```
+
+### typecheck.ans:
+
+```
+
+Type error: definition of Int, but assigned to Bool
+Type error: definition of Int, but assigned to Pitch
+Type error: definition of Int, but assigned to Duration
+Type error: definition of Int, but assigned to Atom
+Type error: definition of Int, but assigned to [Int]
+Type error: definition of Int, but assigned to [[Atom]]
+
+Type error: definition of Bool, but assigned to Int
+
+Type error: definition of Bool, but assigned to Pitch
+Type error: definition of Bool, but assigned to Duration
+Type error: definition of Bool, but assigned to Atom
+Type error: definition of Bool, but assigned to [Int]
+Type error: definition of Bool, but assigned to [[Atom]]
+
+
+Type error: definition of Pitch, but assigned to Bool
+
+Type error: definition of Pitch, but assigned to Duration
+Type error: definition of Pitch, but assigned to Atom
+Type error: definition of Pitch, but assigned to [Int]
+Type error: definition of Pitch, but assigned to [[Atom]]
+
+Type error: definition of Duration, but assigned to Int
+Type error: definition of Duration, but assigned to Bool
+Type error: definition of Duration, but assigned to Pitch
+
+Type error: definition of Duration, but assigned to Atom
+Type error: definition of Duration, but assigned to [Int]
+Type error: definition of Duration, but assigned to [[Atom]]
+
+Type error: definition of Atom, but assigned to Int
+Type error: definition of Atom, but assigned to Bool
+Type error: definition of Atom, but assigned to Pitch
+Type error: definition of Atom, but assigned to Duration
+
+Type error: definition of Atom, but assigned to [Int]
+Type error: definition of Atom, but assigned to [[Atom]]
+
+Type error: definition of Music, but assigned to Int
+Type error: definition of Music, but assigned to Bool
+Type error: definition of Music, but assigned to Pitch
+Type error: definition of Music, but assigned to Duration
+Type error: definition of Music, but assigned to Atom
+Type error: definition of Music, but assigned to [Int]
+
+
+
+Type error: definition of Int, but assigned to Bool
+Type error: definition of Int, but assigned to Pitch
+Type error: definition of Int, but assigned to Duration
+Type error: definition of Int, but assigned to Atom
+Type error: definition of Int, but assigned to [Int]
+Type error: definition of Int, but assigned to [[Atom]]
+
+Type error: definition of [Int], but assigned to Int
+Type error: definition of [Int], but assigned to Bool
+Type error: definition of [Int], but assigned to Pitch
+Type error: definition of [Int], but assigned to Duration
+Type error: definition of [Int], but assigned to Atom
+
+Type error: definition of [Int], but assigned to [[Atom]]
+```
+
+### Testing type checking in functions: typecheckfunc.aps
+
+```
+f: (n: Int) -> Int = { a where a: Pitch = A4 }
+f: (n: Pitch) -> Int = { a where a: Int = 4 } f(4)
+f: (n: Int) -> Int = { a where a: Int = True }
+
+```
+
+### typecheckfunc.ans:
+
+```
+Type error: `f` defined with return-type of Int, but actual return-type is (Int) -> Int
+Type error: for `f` expected aguments of type (Pitch); received (Int)
+Type error: definition of Int, but assigned to Bool
+```
+
+### Testing cc variables: unbound.ap
+
+```
+a: Int = 1
+a
+b
+
+```
+
+### unbound.ans:
+
+```
+Getting an unbound variable: b
+
+```
+
+### Testing unary operations: unop.aps
+
+```
+-2
+!False
+h@[1,2,3]
+t@[1,2,3]
+
+```
+
+### unop.ast:
+
+```
+-2
+True
+1
+[2,3]
+
+```
+
+### Testing variable manipulation: vars.ap
+
+```
+a: Int = 1
+a
+a + 3
+b: Bool = False
+b
+b || True
+b && True
+c: Int = a + 5
+c
+[a, c - 4]
+
+```
+
+### vars.ast:
+
+```
+1
+4
+False
+True
+False
+6
+[1,2]
+
+```
 \pagebreak
 
-Appendix B: Git log summary
+Appendix C: Git log summary
 ===========================
 
 ```
