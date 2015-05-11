@@ -1,59 +1,89 @@
-Program     : Definitions
+Program     : ""
+            | Statements
+
+Statements  : Statement
+            | Statement Statements
+
+Statement   : Definition
+            | Expression
 
 Definitions : Definition
             | Definition Definitions
 
-Definition  : Declaration '=' Expression
+Definition  : ID ':' Type '=' Expression
+            | ID ':' '(' Params ')' '->' Type '=' Expression
+            | TEMPO Expression
 
-Declaration : ID ':' Type
+Type        : TYPE
+            | '[' Type ']'
 
-Type        : INT
-            | BOOL 
-            | PITCH
-            | DURATION
-            | ATOM
-            | MUSIC
-            | FnType
+Param       : ID ':' Type
+            | ID ':' '(' AnonParams ')' '->' Type
 
-FnType      : '(' Params ')' '->' Type
+Params      : Param
+            | Param ',' Params
 
-Params      : Declaration
-            | Declaration ',' Params
+AnonParam   : Type
 
-Expression  : Atom
-            | Block
+AnonParams  : AnonParam
+            | AnonParam ',' AnonParams
+
+Expressions : Expression
+            | Expression ',' Expressions
+
+Expression  : Primitive
+            | Derived
+            | Lambda
+            | FnCall
             | Conditional
+            | Block
             | UnOp
             | BinOp
             | '(' Expression ')'
+            | ID
+            | Macro
 
-Atom        : NUM
+Primitive   : NUM
             | BOOL
-            | NOTE '(' Expression Expression ')'
-            | CHORD '(' Expression Expression ')'
-            | RHYTHM '(' Expression ')'
-            | PART '(' Expression ')'
-            | MUSIC '(' Expression ')'
+            | PITCH
+            | DUR
+            | '_'
 
-UnOp        : '-' Expression
+Derived     : '(' Expression ',' Expression ')'
+            | '(' '_' ',' Expression ')'
+            | '[' Expressions ']'
+            | '[' ']'
+
+Lambda      : '\\' Params '->' Type ':' Expression
+
+FnCall      :  ID '(' Expressions ')'
+            | '(' Lambda ')' '(' Expressions ')'
+
+Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
+            | CASE '(' Expression ')' Expression Conditional
+
+UnOp        : '-' Expression  %prec NEG
             | '!' Expression
+            | 'h@' Expression
+            | 't@' Expression
 
-BinOp       : Expression '+' Expression
-            | Expression '-' Expression
-            | Expression '*' Expression
-            | Expression '/' Expression
-            | Expression '%' Expression
+BinOp       : Expression '+'  Expression
+            | Expression '-'  Expression
+            | Expression '*'  Expression
+            | Expression '/'  Expression
+            | Expression '%'  Expression
             | Expression '==' Expression
             | Expression '!=' Expression
-            | Expression '<' Expression
-            | Expression '>' Expression
+            | Expression '<'  Expression
+            | Expression '>'  Expression
             | Expression '<=' Expression
             | Expression '>=' Expression
             | Expression '&&' Expression
             | Expression '||' Expression
+            | Expression '::' Expression
+
+Macro       : NUM '?' NUM
 
 Block       : '{' Expression '}'
-            | '{' Definitions Expression '}'
+            | '{' Expression WHERE Definitions '}'
 
-Conditional : CASE '(' Expression ')' Expression OTHERWISE Expression
-            | CASE '(' Expression ')' Expression Conditional
