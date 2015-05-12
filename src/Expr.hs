@@ -54,33 +54,7 @@ data Expr = VInt Int                      -- An integer
           | ArrOp AOpr Expr Expr          -- Infix List op
           | Empty                         -- Value of definitions
           | Nil                           -- Value of '_' token
-          deriving (Eq, Ord)
-
-instance Show Expr where
-  show (VInt  i)      = show i
-  show (VBool b)      = show b
-  show (VDuration d)  = "(" ++ show d ++ ")"
-  show (VPitch p)     = "(" ++ show p ++ ")"
-  show (VAtom p d)    = "(Atom " ++ show p ++ " " ++ show d ++ ")"
-  show (VMusic m)     = "(Music " ++ strDelim " " show m ++ ")"
-  show (VList es)     = "(List" ++ (strDelim " " id . map show) es  ++ ")"
-  show (Name n)       = n
-  show (Def i _ e)    = "(Def " ++ i ++ " " ++ show e ++ ")"
-  show (VLam is e)    = "(Lambda " ++ strDelim " " id is ++ " . " ++ show e ++ ")"
-  show (Block es e)   = "(Block " ++ (strDelim " " id . map show) es ++ " " ++ show e ++ ")"
-  show (VTLam _ _ i e)= "(Lambda " ++ strDelim " " id i ++ " . " ++ show e ++ ")"
-  show (If e1 e2 e3)  = "(If " ++ show e1 ++ " " ++ show e2 ++ " " ++ show e3 ++ ")"
-  show (FnCall e1 e2) = "(" ++ show e1 ++ " " ++ strDelim " " show e2 ++ ")"
-  show (Neg e)        = "(Neg " ++ show e ++ ")"
-  show (Not e)        = "(Not " ++ show e ++ ")"
-  show (Head e)       = "(Head " ++ show e ++ ")"
-  show (Tail e)       = "(Tail " ++ show e ++ ")"
-  show (IntOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-  show (BoolOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-  show (CompOp o a b) = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-  show (ArrOp o a b)  = "(" ++ show o ++ " " ++ show a ++ " " ++ show b ++ ")"
-  show Nil            = "Nil"
-  show _              = "<?>"
+          deriving (Eq, Ord, Show)
 
 -- showPP is used for pretty-printing values after evaluation,
 -- whereas the derived Show for Expr is used to print the AST
