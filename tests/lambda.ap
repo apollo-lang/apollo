@@ -4,3 +4,6 @@ mapII(\x: Int -> Int: x * x, [1,2,3,4,5])
 -- | free & bound vars
 y: Int = 3
 mapII(\x: Int -> Int: x * y, [1,2,3,4,5])
+
+-- | lambda call
+(\x: Int, y: Int -> Int: x * y)(2,3)

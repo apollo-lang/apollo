@@ -172,24 +172,11 @@ typecheck env expr = case expr of
         names = map (\(Def name _ _) -> name) body
 
   FnCall (Name name) args -> do
-    (TFunc tps tr) <- getVar env name
-    if length tps /= length args
-    then throwError (TypeArgCount name (length tps) (length args))
-    else do
-      ta <- mapM (check env) (zip tps args)
-      if ta == tps
-      then return tr
-      else throwError (TypeArgMismatch name tps ta)
-   where
-     check _ (param, arg) = if isTFunc param && isName arg
-                            then getVar env (getName arg)
-                            else typecheck env arg
-     isTFunc TFunc{}  = True
-     isTFunc _        = False
-     isName Name{}    = True
-     isName _         = False
-     getName (Name a) = a
-     getName _        = ""
+    TFunc tps tr <- getVar env name
+    checkFn env (name, tps, tr) args
+
+  FnCall (VTLam tps tr _ _) args ->
+    checkFn env ("<lambda>", tps, tr) args
 
   -- To enable recursive functions, env-bindings must be made before
   -- typchecking, then updated with the result. (below)
@@ -240,4 +227,24 @@ pitchOrInt = foldr (\x -> (&&) (x == TPitch || x == TInt)) True
 
 durOrInt :: [Type] -> Bool
 durOrInt = foldr (\ x -> (&&) (x == TDuration || x == TInt)) True
+
+checkFn :: Env Type -> (Id, [Type], Type) -> [Expr] -> IOThrowsError Type
+checkFn env (name, tps, tr) args =
+  if length tps /= length args
+  then throwError (TypeArgCount name (length tps) (length args))
+  else do
+    ta <- mapM (check env) (zip tps args)
+    if ta == tps
+    then return tr
+    else throwError (TypeArgMismatch name tps ta)
+      where
+        check _ (param, arg) = if isTFunc param && isName arg
+                                  then getVar env (getName arg)
+                                  else typecheck env arg
+        isTFunc TFunc{}  = True
+        isTFunc _        = False
+        isName Name{}    = True
+        isName _         = False
+        getName (Name a) = a
+        getName _        = ""
 
