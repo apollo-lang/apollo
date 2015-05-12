@@ -1,3 +1,4 @@
 f: (n: Int) -> Int = { a where a: Pitch = A4 }
 f: (n: Pitch) -> Int = { a where a: Int = 4 } f(4)
 f: (n: Int) -> Int = { a where a: Int = True }
+(\x: [Int] -> Int: h@x)(1)
