@@ -29,6 +29,8 @@ prelude = unlines
 
   , "  concatP: (x1: [Pitch], x2: [Pitch]) -> [Pitch] = case (!x1) x2 otherwise (h@x1 :: concatP(t@x1, x2))"
 
+  , "  concatD: (x1: [Duration], x2: [Duration]) -> [Duration] = case (!x1) x2 otherwise (h@x1 :: concatD(t@x1, x2))"
+
   , "  concatA: (x1: [Atom], x2: [Atom]) -> [Atom] = case (!x1) x2 otherwise (h@x1 :: concatA(t@x1, x2))"
 
   , "  filterI: (f: (Int) -> Bool, a: [Int]) -> [Int] = case (!a) [] otherwise { case (f(h@a)) h@a :: filterI(f, t@a) otherwise filterI(f, t@a) }"
