@@ -17,6 +17,8 @@ prelude = unlines
 
   , "  mapIB: (f: (Int) -> Bool, a: [Int]) -> [Bool] = case (!a) [] otherwise f(h@a) :: mapIB(f, t@a)"
 
+  , "  mapPL: (f: ([Pitch]) -> [Pitch], a: [[Pitch]]) -> [[Pitch]] = case (!a) [] otherwise f(h@a) :: mapPL(f, t@a)"
+
   , "  lengthI: (xs: [Int]) -> Int = case(xs == []) 0 otherwise 1 + lengthI(t@xs)"
 
   , "  lengthB: (xs: [Bool]) -> Int = case(xs == []) 0 otherwise 1 + lengthB(t@xs)"
@@ -60,5 +62,7 @@ prelude = unlines
   , "  intercalateP: (a: [Pitch], b: [Pitch]) -> [Pitch] = case (!a || !b) [] otherwise concatP([h@a, h@b], intercalateP(t@a, t@b))"
 
   , "  concatMapI: (xs: [Int], f: (Int) -> Int, c: Int) -> [Int] = case (c <= 0) xs otherwise concatI(xs, concatMapI(mapII(f, xs), f, c-1))"
+
+  , "  flattenP: (p: [[Pitch]]) -> [Pitch] = case (!p) [] otherwise concatP(h@p, flattenP(t@p))"
 
   ]
