@@ -1,8 +1,9 @@
-#tempo 160
+#tempo 200
 
 scale1: [Int] = mapII(\x: Int -> Int: x + 90, [0, 2, 4, 5, 7, 9, 11])
 
 key: Int = lastI(scale1) + 1
+
 top: [Int] = replicateI([key], lengthI(scale1))
 
 melody1: [Int] = intercalateI(top, reverseI(scale1))
@@ -10,6 +11,7 @@ melody1: [Int] = intercalateI(top, reverseI(scale1))
 melody: [Pitch] = concatMapI(melody1, \x: Int -> Int: x - 5, 10)
 
 rhythm: [Duration] = uniform(\8, lengthP(melody))
+
 part: [Atom] = zip(melody, rhythm)
 
 main: Music = [part]

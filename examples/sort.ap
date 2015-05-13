@@ -1,0 +1,32 @@
+#tempo 180
+
+concat: (a: [Int], b: [Int]) -> [Int] = 
+    case (!a)
+        b
+    otherwise
+        h@a :: concat(t@a, b)
+
+filter: (f: (Int) -> Bool, a: [Int]) -> [Int] = 
+    case (!a)
+        []
+    case (f(h@a))
+        h@a :: filter(f, t@a) 
+    otherwise
+        filter(f, t@a)
+
+sort: (a: [Int]) -> [Int] = 
+    case (!a) 
+        []
+    otherwise {
+        concat(concat(sort(smaller), [pivot]),sort(larger))
+        where
+            pivot: Int = h@a
+            smaller: [Int] = filter(\x: Int -> Bool: x <= pivot, t@a)
+            larger: [Int] = filter(\x: Int -> Bool: x > pivot, t@a)
+    }
+
+main: Music = {
+    [zip(replicateP(pitches, 20), uniform(\16, 120))]
+    where
+        pitches: [Pitch] = sort([81,67,90,23,78,49])
+}
