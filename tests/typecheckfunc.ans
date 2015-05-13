@@ -1,3 +1,4 @@
 Type error: `f` defined with return-type of Int, but actual return-type is (Int) -> Int
 Type error: for `f` expected aguments of type (Pitch); received (Int)
 Type error: definition of Int, but assigned to Bool
+Type error: for `<lambda>` expected aguments of type ([Int]); received (Int)
