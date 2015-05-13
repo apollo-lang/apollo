@@ -1,4 +1,4 @@
-% Apollo Language Reference Manual
+% Apollo Language Final Report
 % **Team 8**
   **System Architect:** Benjamin Matthew Kogan (bmk2130)
   **Language & Tools Guru:** Javier Llaca (jl3960)
