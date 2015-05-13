@@ -1,0 +1,14 @@
+collatz: (n: Int) -> [Int] = 
+    case (n == 1)
+        [1]
+    case (n % 2 == 0)
+        n :: collatz(n / 2)
+    otherwise 
+        n :: collatz(3 * n + 1)
+
+main: Music = {
+    [zip(seq, uniform(\16, len))]
+    where
+        seq: [Pitch] = collatz(1000)
+        len: Int = lengthP(seq)
+}

@@ -1,0 +1,59 @@
+#tempo 120
+
+mapPL: (f: ([Pitch]) -> [Pitch], a: [[Pitch]]) -> [[Pitch]] = 
+    case (!a) 
+        []
+    otherwise
+        f(h@a) :: mapPL(f, t@a)
+
+figurate: (p: [Pitch]) -> [Pitch] = {
+    concatP(figuration, figuration)
+    where
+        figuration: [Pitch] = concatP(p, t@t@p)
+}
+
+flattenP: (p: [[Pitch]]) -> [Pitch] =
+    case (!p)
+        []
+    otherwise
+        concatP(h@p, flattenP(t@p))
+
+chords: [[Pitch]] = [
+    [C4, E4, G4, C5, E5],
+    [C4, D4, A4, D5, F5],
+    [B3, D4, G4, D5, F5],
+    [C4, E4, G4, C5, E5],
+    [C4, E4, A4, E5, A5],
+    [C4, D4, F#4, A4, D5],
+    [B3, D4, G4, D5, G5],
+    [B3, C4, E4, G4, C5],
+    [A3, C4, E4, G4, C5],
+    [D3, A3, D4, F#4, C5],
+    [G3, B3, D4, G4, B4],
+    [G3, Bb3, E4, G4, C#5],
+    [F3, A3, D4, A4, D5],
+    [F3, Ab3, D4, F4, B4],
+    [E3, G3, C4, G4, C5],
+    [E3, F3, A3, C4, F4],
+    [D3, F3, A3, C4, F4],
+    [G2, D3, G3, B3, F4],
+    [C3, E3, G3, C4, E4],
+    [F2, F3, A3, C4, E4],
+    [F#2, C3, A3, C4, Eb4],
+    [Ab2, F3, B3, C4, D4],
+    [G2, F3, G3, B3, D4],
+    [G2, E3, G3, C4, E4],
+    [G2, D3, G3, C4, F4],
+    [G2, D3, G3, B3, F4],
+    [G2, Eb3, A3, C4, F#4],
+    [G2, E3, G3, C4, G4],
+    [G2, D3, G3, C4, F4],
+    [G2, D3, G3, B3, F4],
+    [C2, C3, G3, Bb3, E4]]
+    
+main: Music = {
+    [zip(seq, uniform(\16, len))]
+    where 
+        seq: [Pitch] = flattenP(mapPL(figurate, chords))
+        len: Int = lengthP(seq)
+}
