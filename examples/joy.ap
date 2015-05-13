@@ -1,0 +1,15 @@
+#tempo 160
+
+phraseA: [Pitch] = mapII(
+    \x: Int -> Int: x + 60,
+    [4, 4, 5, 7, 7, 5, 4, 2, 0, 0, 2, 4, 4, 2, 2])
+
+phraseB: [Pitch] = mapII(
+    \x: Int -> Int: x + 60,
+    [4, 4, 5, 7, 7, 5, 4, 2, 0, 0, 2, 4, 2, 0, 0])
+
+rhythm: [Duration] = concatD(uniform(\4, 4 * 3), [\4., \8, \2])
+
+main: Music = [concatA(
+    zip(phraseA, rhythm), 
+    zip(phraseB, rhythm))]
