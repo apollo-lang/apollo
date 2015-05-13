@@ -1,22 +1,10 @@
-#tempo 120
-
-mapPL: (f: ([Pitch]) -> [Pitch], a: [[Pitch]]) -> [[Pitch]] = 
-    case (!a) 
-        []
-    otherwise
-        f(h@a) :: mapPL(f, t@a)
+#tempo 76
 
 figurate: (p: [Pitch]) -> [Pitch] = {
     concatP(figuration, figuration)
     where
         figuration: [Pitch] = concatP(p, t@t@p)
 }
-
-flattenP: (p: [[Pitch]]) -> [Pitch] =
-    case (!p)
-        []
-    otherwise
-        concatP(h@p, flattenP(t@p))
 
 chords: [[Pitch]] = [
     [C4, E4, G4, C5, E5],
@@ -38,6 +26,7 @@ chords: [[Pitch]] = [
     [D3, F3, A3, C4, F4],
     [G2, D3, G3, B3, F4],
     [C3, E3, G3, C4, E4],
+    [C3, G3, Bb3, C4, E4],
     [F2, F3, A3, C4, E4],
     [F#2, C3, A3, C4, Eb4],
     [Ab2, F3, B3, C4, D4],
@@ -50,10 +39,25 @@ chords: [[Pitch]] = [
     [G2, D3, G3, C4, F4],
     [G2, D3, G3, B3, F4],
     [C2, C3, G3, Bb3, E4]]
+
+flourishP: [Pitch] = [
+    C2, C3, F3, A3, C4, F4, C4, A3, C4, A3, F3, A3, F3, D3, F3, D3, 
+    C2, B2, G4, B4, D5, F5, D5, B4, D5, B4, G4, B4, D4, F4, E4, D4]
+
+chord: Atom = ([C2, C3, E4, G4, C5], \1)
     
 main: Music = {
-    [zip(seq, uniform(\16, len))]
-    where 
-        seq: [Pitch] = flattenP(mapPL(figurate, chords))
-        len: Int = lengthP(seq)
+    [concatA(concatA(progression, flourish), [chord])]
+    where
+        progression: [Atom] = {
+            zip(seq, uniform(\16, len))
+            where 
+                seq: [Pitch] = flattenP(mapPL(figurate, chords))
+                len: Int = lengthP(seq)
+        }
+        flourish: [Atom] = {
+            zip(flourishP, uniform(\16, len))
+            where
+                len: Int = lengthP(flourishP)
+        }
 }
