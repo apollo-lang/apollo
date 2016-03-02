@@ -29,7 +29,7 @@ To see the path where apollo is installed, use the following command
 stack path --local-bin-path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[Stack][]: http://docs.haskellstack.org/en/stable/install_and_upgrade/
+[Stack]: http://docs.haskellstack.org/en/stable/install_and_upgrade/
 
 Usage
 -----
