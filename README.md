@@ -14,16 +14,22 @@ Contributors:
 Getting Started
 ---------------
 
-Apollo requires [Haskell Platform][]. Once you have that installed, the
-following series of commands will install all necessary dependencies and then build and install the compiler:
+Apollo requires [Stack][]. Once you have that installed, the following series
+of commands will install all necessary dependencies and then build the
+and install the compiler:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ make config
-$ cabal install happy alex
-$ make install
+make
+make install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[haskell platform]: https://www.haskell.org/platform
+To see the path where apollo is installed, use the following command
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+stack path --local-bin-path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Stack][]: http://docs.haskellstack.org/en/stable/install_and_upgrade/
 
 Usage
 -----
