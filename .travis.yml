@@ -1,56 +1,29 @@
 # Adapted from:
-# http://docs.haskellstack.org/en/stable/travis_ci/
-# ~~~~~~~~~~
+#   github: haskell-distributed/cloud-haskell
+#   file: .travis.yml
+#   at: f48a5f6cbb9064d6da346960f9f01779e01be7e7
 
-# Use new container infrastructure to enable caching
+language: c
 sudo: false
 
-# Choose a lightweight base image; we provide our own build tools.
-language: c
-
-# Caching so the next build will be fast too.
 cache:
   directories:
-  - $HOME/.ghc
-  - $HOME/.cabal
   - $HOME/.stack
 
+matrix:
+  include:
+    - env: CABALVER=1.22 GHCVER=7.10.3
+      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.3],sources: [hvr-ghc]}}
+
 before_install:
-# Using compiler above sets CC to an invalid value, so unset it
-- unset CC
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar -xzO --wildcards '*/stack' > ~/.local/bin/stack
+  - chmod a+x ~/.local/bin/stack
 
-# We want to always allow newer versions of packages when building on GHC HEAD
-- CABALARGS=""
-- if [ "x$GHCVER" = "xhead" ]; then CABALARGS=--allow-newer; fi
+install:
+  - stack -j 2 setup --no-terminal
+  - stack -j 2 build --only-snapshot --no-terminal
 
-# Download and unpack the stack executable
-- export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$HOME/.local/bin:$PATH
-- mkdir -p ~/.local/bin
-- |
-  if [ `uname` = "Darwin" ]
-  then
-    curl --insecure -L https://www.stackage.org/stack/osx-x86_64 | tar xz --strip-components=1 --include '*/stack' -C ~/.local/bin
-  else
-    curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-  fi
-
-## TODO uncomment the below if deemed necessary
-#
-## install:
-## - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
-## - if [ -f configure.ac ]; then autoreconf -i; fi
-## - |
-##   case "$BUILD" in
-##     stack)
-##       stack --no-terminal --install-ghc $ARGS test --only-dependencies
-##       ;;
-##     cabal)
-##       cabal --version
-##       travis_retry cabal update
-##       cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS
-##       ;;
-##   esac
-
-install: make
 script: make test
 
