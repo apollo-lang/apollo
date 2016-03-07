@@ -8,12 +8,7 @@ sudo: false
 
 cache:
   directories:
-  - $HOME/.stack
-
-matrix:
-  include:
-    - env: CABALVER=1.22 GHCVER=7.10.3
-      addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.3],sources: [hvr-ghc]}}
+    - $HOME/.stack
 
 before_install:
   - mkdir -p ~/.local/bin
@@ -21,9 +16,6 @@ before_install:
   - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar -xzO --wildcards '*/stack' > ~/.local/bin/stack
   - chmod a+x ~/.local/bin/stack
 
-install:
-  - stack -j 2 setup --no-terminal
-  - stack -j 2 build --only-snapshot --no-terminal
-
+install: make
 script: make test
 
