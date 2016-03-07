@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-os=$(uname -s)
 indent="  "
 quiet=0
 exit_status=0
 compile_error=0
+
+os=$(uname -s)
+exe="$(stack path --local-install-root)/bin/apollo"
 
 # Several functions to print strings with colors
 green() {
@@ -44,7 +46,7 @@ evaluate() {
   # Stop execution exceeding 10 seconds to prevent infinite loops
   ulimit -t 10
 
-  ../apollo $2 < "$1" 2> /dev/null
+  eval $exe $2 < "$1" 2> /dev/null
 
   # if Apollo exits with 1 something severe happened!
   if test $? -eq 1; then
@@ -57,7 +59,7 @@ evalAPS() {
   # Stop execution exceeding 10 seconds to prevent infinite loops
   ulimit -t 10
 
-  echo "$1" | ../apollo - $2 2> /dev/null
+  echo "$1" | eval $exe - $2 2> /dev/null
 
   if test $? -eq 1; then
     echo "<compilation error>"
