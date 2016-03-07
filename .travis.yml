@@ -1,8 +1,3 @@
-# Adapted from:
-#   github: haskell-distributed/cloud-haskell
-#   file: .travis.yml
-#   at: f48a5f6cbb9064d6da346960f9f01779e01be7e7
-
 language: c
 sudo: false
 
@@ -19,6 +14,7 @@ before_install:
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
   - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar -xzO --wildcards '*/stack' > ~/.local/bin/stack
+  - chmod a+x ~/.local/bin/stack
 
 install: make
 script: make test
