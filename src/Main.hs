@@ -12,6 +12,7 @@ import Control.Monad.Error (throwError, liftIO, runErrorT)
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout, isEOF)
 import Data.IORef (readIORef)
+import Version
 import Parse
 import Check
 import Error
@@ -29,6 +30,7 @@ main = getArgs >>= \args ->
          ["--ast"]  -> putAst
          ["--repl"] -> runRepl
          ["--help"] -> usage
+         ["--version"] -> putStrLn version
          ["-h"]     -> usage
          ["-"]      -> getContents >>= interpret "main.mid"
          [fname]    -> readFile fname >>= interpret "main.mid"
@@ -160,14 +162,11 @@ usage = do
 
 replUsage :: IO ()
 replUsage = do
-  putStrLn $ "Apollo repl, version " ++ showVersion ++ ": https://github.com/apollo-lang/apollo"
+  putStrLn $ "Apollo repl, version " ++ version ++ ": https://github.com/apollo-lang/apollo"
   putStrLn   ""
   putStrLn   "Commands:"
   putStrLn   "  :browse            See all current bindings and their types"
   putStrLn   "  :export <name>     Export a name of type Music to `_repl.mid`"
   putStrLn   "  :quit              Exit the repl"
   putStrLn   ""
-    where
-      showVersion = init (concatMap ((++ ".") . show) version)
-      version = [0,0,1,0] :: [Int]
 
