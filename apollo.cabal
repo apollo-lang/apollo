@@ -24,6 +24,7 @@ executable apollo
                      , Error
                      , Eval
                      , Expr
+                     , Lib
                      , Lex
                      , Parse
                      , Util
