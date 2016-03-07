@@ -1,16 +1,13 @@
-.PHONY: all
-all: build
+.PHONY: build
+build:
+	stack --jobs 2 setup
+	stack --jobs 2 build
 
-# TODO uninstall command
 .PHONY: install
 install:
 	stack install
 
 .PHONY: test
-test: $(EXE)
+test:
 	@./tests/run.sh
-
-build:
-	stack setup
-	stack build
 
