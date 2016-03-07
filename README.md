@@ -5,7 +5,7 @@ A programming language for algorithmic and musical composition.
 
 Contributors:
 
- * [Benjamin Matthew Kogan](https://github.com/benkogan)
+ * [Ben Kogan](https://github.com/benkogan)
  * [Javier Llaca](https://github.com/javierllaca)
  * [Reza Nayebi](https://github.com/rezanayebi)
  * [Roberto Jose De Amorim](https://github.com/rjamorim)
@@ -34,5 +34,5 @@ stack path --local-bin-path
 Usage
 -----
 
-Use the `--help` flag to see all options.
+Use the `apollo --help` command to see all options.
 
