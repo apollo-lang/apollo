@@ -1,5 +1,5 @@
 name:                apollo
-version:             0.0.1.0
+version:             0.0.3.0
 category:            Language
 build-type:          Simple
 extra-source-files:  README.md
@@ -24,17 +24,20 @@ executable apollo
                      , Error
                      , Eval
                      , Expr
+                     , Lib
                      , Lex
                      , Parse
+                     , Paths_apollo
                      , Util
                      , Midi
                      , Type
+                     , Version
 
-  build-depends:       base           >=4.6  && <4.8
+  build-depends:       base           >=4.6  && <4.9
                      , regex-posix    >=0.95 && <0.96
-                     , mtl            >=2.1  && <2.2
+                     , mtl            >=2.1  && <2.3
                      , array          >=0.5  && <0.6
-                     , transformers   >=0.3  && <0.4
+                     , transformers   >=0.3  && <0.5
                      , containers     >=0.5  && <0.6
                      , HCodecs        >=0.5  && <0.6
                      , random         >=1.0  && <1.2

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-os=$(uname -s)
 indent="  "
 quiet=0
 exit_status=0
 compile_error=0
+
+os=$(uname -s)
+exe="$(stack path --local-install-root)/bin/apollo"
 
 # Several functions to print strings with colors
 green() {
@@ -13,6 +15,10 @@ green() {
 
 yellow() {
   printf "${indent}\033[0;33m%s\033[0m %s\n" "$1" "$2"
+}
+
+blue() {
+  printf "${indent}\033[0;34m%s\033[0m %s\n" "$1" "$2"
 }
 
 red() {
@@ -44,7 +50,7 @@ evaluate() {
   # Stop execution exceeding 10 seconds to prevent infinite loops
   ulimit -t 10
 
-  ../apollo $2 < "$1" 2> /dev/null
+  eval $exe $2 < "$1" 2> /dev/null
 
   # if Apollo exits with 1 something severe happened!
   if test $? -eq 1; then
@@ -57,7 +63,7 @@ evalAPS() {
   # Stop execution exceeding 10 seconds to prevent infinite loops
   ulimit -t 10
 
-  echo "$1" | ../apollo - $2 2> /dev/null
+  echo "$1" | eval $exe - $2 2> /dev/null
 
   if test $? -eq 1; then
     echo "<compilation error>"
@@ -229,6 +235,15 @@ main() {
   change_dir_if_necessary
   run_tests
 }
+
+# Sanity check
+if test -e "$exe"
+then
+  blue "running tests using executable:" "${exe}"
+else
+  red "test error" "executable not found"
+  exit 1
+fi
 
 main $@
 exit $exit_status

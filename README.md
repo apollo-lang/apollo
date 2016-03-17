@@ -5,7 +5,7 @@ A programming language for algorithmic and musical composition.
 
 Contributors:
 
- * [Benjamin Matthew Kogan](https://github.com/benkogan)
+ * [Ben Kogan](https://github.com/benkogan)
  * [Javier Llaca](https://github.com/javierllaca)
  * [Reza Nayebi](https://github.com/rezanayebi)
  * [Roberto Jose De Amorim](https://github.com/rjamorim)
@@ -14,19 +14,25 @@ Contributors:
 Getting Started
 ---------------
 
-Apollo requires [Haskell Platform][]. Once you have that installed, the
-following series of commands will install all necessary dependencies and then build and install the compiler:
+Apollo requires [Stack][]. Once you have that installed, the following series
+of commands will install all necessary dependencies and then build the
+and install the compiler:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$ make config
-$ cabal install happy alex
-$ make install
+make
+make install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-[haskell platform]: https://www.haskell.org/platform
+To see the path where apollo is installed, use the following command
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+stack path --local-bin-path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+[Stack]: http://docs.haskellstack.org/en/stable/install_and_upgrade/
 
 Usage
 -----
 
-Use the `--help` flag to see all options.
+Use the `apollo --help` command to see all options.
 

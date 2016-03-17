@@ -1,0 +1,15 @@
+# For more information on stack configuration, see:
+# http://docs.haskellstack.org/en/stable/yaml_configuration/
+
+resolver: 'lts-5.5'
+packages: ['.']
+extra-deps: []
+flags: {}
+extra-package-dbs: []
+system-ghc: false
+require-stack-version: '>= 1.0.0'
+compiler-check: 'newer-minor'
+
+# TODO consider removing this override
+local-bin-path: /usr/local/bin
+

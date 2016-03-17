@@ -1,30 +1,13 @@
-EXE     := apollo
-BUILD   := ./dist/build/$(EXE)
-SOURCES := $(wildcard src/*)
-PREFIX  ?= /usr/local
-
-
-.PHONY: all
-all: $(EXE)
-
-.PHONY: config
-config:
-	cabal sandbox init
-	cabal install --only-dependencies
+.PHONY: build
+build:
+	stack --jobs 2 setup
+	stack --jobs 2 build
 
 .PHONY: install
-install: $(EXE)
-	cp $(BUILD)/$(EXE) $(PREFIX)/bin/$(EXE)
-
-.PHONY: uninstall
-uninstall:
-	rm -f $(PREFIX)/bin/$(EXE)
+install:
+	stack install
 
 .PHONY: test
-test: $(EXE)
+test:
 	@./tests/run.sh
-
-$(EXE): $(SOURCES)
-	cabal build
-	ln -s -f $(BUILD)/$(EXE) ./$(EXE)
 
